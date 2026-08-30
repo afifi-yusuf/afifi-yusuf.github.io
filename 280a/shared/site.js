@@ -76,8 +76,13 @@
     }
     if (toggle) toggle.addEventListener('click', function () { playing = !playing; applyState(); });
 
+    // Fall back on a real error, or if nothing has arrived at all after a while
+    // (a slow connection that is still downloading keeps the video).
     video.addEventListener('error', useFallback);
-    var guard = setTimeout(function () { if (playing && video.readyState < 2) useFallback(); }, 5000);
+    var guard = setTimeout(function () {
+      var stalled = video.readyState === 0 && video.networkState !== 2; // 2 = NETWORK_LOADING
+      if (playing && stalled) useFallback();
+    }, 8000);
     video.addEventListener('playing', function () { clearTimeout(guard); }, { once: true });
     if (reduceMotion) video.removeAttribute('autoplay');
     applyState();
