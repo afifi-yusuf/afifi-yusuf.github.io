@@ -1,8 +1,13 @@
 /* ------------------------------------------------------------------
-   CS 180 / 280A · Project 0
-   Visual system: the zoom ring. Condensed numerals like the focal-length
-   engravings on a lens barrel; indigo carries the identity, a late-
-   afternoon amber is the index mark. White paper so it prints.
+   CS 180 / 280A · shared design system (Yusuf Afifi, Fall 2026)
+
+   The zoom ring. Condensed numerals like the engravings on a lens barrel,
+   ruler ticks, an amber index mark. Indigo carries the identity; white paper
+   so every page prints for Gradescope.
+
+   Components: .masthead .hero .barrel .part .part-head .param .pair .shot
+   .part-body .prose .formula .wipe .part-bleed .stage .strip .entries .colophon
+   Behaviour lives in site.js (wipe comparators, video-synced rings).
    ------------------------------------------------------------------ */
 
 @property --at {
@@ -343,7 +348,7 @@ a:hover {
   margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 
-.focal {
+.param {
   margin: 0;
   font-family: var(--display);
   font-stretch: 55%;
@@ -356,7 +361,7 @@ a:hover {
   font-variant-numeric: tabular-nums;
 }
 
-.focal i {
+.param i {
   font-style: normal;
   font-stretch: 75%;
   font-weight: 600;
@@ -366,7 +371,7 @@ a:hover {
   color: var(--amber-ink);
 }
 
-.focal small {
+.param small {
   margin-left: 0.3em;
   font-size: 0.26em;
   font-stretch: 90%;
@@ -598,10 +603,10 @@ var {
   color: var(--ink-2);
 }
 
-/* ---- dolly stage: full bleed indigo ------------------------------ */
+/* ---- stage: full bleed indigo for animations -------------------- */
 
-/* the dolly section bleeds its stage edge to edge without viewport units */
-.part-dolly {
+/* a section whose .stage bleeds edge to edge (no viewport units) */
+.part-bleed {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(1.5rem, 1fr) var(--page) minmax(1.5rem, 1fr);
@@ -609,11 +614,15 @@ var {
   border-top: 0;
 }
 
-.part-dolly > * {
+.part + .part-bleed {
+  border-top: 0;
+}
+
+.part-bleed > * {
   grid-column: 2;
 }
 
-.part-dolly > .part-head {
+.part-bleed > .part-head {
   padding-top: clamp(3.5rem, 7vw, 6.5rem);
   border-top: 2px solid var(--indigo);
 }
@@ -632,30 +641,30 @@ var {
     var(--indigo-deep);
 }
 
-.stage-gif {
+.stage-media {
   margin: 0;
 }
 
-.stage-gif video,
-.stage-gif img {
+.stage-media video,
+.stage-media img {
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   background: var(--mat);
 }
 
-.stage-gif figcaption {
+.stage-media figcaption {
   margin-top: 0.6rem;
   font-family: var(--display);
   font-weight: 550;
   font-size: 0.8rem;
 }
 
-.stage-gif figcaption a {
+.stage-media figcaption a {
   color: var(--on-dark-2);
 }
 
-.stage-gif figcaption a:hover {
+.stage-media figcaption a:hover {
   color: var(--amber);
 }
 
@@ -688,7 +697,7 @@ var {
 
 /* GIF fallback: sweep on a fixed clock (forward, hold, back, hold) */
 .barrel-freerun .index {
-  animation: sweep-loop 6.25s linear infinite;
+  animation: sweep-loop var(--loop, 6.25s) linear infinite;
 }
 
 @keyframes sweep-loop {
@@ -730,6 +739,69 @@ var {
   text-align: center;
 }
 
+/* ---- project index ------------------------------------------------- */
+
+.entries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 21rem));
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  width: var(--page);
+  margin: 0 auto;
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0 clamp(3rem, 6vw, 5rem);
+  list-style: none;
+}
+
+.entry {
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.entry img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--mat);
+}
+
+.entry-num {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: var(--display);
+  font-stretch: 58%;
+  font-weight: 850;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--indigo);
+}
+
+.entry-title {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.entry-blurb {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.95em;
+  color: var(--ink-2);
+}
+
+.entry:hover .entry-num {
+  color: var(--amber-ink);
+}
+
+.entry-soon {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 /* ---- colophon ------------------------------------------------------ */
 
 .colophon {
@@ -767,8 +839,8 @@ var {
     grid-template-columns: 1fr;
   }
 
-  .stage-gif video,
-  .stage-gif img {
+  .stage-media video,
+  .stage-media img {
     max-width: 30rem;
   }
 }
@@ -881,7 +953,7 @@ var {
     break-after: avoid;
   }
 
-  .focal {
+  .param {
     font-size: 2.6rem;
   }
 
@@ -924,7 +996,8 @@ var {
     grid-template-columns: 1fr 16rem;
   }
 
-  #selfie .part-body {
+  /* a comparator with no print substitute disappears; let the prose take the row */
+  .part-body:has(> .wipe):not(:has(.print-only)) {
     grid-template-columns: 1fr;
   }
 
@@ -932,11 +1005,11 @@ var {
     font-size: 0.9rem;
   }
 
-  .part-dolly {
+  .part-bleed {
     display: block;
   }
 
-  .part-dolly > .part-head {
+  .part-bleed > .part-head {
     padding-top: 1.25rem;
   }
 
@@ -948,8 +1021,8 @@ var {
     grid-template-columns: 16rem 1fr;
   }
 
-  .stage-gif video,
-  .stage-gif figcaption {
+  .stage-media video,
+  .stage-media figcaption {
     display: none;
   }
 

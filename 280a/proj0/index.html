@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:opsz,wdth,wght@8..144,25..151,400..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="project.css">
 </head>
 <body>
   <header class="masthead">
@@ -51,7 +52,7 @@
 
     <section class="part" id="selfie">
       <header class="part-head">
-        <p class="focal"><span>24</span><i aria-hidden="true">→</i><span>385</span><small>mm</small></p>
+        <p class="param"><span>24</span><i aria-hidden="true">→</i><span>385</span><small>mm</small></p>
         <h2>Selfie: the wrong way vs. the right way</h2>
       </header>
 
@@ -95,7 +96,7 @@
 
     <section class="part" id="building">
       <header class="part-head">
-        <p class="focal"><span>72</span><i aria-hidden="true">→</i><span>24</span><small>mm</small></p>
+        <p class="param"><span>72</span><i aria-hidden="true">→</i><span>24</span><small>mm</small></p>
         <h2>Architectural perspective compression</h2>
       </header>
 
@@ -128,14 +129,14 @@
       </div>
     </section>
 
-    <section class="part part-dolly" id="dolly">
+    <section class="part part-bleed" id="dolly">
       <header class="part-head">
-        <p class="focal"><span>24</span><i aria-hidden="true">→</i><span>240</span><small>mm</small></p>
+        <p class="param"><span>24</span><i aria-hidden="true">→</i><span>240</span><small>mm</small></p>
         <h2>The dolly zoom</h2>
       </header>
 
-      <div class="stage">
-        <figure class="stage-gif">
+      <div class="stage" data-stage data-hold="0.6" data-loop="pingpong" data-fallback="images/dolly.gif" data-duration="6.25">
+        <figure class="stage-media">
           <video autoplay loop muted playsinline poster="images/aligned/dolly-01.jpg" width="720" height="960" aria-label="Dolly zoom of a bao plush on a railing: the bao stays the same size while the hillside compresses into foliage">
             <source src="images/dolly.mp4" type="video/mp4">
             <img src="images/dolly.gif" alt="Animated dolly zoom of a bao plush on a railing: subject stays the same size while the hillside compresses into foliage" width="420" height="560">
@@ -209,52 +210,6 @@
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj0</p>
   </footer>
 
-  <script>
-    document.querySelectorAll('[data-wipe]').forEach(function (fig) {
-      var frame = fig.querySelector('.wipe-frame');
-      var input = fig.querySelector('input[type="range"]');
-      var set = function () { frame.style.setProperty('--pos', input.value + '%'); };
-      input.addEventListener('input', set);
-      set();
-    });
-
-    // Drive the zoom-ring index from the video clock: forward sweep, hold, reverse, hold.
-    (function () {
-      var video = document.querySelector('.stage video');
-      var ring = document.querySelector('.barrel-stage');
-      if (!video || !ring) return;
-      var HOLD = 0.6;
-      function at(t, dur) {
-        var half = dur / 2, move = half - HOLD;
-        if (t < half) return Math.min(t / move, 1);
-        var r = t - half;
-        return r < HOLD ? 1 : Math.max(1 - (r - HOLD) / move, 0);
-      }
-      function tick() {
-        if (video.duration) ring.style.setProperty('--at', at(video.currentTime, video.duration).toFixed(4));
-        if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(tick);
-        else requestAnimationFrame(tick);
-      }
-      tick();
-
-      // If the MP4 cannot play (blocked, unsupported, stalled), show the GIF instead
-      // and let the ring run on its own clock.
-      var swapped = false;
-      function useGif() {
-        if (swapped) return;
-        swapped = true;
-        var gif = document.createElement('img');
-        gif.src = 'images/dolly.gif';
-        gif.width = 420; gif.height = 560;
-        gif.alt = video.getAttribute('aria-label');
-        video.replaceWith(gif);
-        ring.classList.add('barrel-freerun');
-      }
-      video.addEventListener('error', useGif);
-      var guard = setTimeout(function () { if (video.readyState < 2) useGif(); }, 5000);
-      video.addEventListener('playing', function () { clearTimeout(guard); }, { once: true });
-      video.play().catch(function () {});
-    })();
-  </script>
+  <script src="../shared/site.js"></script>
 </body>
 </html>
