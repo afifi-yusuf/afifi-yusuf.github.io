@@ -31,7 +31,7 @@
         <p class="spec">Project 0 · iPhone 17 Pro Max · every focal length from 24 to 385 mm</p>
         <h1>Becoming friends with your camera</h1>
         <p class="lede">
-          Project 0 is about one idea that is easy to mix up. Zoom changes how much of the world fits in the frame, but it does not change perspective. Perspective is set by where the camera sits, the center of projection. I shot the three required experiments on an iPhone 17 Pro Max to make that difference visible.
+          One phone, every focal length it has, from 24 to 385 mm. I pointed the iPhone 17 Pro Max at my own face on campus, at the Neiman Marcus sign, and at a bao plush on my balcony rail, and each time asked the same question: what does the zoom ring actually change? Less than it seems. The lens decides how much of the scene lands on the sensor. Where I was standing decides everything else.
         </p>
         <div class="barrel barrel-hero" role="img" aria-label="Zoom ring marked with the focal lengths used in this project: 24, 47, 72, 108, 147, 188, 240 and 385 millimetres">
           <ol class="ticks">
@@ -198,7 +198,7 @@
             The trick works because image size and perspective are controlled by different things. Size depends on focal length divided by distance, while perspective depends only on distance. Holding the bao at a constant size while the focal length goes from 24mm to 240mm means the camera finished about ten times farther from the bao than it started. Over that walk the hillside, the houses, and the sky collapse into a wall of trees. It is the same relationship as the selfie and the building, just animated.
           </p>
           <p>
-            The stills were handheld, so the bao drifted by up to a third of its width between frames. I registered them with a similarity transform (scale plus shift) found by multi-scale normalized cross-correlation on the bao, then refined on its face. Blend the first and last frame and the bao is sharp while the background is doubled, which is the whole effect in one image. The registration cannot make the two frames identical, though: at 24mm the bao’s face is larger relative to its body than at 240mm, because perspective changed and no amount of scaling undoes that.
+            The stills were handheld, so the bao drifted by up to a third of its width between frames. I registered them with a similarity transform (scale plus shift) found by multi-scale normalized cross-correlation on the bao, then refined on its face. Blend the first and last frame and the bao is sharp while the background is doubled, which is the whole effect in one image.
           </p>
         </div>
       </div>
