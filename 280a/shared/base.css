@@ -194,10 +194,37 @@ a:hover {
   transition: color 150ms var(--ease-out);
 }
 
-.jump-home {
-  margin-right: 0.75rem;
-  padding-right: 1.25rem;
-  border-right: 1px solid var(--rule);
+.masthead-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0 0.75rem 1.25rem;
+  border-left: 1px solid var(--rule);
+  font-family: var(--display);
+  font-size: 0.82rem;
+  font-weight: 550;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.home b {
+  font-weight: 700;
+  color: var(--indigo);
+  transition: color 150ms var(--ease-out);
+}
+
+.home:hover {
+  color: var(--ink);
+}
+
+.home:hover b {
+  color: var(--amber-ink);
 }
 
 .jump a:hover {
@@ -997,6 +1024,7 @@ var {
 
   .who span,
   .jump,
+  .home,
   .shot figcaption span,
   .wipe figcaption,
   .colophon,
@@ -1053,7 +1081,8 @@ var {
     border-bottom: 2px solid var(--indigo);
   }
 
-  .jump {
+  .jump,
+  .home {
     display: none;
   }
 
