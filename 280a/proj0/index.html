@@ -5,132 +5,256 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project 0 · Becoming Friends with Your Camera · Yusuf Afifi</title>
   <meta name="description" content="CS 180 / 280A Project 0: perspective, zoom, and the center of projection.">
+  <meta name="theme-color" content="#1d1a4f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:wght@450;550;650;750&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:opsz,wdth,wght@8..144,25..151,400..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <p class="identity">
+  <header class="masthead">
+    <a class="who" href="#top">
       <strong>Yusuf Afifi</strong>
       <span>CS 180 / 280A · Fall 2026</span>
-    </p>
-    <nav class="site-nav" aria-label="Sections">
-      <a href="#selfie">Selfie</a>
-      <a href="#building">Building</a>
-      <a href="#dolly">Dolly zoom</a>
+    </a>
+    <nav class="jump" aria-label="Sections">
+      <a href="#selfie"><b>24→385</b> Selfie</a>
+      <a href="#building"><b>72→24</b> Building</a>
+      <a href="#dolly"><b>24→240</b> Dolly zoom</a>
     </nav>
   </header>
 
-  <main>
+  <main id="top">
     <section class="hero">
-      <h1>Becoming friends with your camera</h1>
-      <p class="lede">
-        Project 0 is about one idea that is easy to mix up. Zoom changes how much of the world fits in the frame, but it does not change perspective. Perspective is set by where the camera sits, the center of projection. I shot the three required experiments on an iPhone 17 Pro Max to make that difference visible.
-      </p>
+      <div class="hero-inner">
+        <p class="spec">Project 0 · iPhone 17 Pro Max · every focal length from 24 to 385 mm</p>
+        <h1>Becoming friends with your camera</h1>
+        <p class="lede">
+          Project 0 is about one idea that is easy to mix up. Zoom changes how much of the world fits in the frame, but it does not change perspective. Perspective is set by where the camera sits, the center of projection. I shot the three required experiments on an iPhone 17 Pro Max to make that difference visible.
+        </p>
+        <div class="barrel barrel-hero" role="img" aria-label="Zoom ring marked with the focal lengths used in this project: 24, 47, 72, 108, 147, 188, 240 and 385 millimetres">
+          <ol class="ticks">
+            <li style="--p:0">24</li>
+            <li style="--p:0.242">47</li>
+            <li style="--p:0.396">72</li>
+            <li style="--p:0.542">108</li>
+            <li style="--p:0.653">147</li>
+            <li style="--p:0.742">188</li>
+            <li style="--p:0.830">240</li>
+            <li style="--p:1">385</li>
+          </ol>
+          <span class="index"></span>
+          <span class="unit">mm</span>
+        </div>
+      </div>
     </section>
 
     <section class="part" id="selfie">
-      <p class="part-kicker">Part 1</p>
-      <h2>Selfie: the wrong way vs. the right way</h2>
+      <header class="part-head">
+        <p class="focal"><span>24</span><i aria-hidden="true">→</i><span>385</span><small>mm</small></p>
+        <h2>Selfie: the wrong way vs. the right way</h2>
+      </header>
+
       <div class="pair">
         <figure class="shot">
-          <img src="images/selfie-close.jpg" alt="Close wide-angle portrait at 24mm, face slightly stretched by proximity" width="1500" height="2000">
-          <figcaption><strong>Close</strong> <span>24mm · arm’s length, cropped to match</span></figcaption>
+          <img src="images/selfie-close.jpg" alt="Close wide-angle portrait at 24mm, cropped so the face matches the far shot; nose and cheeks pushed forward" width="1500" height="2000">
+          <figcaption><b>24</b><span>Close · arm’s length, cropped to match</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/selfie-far.jpg" alt="Zoomed portrait from farther away at 385mm, more natural facial proportions" width="1500" height="2000">
-          <figcaption><strong>Stepped back</strong> <span>385mm · same face size, farther away</span></figcaption>
+          <figcaption><b>385</b><span>Stepped back · same face size, farther away</span></figcaption>
         </figure>
       </div>
-      <p class="note">
-        I took the first photo from arm’s length at 24mm, then walked back several yards and zoomed to 385mm so my face filled about the same amount of the frame. I then cropped the close shot so the two faces are the same width. Cropping only throws away pixels, so it cannot change perspective, and the comparison stays fair. The close one is the typical selfie: nose and cheeks pushed forward, ears pulled back, jaw narrowed. The second looks closer to how people actually see a face.
-      </p>
-      <p class="note">
-        What changed is the distance, not the zoom. When the camera is close, my nose is much nearer to the lens than my ears or the sides of my head, so the nearer features take up more of the picture. From several yards back, those depth differences are tiny compared with the distance to the camera, so the face stays in proportion. The long zoom only crops that distant view; it does not move the center of projection.
-      </p>
+
+      <div class="part-body">
+        <figure class="wipe" data-wipe>
+          <div class="wipe-frame" style="--pos:50%">
+            <img class="wipe-under" src="images/selfie-far.jpg" alt="" width="1500" height="2000">
+            <img class="wipe-over" src="images/selfie-close.jpg" alt="" width="1500" height="2000">
+            <span class="wipe-tag wipe-tag-l">24 mm</span>
+            <span class="wipe-tag wipe-tag-r">385 mm</span>
+            <span class="wipe-line" aria-hidden="true"></span>
+            <span class="wipe-knob" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+            </span>
+            <input type="range" min="0" max="100" value="50" aria-label="Wipe between the 24mm close-up and the 385mm portrait">
+          </div>
+          <figcaption>Drag the line. The faces are the same width in both, so everything that moves is perspective: the 24 mm nose, the 385 mm ears.</figcaption>
+        </figure>
+
+        <div class="prose">
+          <p>
+            I took the first photo from arm’s length at 24mm, then walked back several yards and zoomed to 385mm so my face filled about the same amount of the frame. I then cropped the close shot so the two faces are the same width. Cropping only throws away pixels, so it cannot change perspective, and the comparison stays fair. The close one is the typical selfie: nose and cheeks pushed forward, ears pulled back, jaw narrowed. The second looks closer to how people actually see a face.
+          </p>
+          <p>
+            What changed is the distance, not the zoom. When the camera is close, my nose is much nearer to the lens than my ears or the sides of my head, so the nearer features take up more of the picture. From several yards back, those depth differences are tiny compared with the distance to the camera, so the face stays in proportion. The long zoom only crops that distant view; it does not move the center of projection.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="part" id="building">
-      <p class="part-kicker">Part 2</p>
-      <h2>Architectural perspective compression</h2>
+      <header class="part-head">
+        <p class="focal"><span>72</span><i aria-hidden="true">→</i><span>24</span><small>mm</small></p>
+        <h2>Architectural perspective compression</h2>
+      </header>
+
       <div class="pair">
         <figure class="shot">
           <img src="images/building-zoom.jpg" alt="Neiman Marcus facade photographed from farther away at 72mm, looking flatter" width="1500" height="2000">
-          <figcaption><strong>Zoomed from farther back</strong> <span>72mm</span></figcaption>
+          <figcaption><b>72</b><span>Zoomed from farther back</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/building-wide.jpg" alt="Same Neiman Marcus facade from closer in at 24mm, stronger depth and converging lines" width="1577" height="2000">
-          <figcaption><strong>Walked up, no zoom</strong> <span>24mm</span></figcaption>
+          <figcaption><b>24</b><span>Walked up, no zoom</span></figcaption>
         </figure>
       </div>
-      <p class="note">
-        I ran the same experiment in reverse on the Neiman Marcus facade, shot slightly off axis so the corner and the palm sit at different depths. First I stood back and zoomed to 72mm. Then I walked toward the wall and shot at 24mm, keeping the sign and the ribbed face about the same size.
-      </p>
-      <p class="note">
-        The far shot looks flatter. From that viewpoint the palm, the bushes, the wall, and the sky are all a long way from the camera, so their relative sizes barely differ. Walking in moves the center of projection: the nearby plants and the lamp grow, and the wall starts to lean and recede. It is the same building and the same sign with different geometry, and the only thing that changed the perspective was where I stood.
-      </p>
-      <p class="note">
-        The geometry is one line. A feature of height <var>h</var> at depth <var>Z</var> projects to a height of <var>f</var>·<var>h</var>/<var>Z</var> on the sensor. For two features at depths <var>Z</var><sub>1</sub> and <var>Z</var><sub>2</sub>, the ratio of their image sizes is (<var>h</var><sub>1</sub>/<var>h</var><sub>2</sub>)·(<var>Z</var><sub>2</sub>/<var>Z</var><sub>1</sub>). Walking back adds the same distance to both depths, so <var>Z</var><sub>2</sub>/<var>Z</var><sub>1</sub> drifts toward 1 and everything looks flat. Zooming multiplies both sizes by the same <var>f</var>, so the ratio does not move at all.
-      </p>
+
+      <div class="part-body part-body-wide">
+        <div class="prose">
+          <p>
+            I ran the same experiment in reverse on the Neiman Marcus facade, shot slightly off axis so the corner and the palm sit at different depths. First I stood back and zoomed to 72mm. Then I walked toward the wall and shot at 24mm, keeping the sign and the ribbed face about the same size.
+          </p>
+          <p>
+            The far shot looks flatter. From that viewpoint the palm, the bushes, the wall, and the sky are all a long way from the camera, so their relative sizes barely differ. Walking in moves the center of projection: the nearby plants and the lamp grow, and the wall starts to lean and recede. It is the same building and the same sign with different geometry, and the only thing that changed the perspective was where I stood.
+          </p>
+        </div>
+        <aside class="formula" aria-label="The geometry">
+          <p class="formula-line"><var>h</var>′ = <var>f</var>·<var>h</var>/<var>Z</var></p>
+          <p>
+            A feature of height <var>h</var> at depth <var>Z</var> projects to height <var>h</var>′ on the sensor. For two features at depths <var>Z</var><sub>1</sub> and <var>Z</var><sub>2</sub>, the ratio of their image sizes is (<var>h</var><sub>1</sub>/<var>h</var><sub>2</sub>)·(<var>Z</var><sub>2</sub>/<var>Z</var><sub>1</sub>). Walking back adds the same distance to both depths, so <var>Z</var><sub>2</sub>/<var>Z</var><sub>1</sub> drifts toward 1 and everything looks flat. Zooming multiplies both sizes by the same <var>f</var>, so the ratio does not move at all.
+          </p>
+        </aside>
+      </div>
     </section>
 
-    <section class="part" id="dolly">
-      <p class="part-kicker">Part 3</p>
-      <h2>The dolly zoom</h2>
-      <figure class="dolly-stage">
-        <img src="images/dolly.gif" alt="Animated dolly zoom of a bao plush on a railing: subject stays similar in size while the hillside compresses into foliage" width="720" height="960">
-        <figcaption>Walk back + zoom in, 24mm → 240mm, seven handheld stills registered on the bao. The bao stays put; the neighborhood does not.</figcaption>
-      </figure>
-      <div class="strip" aria-label="Dolly zoom stills, registered on the bao">
-        <figure>
-          <img src="images/aligned/dolly-01.jpg" alt="Registered dolly frame at 24mm, hillside and houses visible" width="720" height="960">
-          <figcaption>24mm</figcaption>
+    <section class="part part-dolly" id="dolly">
+      <header class="part-head">
+        <p class="focal"><span>24</span><i aria-hidden="true">→</i><span>240</span><small>mm</small></p>
+        <h2>The dolly zoom</h2>
+      </header>
+
+      <div class="stage">
+        <figure class="stage-gif">
+          <video autoplay loop muted playsinline poster="images/aligned/dolly-01.jpg" width="720" height="960" aria-label="Dolly zoom of a bao plush on a railing: the bao stays the same size while the hillside compresses into foliage">
+            <source src="images/dolly.mp4" type="video/mp4">
+            <img src="images/dolly.gif" alt="Animated dolly zoom of a bao plush on a railing: subject stays the same size while the hillside compresses into foliage" width="420" height="560">
+          </video>
+          <img class="print-only" src="images/aligned/dolly-04.jpg" alt="Middle frame of the dolly zoom at 108mm" width="720" height="960">
+          <figcaption><a href="images/dolly.gif">Open as an animated GIF</a></figcaption>
         </figure>
-        <figure>
-          <img src="images/aligned/dolly-02.jpg" alt="Registered dolly frame at 47mm" width="720" height="960">
-          <figcaption>47mm</figcaption>
-        </figure>
-        <figure>
-          <img src="images/aligned/dolly-03.jpg" alt="Registered dolly frame at 72mm" width="720" height="960">
-          <figcaption>72mm</figcaption>
-        </figure>
-        <figure>
-          <img src="images/aligned/dolly-04.jpg" alt="Registered dolly frame at 108mm" width="720" height="960">
-          <figcaption>108mm</figcaption>
-        </figure>
-        <figure>
-          <img src="images/aligned/dolly-05.jpg" alt="Registered dolly frame at 147mm" width="720" height="960">
-          <figcaption>147mm</figcaption>
-        </figure>
-        <figure>
-          <img src="images/aligned/dolly-06.jpg" alt="Registered dolly frame at 188mm" width="720" height="960">
-          <figcaption>188mm</figcaption>
-        </figure>
-        <figure>
-          <img src="images/aligned/dolly-07.jpg" alt="Registered dolly frame at 240mm, background compressed to foliage" width="720" height="960">
-          <figcaption>240mm</figcaption>
-        </figure>
+        <div class="stage-side">
+          <p class="stage-title">Walk back, zoom in.</p>
+          <p class="stage-copy">Seven handheld stills from 24 mm to 240 mm, registered on the bao and motion-interpolated into one continuous move. The bao stays put; the neighborhood does not.</p>
+          <div class="barrel barrel-stage" role="img" aria-label="Zoom ring sweeping from 24 to 240 millimetres in time with the animation">
+            <ol class="ticks">
+              <li style="--p:0">24</li>
+              <li style="--p:0.292">47</li>
+              <li style="--p:0.477">72</li>
+              <li style="--p:0.653">108</li>
+              <li style="--p:0.787">147</li>
+              <li style="--p:0.894">188</li>
+              <li style="--p:1">240</li>
+            </ol>
+            <span class="index index-sweep"></span>
+            <span class="unit">mm</span>
+          </div>
+        </div>
       </div>
-      <p class="note">
-        This is the Vertigo shot: move the camera back while zooming in so the subject stays roughly the same size. I used a bao plush on a balcony rail, since it is small and has a deep background behind it, and took seven stills from 24mm to 240mm, then stitched them into a looping GIF.
-      </p>
-      <p class="note">
-        The trick works because image size and perspective are controlled by different things. Size depends on focal length divided by distance, while perspective depends only on distance. Holding the bao at a constant size while the focal length goes from 24mm to 240mm means the camera finished about ten times farther from the bao than it started. Over that walk the hillside, the houses, and the sky collapse into a wall of trees. It is the same relationship as the selfie and the building, just animated.
-      </p>
-      <figure class="evidence">
-        <img src="images/dolly-overlay.jpg" alt="Fifty-fifty blend of the 24mm and 240mm frames: the bao is sharp, the background is doubled" width="720" height="960">
-        <figcaption>
-          <strong>24mm and 240mm, blended 50/50.</strong>
-          The stills were handheld, so the bao drifted by up to a third of its width between frames. I registered them with a similarity transform (scale plus shift) found by multi-scale normalized cross-correlation on the bao, then refined on its face. In the blend the bao is sharp and the background is doubled, which is the whole effect in one image. The registration cannot make the two frames identical, though: at 24mm the bao’s face is larger relative to its body than at 240mm, because perspective changed and no amount of scaling undoes that.
-        </figcaption>
-      </figure>
+
+      <div class="strip" aria-label="Dolly zoom stills, registered on the bao">
+        <figure><img src="images/aligned/dolly-01.jpg" alt="Registered dolly frame at 24mm, hillside and houses visible" width="720" height="960"><figcaption>24</figcaption></figure>
+        <figure><img src="images/aligned/dolly-02.jpg" alt="Registered dolly frame at 47mm" width="720" height="960"><figcaption>47</figcaption></figure>
+        <figure><img src="images/aligned/dolly-03.jpg" alt="Registered dolly frame at 72mm" width="720" height="960"><figcaption>72</figcaption></figure>
+        <figure><img src="images/aligned/dolly-04.jpg" alt="Registered dolly frame at 108mm" width="720" height="960"><figcaption>108</figcaption></figure>
+        <figure><img src="images/aligned/dolly-05.jpg" alt="Registered dolly frame at 147mm" width="720" height="960"><figcaption>147</figcaption></figure>
+        <figure><img src="images/aligned/dolly-06.jpg" alt="Registered dolly frame at 188mm" width="720" height="960"><figcaption>188</figcaption></figure>
+        <figure><img src="images/aligned/dolly-07.jpg" alt="Registered dolly frame at 240mm, background compressed to foliage" width="720" height="960"><figcaption>240</figcaption></figure>
+      </div>
+
+      <div class="part-body">
+        <figure class="wipe" data-wipe>
+          <div class="wipe-frame" style="--pos:50%">
+            <img class="wipe-under" src="images/aligned/dolly-07.jpg" alt="" width="720" height="960">
+            <img class="wipe-over" src="images/aligned/dolly-01.jpg" alt="" width="720" height="960">
+            <span class="wipe-tag wipe-tag-l">24 mm</span>
+            <span class="wipe-tag wipe-tag-r">240 mm</span>
+            <span class="wipe-line" aria-hidden="true"></span>
+            <span class="wipe-knob" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+            </span>
+            <input type="range" min="0" max="100" value="50" aria-label="Wipe between the 24mm and 240mm dolly frames">
+          </div>
+          <img class="print-only" src="images/dolly-overlay.jpg" alt="Fifty-fifty blend of the 24mm and 240mm frames: the bao is sharp, the background is doubled" width="720" height="960">
+          <figcaption>First and last frame, registered. Drag the line: the bao barely moves, the hillside becomes a hedge.</figcaption>
+        </figure>
+
+        <div class="prose">
+          <p>
+            This is the Vertigo shot: move the camera back while zooming in so the subject stays roughly the same size. I used a bao plush on a balcony rail, since it is small and has a deep background behind it, and took seven stills from 24mm to 240mm, then stitched them into a looping GIF.
+          </p>
+          <p>
+            The trick works because image size and perspective are controlled by different things. Size depends on focal length divided by distance, while perspective depends only on distance. Holding the bao at a constant size while the focal length goes from 24mm to 240mm means the camera finished about ten times farther from the bao than it started. Over that walk the hillside, the houses, and the sky collapse into a wall of trees. It is the same relationship as the selfie and the building, just animated.
+          </p>
+          <p>
+            The stills were handheld, so the bao drifted by up to a third of its width between frames. I registered them with a similarity transform (scale plus shift) found by multi-scale normalized cross-correlation on the bao, then refined on its face. Blend the first and last frame and the bao is sharp while the background is doubled, which is the whole effect in one image. The registration cannot make the two frames identical, though: at 24mm the bao’s face is larger relative to its body than at 240mm, because perspective changed and no amount of scaling undoes that.
+          </p>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="colophon">
     <p>Yusuf Afifi · CS 180 / 280A Project 0 · iPhone 17 Pro Max · Fall 2026</p>
+    <p class="colophon-url">afifi-yusuf.github.io/280a/proj0</p>
   </footer>
+
+  <script>
+    document.querySelectorAll('[data-wipe]').forEach(function (fig) {
+      var frame = fig.querySelector('.wipe-frame');
+      var input = fig.querySelector('input[type="range"]');
+      var set = function () { frame.style.setProperty('--pos', input.value + '%'); };
+      input.addEventListener('input', set);
+      set();
+    });
+
+    // Drive the zoom-ring index from the video clock: forward sweep, hold, reverse, hold.
+    (function () {
+      var video = document.querySelector('.stage video');
+      var ring = document.querySelector('.barrel-stage');
+      if (!video || !ring) return;
+      var HOLD = 0.6;
+      function at(t, dur) {
+        var half = dur / 2, move = half - HOLD;
+        if (t < half) return Math.min(t / move, 1);
+        var r = t - half;
+        return r < HOLD ? 1 : Math.max(1 - (r - HOLD) / move, 0);
+      }
+      function tick() {
+        if (video.duration) ring.style.setProperty('--at', at(video.currentTime, video.duration).toFixed(4));
+        if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(tick);
+        else requestAnimationFrame(tick);
+      }
+      tick();
+
+      // If the MP4 cannot play (blocked, unsupported, stalled), show the GIF instead
+      // and let the ring run on its own clock.
+      var swapped = false;
+      function useGif() {
+        if (swapped) return;
+        swapped = true;
+        var gif = document.createElement('img');
+        gif.src = 'images/dolly.gif';
+        gif.width = 420; gif.height = 560;
+        gif.alt = video.getAttribute('aria-label');
+        video.replaceWith(gif);
+        ring.classList.add('barrel-freerun');
+      }
+      video.addEventListener('error', useGif);
+      var guard = setTimeout(function () { if (video.readyState < 2) useGif(); }, 5000);
+      video.addEventListener('playing', function () { clearTimeout(guard); }, { once: true });
+      video.play().catch(function () {});
+    })();
+  </script>
 </body>
 </html>
