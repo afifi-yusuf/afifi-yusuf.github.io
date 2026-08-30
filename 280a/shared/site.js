@@ -1,4 +1,4 @@
-// CS 180 / 280A shared behaviour. Progressive enhancement only: every page
+// CS 280A shared behaviour. Progressive enhancement only: every page
 // reads correctly with this file missing.
 (function () {
   // Wipe comparators: <figure class="wipe" data-wipe> with a .wipe-frame and a range input.
