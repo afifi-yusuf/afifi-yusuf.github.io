@@ -10,6 +10,38 @@
    Behaviour lives in site.js (wipe comparators, video-synced rings).
    ------------------------------------------------------------------ */
 
+/* Metric-matched local fallbacks so the web-font swap does not reflow.
+   size-adjust values measured against the loaded fonts in Chrome. */
+@font-face {
+  font-family: "Pathway Fallback Narrow";
+  src: local("Arial Narrow");
+  size-adjust: 108.9%;
+}
+
+@font-face {
+  font-family: "Pathway Fallback Sans";
+  src: local("Helvetica Neue"), local("Arial");
+  size-adjust: 89%;
+}
+
+@font-face {
+  font-family: "Serif Fallback Iowan";
+  src: local("Iowan Old Style");
+  size-adjust: 94.7%;
+}
+
+@font-face {
+  font-family: "Serif Fallback Palatino";
+  src: local("Palatino"), local("Palatino Linotype");
+  size-adjust: 96.2%;
+}
+
+@font-face {
+  font-family: "Serif Fallback Georgia";
+  src: local("Georgia");
+  size-adjust: 96.2%;
+}
+
 @property --at {
   syntax: "<number>";
   inherits: true;
@@ -36,8 +68,9 @@
   --glow-warm: oklch(0.80 0.16 72 / 0.55);
   --glow-cool: oklch(0.45 0.17 292 / 0.55);
 
-  --display: "Pathway Extreme", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --body: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --display: "Pathway Extreme", "Pathway Fallback Narrow", "Pathway Fallback Sans", sans-serif;
+  --body: "Source Serif 4", "Serif Fallback Iowan", "Serif Fallback Palatino", "Serif Fallback Georgia", serif;
+  color-scheme: light;
 
   --page: min(76rem, calc(100% - 3rem));
   --measure: 64ch;
