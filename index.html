@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yusuf Afifi · CS 180 / 280A</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:wght@550;750&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(1 0 0);
+      --ink: oklch(0.22 0.028 270);
+      --primary: oklch(0.32 0.12 270);
+      --muted: oklch(0.42 0.03 270);
+      --rule: oklch(0.88 0.02 270);
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Source Serif 4", Palatino, serif;
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+    main {
+      width: min(40rem, calc(100% - 2.5rem));
+      margin: 0 auto;
+      padding: 4.5rem 0 5rem;
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-family: "Pathway Extreme", "Helvetica Neue", sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: -0.035em;
+      line-height: 0.95;
+      color: var(--primary);
+    }
+    .meta {
+      margin: 0 0 1.5rem;
+      font-family: "Pathway Extreme", "Helvetica Neue", sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    a { color: var(--primary); }
+    ul { padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+    li { border-bottom: 1px solid var(--rule); }
+    li a {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      text-decoration: none;
+      font-family: "Pathway Extreme", "Helvetica Neue", sans-serif;
+      font-weight: 550;
+    }
+    li a:hover { color: oklch(0.48 0.14 55); }
+    span { color: var(--muted); font-weight: 450; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CS 180 / 280A</h1>
+    <p class="meta">Yusuf Afifi · Fall 2026 · UC Berkeley</p>
+    <p>Course work for Intro to Computer Vision and Computational Photography.</p>
+    <ul>
+      <li>
+        <a href="./proj0/">Project 0 <span>Becoming friends with your camera</span></a>
+      </li>
+    </ul>
+  </main>
+</body>
+</html>
