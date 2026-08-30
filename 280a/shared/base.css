@@ -156,6 +156,12 @@ a:hover {
   transition: color 150ms var(--ease-out);
 }
 
+.jump-home {
+  margin-right: 0.75rem;
+  padding-right: 1.25rem;
+  border-right: 1px solid var(--rule);
+}
+
 .jump a:hover {
   color: var(--ink);
 }
