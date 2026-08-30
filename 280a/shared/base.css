@@ -1050,7 +1050,6 @@ var {
     position: static;
     padding: 0 0 0.5rem;
     background: var(--bg);
-    backdrop-filter: none;
     border-bottom: 2px solid var(--indigo);
   }
 
