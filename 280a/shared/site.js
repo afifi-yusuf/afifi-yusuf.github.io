@@ -35,13 +35,15 @@
       toggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
     }
 
+    // pingpong: out (move), hold, back (move), hold
     function at(t, dur) {
       if (!dur) return 0;
       if (mode === 'linear') return t / dur;
-      var half = dur / 2, move = half - hold;
-      if (t < half) return Math.min(t / move, 1);
-      var r = t - half;
-      return r < hold ? 1 : Math.max(1 - (r - hold) / move, 0);
+      var move = (dur - 2 * hold) / 2;
+      if (t < move) return t / move;
+      if (t < move + hold) return 1;
+      if (t < 2 * move + hold) return 1 - (t - move - hold) / move;
+      return 0;
     }
     function tick() {
       if (index && video.duration && !swapped) index.style.setProperty('--at', at(video.currentTime, video.duration).toFixed(4));
