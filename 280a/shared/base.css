@@ -70,6 +70,7 @@ a {
   color: var(--indigo);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+  transition: color 150ms var(--ease-out);
 }
 
 a:hover {
@@ -141,6 +142,7 @@ a:hover {
   display: inline-flex;
   align-items: baseline;
   gap: 0.4rem;
+  padding: 0.6rem 0;
   color: var(--ink-2);
   text-decoration: none;
 }
@@ -151,6 +153,7 @@ a:hover {
   font-size: 1.05rem;
   color: var(--indigo);
   letter-spacing: -0.01em;
+  transition: color 150ms var(--ease-out);
 }
 
 .jump a:hover {
@@ -172,9 +175,39 @@ a:hover {
 }
 
 .hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 21rem);
+  column-gap: clamp(2rem, 5vw, 5rem);
+  align-items: end;
   width: var(--page);
   margin: 0 auto;
   padding: clamp(3.5rem, 9vw, 8rem) 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.hero-copy {
+  grid-column: 1;
+  min-width: 0;
+}
+
+/* a photograph in the first fold; hidden where the column would be too narrow */
+.hero-photo {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  align-self: end;
+  animation: rise 0.9s var(--ease-out) 0.2s both;
+}
+
+.hero-photo img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: var(--mat);
+  box-shadow: 0 24px 60px oklch(0.1 0.05 270 / 0.5);
+}
+
+.hero-inner > .barrel {
+  grid-column: 1 / -1;
 }
 
 .spec {
@@ -558,6 +591,17 @@ var {
   transform: translate(-50%, -50%);
   box-shadow: 0 2px 12px oklch(0 0 0 / 0.4);
   pointer-events: none;
+  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+
+.wipe-frame:hover .wipe-knob,
+.wipe-frame:focus-within .wipe-knob {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 4px 18px oklch(0 0 0 / 0.5);
+}
+
+.wipe-frame:active .wipe-knob {
+  transform: translate(-50%, -50%) scale(0.96);
 }
 
 .wipe-tag {
@@ -793,6 +837,11 @@ var {
   color: var(--ink-2);
 }
 
+.entry-num,
+.entry img {
+  transition: color 150ms var(--ease-out), transform 300ms var(--ease-out);
+}
+
 .entry:hover .entry-num {
   color: var(--amber-ink);
 }
@@ -826,6 +875,14 @@ var {
 /* ---- responsive ---------------------------------------------------- */
 
 @media (max-width: 860px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-photo {
+    display: none;
+  }
+
   .part-body,
   .part-body-wide {
     grid-template-columns: 1fr;
@@ -878,9 +935,18 @@ var {
 
   .hero h1,
   .lede,
+  .hero-photo,
   .barrel-hero .index,
   .barrel-freerun .index {
     animation: none;
+  }
+
+  a,
+  .jump b,
+  .wipe-knob,
+  .entry-num,
+  .entry img {
+    transition: none;
   }
 }
 
@@ -916,7 +982,18 @@ var {
   }
 
   .hero-inner {
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    column-gap: 1.5rem;
     padding: 1.5rem 0 1rem;
+  }
+
+  .hero-photo {
+    display: block;   /* the narrow-viewport rule hides it; paper is narrow */
+    animation: none;
+  }
+
+  .hero-photo img {
+    box-shadow: none;
   }
 
   .hero h1 {
