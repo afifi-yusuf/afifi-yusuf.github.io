@@ -1,1 +1,12 @@
-/* Project 0: nothing beyond the shared system yet. Project-specific rules go here. */
+/* Project 0: project-specific rules. The shared system is ../shared/base.css. */
+
+/* Gradescope asks for the page URL in the header of the printed PDF. */
+@media print {
+  @page {
+    @top-right {
+      content: "https://afifi-yusuf.github.io/280a/proj0/";
+      font: 600 8pt "Pathway Extreme", "Helvetica Neue", Arial, sans-serif;
+      color: #444;
+    }
+  }
+}
