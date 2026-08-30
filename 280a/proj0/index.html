@@ -37,7 +37,7 @@
         </p>
         </div>
         <figure class="hero-photo">
-          <img src="images/aligned/dolly-07.jpg" alt="The bao plush at 240 mm, the last frame of the dolly zoom, with the hillside compressed into a wall of leaves" width="720" height="960">
+          <img src="images/aligned/dolly-07.jpg" srcset="images/aligned/dolly-07-360.jpg 360w, images/aligned/dolly-07.jpg 720w" sizes="(min-width: 861px) 21rem, 0px" alt="The bao plush at 240 mm, the last frame of the dolly zoom, with the hillside compressed into a wall of leaves" width="720" height="960">
         </figure>
         <div class="barrel barrel-hero" role="img" aria-label="Zoom ring marked with the focal lengths used in this project: 24, 47, 72, 108, 147, 188, 240 and 385 millimetres">
           <ol class="ticks">
@@ -58,17 +58,17 @@
 
     <section class="part" id="selfie">
       <header class="part-head">
-        <p class="param"><span>24</span><i aria-hidden="true">→</i><span>385</span><small>mm</small></p>
+        <p class="param" aria-label="24 to 385 millimetres"><span>24</span><i aria-hidden="true">→</i><span>385</span><small>mm</small></p>
         <h2>Selfie: the wrong way vs. the right way</h2>
       </header>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/selfie-close.jpg" alt="Close wide-angle portrait at 24mm, cropped so the face matches the far shot; nose and cheeks pushed forward" width="1500" height="2000">
+          <img src="images/selfie-close.jpg" srcset="images/selfie-close-750.jpg 750w, images/selfie-close.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" decoding="async" alt="Close wide-angle portrait at 24mm, cropped so the face matches the far shot; nose and cheeks pushed forward" width="1500" height="2000">
           <figcaption><b>24</b><span>Close · arm’s length, cropped to match</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/selfie-far.jpg" alt="Zoomed portrait from farther away at 385mm, more natural facial proportions" width="1500" height="2000">
+          <img src="images/selfie-far.jpg" srcset="images/selfie-far-750.jpg 750w, images/selfie-far.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" decoding="async" alt="Zoomed portrait from farther away at 385mm, more natural facial proportions" width="1500" height="2000">
           <figcaption><b>385</b><span>Stepped back · same face size, farther away</span></figcaption>
         </figure>
       </div>
@@ -76,8 +76,8 @@
       <div class="part-body">
         <figure class="wipe" data-wipe>
           <div class="wipe-frame" style="--pos:50%">
-            <img class="wipe-under" src="images/selfie-far.jpg" alt="" width="1500" height="2000">
-            <img class="wipe-over" src="images/selfie-close.jpg" alt="" width="1500" height="2000">
+            <img class="wipe-under" src="images/selfie-far.jpg" srcset="images/selfie-far-750.jpg 750w, images/selfie-far.jpg 1500w" sizes="(min-width: 861px) 24rem, 90vw" loading="lazy" decoding="async" alt="" width="1500" height="2000">
+            <img class="wipe-over" src="images/selfie-close.jpg" srcset="images/selfie-close-750.jpg 750w, images/selfie-close.jpg 1500w" sizes="(min-width: 861px) 24rem, 90vw" loading="lazy" decoding="async" alt="" width="1500" height="2000">
             <span class="wipe-tag wipe-tag-l">24 mm</span>
             <span class="wipe-tag wipe-tag-r">385 mm</span>
             <span class="wipe-line" aria-hidden="true"></span>
@@ -102,17 +102,17 @@
 
     <section class="part" id="building">
       <header class="part-head">
-        <p class="param"><span>72</span><i aria-hidden="true">→</i><span>24</span><small>mm</small></p>
+        <p class="param" aria-label="72 to 24 millimetres"><span>72</span><i aria-hidden="true">→</i><span>24</span><small>mm</small></p>
         <h2>Architectural perspective compression</h2>
       </header>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/building-zoom.jpg" alt="Neiman Marcus facade photographed from farther away at 72mm, looking flatter" width="1500" height="2000">
+          <img src="images/building-zoom.jpg" srcset="images/building-zoom-750.jpg 750w, images/building-zoom.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="Neiman Marcus facade photographed from farther away at 72mm, looking flatter" width="1500" height="2000">
           <figcaption><b>72</b><span>Zoomed from farther back</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/building-wide.jpg" alt="Same Neiman Marcus facade from closer in at 24mm, stronger depth and converging lines" width="1577" height="2000">
+          <img src="images/building-wide.jpg" srcset="images/building-wide-750.jpg 750w, images/building-wide.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="Same Neiman Marcus facade from closer in at 24mm, stronger depth and converging lines" width="1577" height="2000">
           <figcaption><b>24</b><span>Walked up, no zoom</span></figcaption>
         </figure>
       </div>
@@ -137,18 +137,21 @@
 
     <section class="part part-bleed" id="dolly">
       <header class="part-head">
-        <p class="param"><span>24</span><i aria-hidden="true">→</i><span>240</span><small>mm</small></p>
+        <p class="param" aria-label="24 to 240 millimetres"><span>24</span><i aria-hidden="true">→</i><span>240</span><small>mm</small></p>
         <h2>The dolly zoom</h2>
       </header>
 
-      <div class="stage" data-stage data-hold="0.6" data-loop="pingpong" data-fallback="images/dolly.gif" data-duration="6.25">
+      <div class="stage" data-stage data-hold="0.6" data-loop="pingpong" data-fallback="images/dolly.gif" data-poster="images/aligned/dolly-01.jpg" data-duration="6.25">
         <figure class="stage-media">
           <video autoplay loop muted playsinline poster="images/aligned/dolly-01.jpg" width="720" height="960" aria-label="Dolly zoom of a bao plush on a railing: the bao stays the same size while the hillside compresses into foliage">
             <source src="images/dolly.mp4" type="video/mp4">
             <img src="images/dolly.gif" alt="Animated dolly zoom of a bao plush on a railing: subject stays the same size while the hillside compresses into foliage" width="420" height="560">
           </video>
-          <img class="print-only" src="images/aligned/dolly-04.jpg" alt="Middle frame of the dolly zoom at 108mm" width="720" height="960">
-          <figcaption><a href="images/dolly.gif">Open as an animated GIF</a></figcaption>
+          <img class="print-only" loading="lazy" src="images/aligned/dolly-04.jpg" alt="Middle frame of the dolly zoom at 108mm" width="720" height="960">
+          <figcaption>
+            <button class="stage-toggle" type="button" aria-pressed="true" hidden>Pause</button>
+            <a href="images/dolly.gif">Open as an animated GIF</a>
+          </figcaption>
         </figure>
         <div class="stage-side">
           <p class="stage-title">Walk back, zoom in.</p>
@@ -170,20 +173,20 @@
       </div>
 
       <div class="strip" aria-label="Dolly zoom stills, registered on the bao">
-        <figure><img src="images/aligned/dolly-01.jpg" alt="Registered dolly frame at 24mm, hillside and houses visible" width="720" height="960"><figcaption>24</figcaption></figure>
-        <figure><img src="images/aligned/dolly-02.jpg" alt="Registered dolly frame at 47mm" width="720" height="960"><figcaption>47</figcaption></figure>
-        <figure><img src="images/aligned/dolly-03.jpg" alt="Registered dolly frame at 72mm" width="720" height="960"><figcaption>72</figcaption></figure>
-        <figure><img src="images/aligned/dolly-04.jpg" alt="Registered dolly frame at 108mm" width="720" height="960"><figcaption>108</figcaption></figure>
-        <figure><img src="images/aligned/dolly-05.jpg" alt="Registered dolly frame at 147mm" width="720" height="960"><figcaption>147</figcaption></figure>
-        <figure><img src="images/aligned/dolly-06.jpg" alt="Registered dolly frame at 188mm" width="720" height="960"><figcaption>188</figcaption></figure>
-        <figure><img src="images/aligned/dolly-07.jpg" alt="Registered dolly frame at 240mm, background compressed to foliage" width="720" height="960"><figcaption>240</figcaption></figure>
+        <figure><img src="images/aligned/dolly-01.jpg" srcset="images/aligned/dolly-01-360.jpg 360w, images/aligned/dolly-01.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 24mm, hillside and houses visible" width="720" height="960"><figcaption>24</figcaption></figure>
+        <figure><img src="images/aligned/dolly-02.jpg" srcset="images/aligned/dolly-02-360.jpg 360w, images/aligned/dolly-02.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 47mm" width="720" height="960"><figcaption>47</figcaption></figure>
+        <figure><img src="images/aligned/dolly-03.jpg" srcset="images/aligned/dolly-03-360.jpg 360w, images/aligned/dolly-03.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 72mm" width="720" height="960"><figcaption>72</figcaption></figure>
+        <figure><img src="images/aligned/dolly-04.jpg" srcset="images/aligned/dolly-04-360.jpg 360w, images/aligned/dolly-04.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 108mm" width="720" height="960"><figcaption>108</figcaption></figure>
+        <figure><img src="images/aligned/dolly-05.jpg" srcset="images/aligned/dolly-05-360.jpg 360w, images/aligned/dolly-05.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 147mm" width="720" height="960"><figcaption>147</figcaption></figure>
+        <figure><img src="images/aligned/dolly-06.jpg" srcset="images/aligned/dolly-06-360.jpg 360w, images/aligned/dolly-06.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 188mm" width="720" height="960"><figcaption>188</figcaption></figure>
+        <figure><img src="images/aligned/dolly-07.jpg" srcset="images/aligned/dolly-07-360.jpg 360w, images/aligned/dolly-07.jpg 720w" sizes="(min-width: 76rem) 10rem, 13vw" loading="lazy" decoding="async" alt="Registered dolly frame at 240mm, background compressed to foliage" width="720" height="960"><figcaption>240</figcaption></figure>
       </div>
 
       <div class="part-body">
         <figure class="wipe" data-wipe>
           <div class="wipe-frame" style="--pos:50%">
-            <img class="wipe-under" src="images/aligned/dolly-07.jpg" alt="" width="720" height="960">
-            <img class="wipe-over" src="images/aligned/dolly-01.jpg" alt="" width="720" height="960">
+            <img class="wipe-under" src="images/aligned/dolly-07.jpg" srcset="images/aligned/dolly-07-360.jpg 360w, images/aligned/dolly-07.jpg 720w" sizes="(min-width: 861px) 24rem, 90vw" loading="lazy" decoding="async" alt="" width="720" height="960">
+            <img class="wipe-over" src="images/aligned/dolly-01.jpg" srcset="images/aligned/dolly-01-360.jpg 360w, images/aligned/dolly-01.jpg 720w" sizes="(min-width: 861px) 24rem, 90vw" loading="lazy" decoding="async" alt="" width="720" height="960">
             <span class="wipe-tag wipe-tag-l">24 mm</span>
             <span class="wipe-tag wipe-tag-r">240 mm</span>
             <span class="wipe-line" aria-hidden="true"></span>
@@ -192,7 +195,7 @@
             </span>
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the 24mm and 240mm dolly frames">
           </div>
-          <img class="print-only" src="images/dolly-overlay.jpg" alt="Fifty-fifty blend of the 24mm and 240mm frames: the bao is sharp, the background is doubled" width="720" height="960">
+          <img class="print-only" loading="lazy" src="images/dolly-overlay.jpg" alt="Fifty-fifty blend of the 24mm and 240mm frames: the bao is sharp, the background is doubled" width="720" height="960">
           <figcaption>First and last frame, registered. Drag the line: the bao barely moves, the hillside becomes a hedge.</figcaption>
         </figure>
 
