@@ -281,6 +281,16 @@ a:hover {
   grid-column: 1 / -1;
 }
 
+/* a short hero for index pages: no lede, no photo, no ring */
+.hero-compact .hero-inner {
+  grid-template-columns: 1fr;
+  padding: clamp(2rem, 5vw, 3.5rem) 0 clamp(1.75rem, 4vw, 3rem);
+}
+
+.hero-compact h1 {
+  font-size: clamp(2.4rem, 1.4rem + 3.6vw, 4.2rem);
+}
+
 .spec {
   margin: 0 0 1.25rem;
   font-family: var(--display);
