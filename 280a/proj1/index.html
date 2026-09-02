@@ -39,7 +39,7 @@
           <p class="spec">Project 1 · Prokudin-Gorskii glass plates · Library of Congress · NumPy, from scratch</p>
           <h1>Colorizing the Prokudin-Gorskii collection</h1>
           <p class="lede">
-            Prokudin-Gorskii photographed each scene three times, through a blue, a green and a red filter, onto one tall glass plate. The Library of Congress scanned the plates. My job is to cut each scan into its three exposures, line them up, and stack them into one color image. This page goes in the order I built it. Each step says what I added, shows the code that does it, and shows what it did to the same two plates: a church on a lake and the Emir of Bukhara.
+            Prokudin-Gorskii photographed each scene three times, through a blue, a green and a red filter, onto one tall glass plate. The Library of Congress scanned the plates. My job is to cut each scan into its three exposures, line them up, and stack them into one color image. This page goes in the order I built it, with the code for each step and what it did to the same two plates: a church on a lake and the Emir of Bukhara.
           </p>
         </div>
         <figure class="hero-photo">
@@ -147,7 +147,7 @@ best = argmax(grid)</pre>
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. The two extra scores on the right, SSIM and LPIPS, come in step 4; I include them here because the same code ran with them. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
+            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. SSIM and LPIPS are the two extra scores from step 4. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
           </p>
         </div>
         <aside class="formula" aria-label="Normalized cross-correlation">
@@ -218,12 +218,6 @@ for lvl in range(coarsest, -1, -1):
             All parameters are the same for every image: 10% scoring margin, ±15 coarse window, ±2 refinement, 64-pixel floor. Nothing is tuned per plate.
           </p>
         </div>
-        <aside class="formula" aria-label="Downsampling">
-          <p class="formula-line"><var>d</var>[<var>i</var>,<var>j</var>] = ¼ Σ <var>s</var>[2<var>i</var>+<var>u</var>, 2<var>j</var>+<var>v</var>]</p>
-          <p>
-            for <var>u</var>, <var>v</var> ∈ {0, 1}. At level <var>k</var> one pixel is 2<sup><var>k</var></sup> pixels of the scan, so an offset found there is doubled on the way down and refined within ±2.
-          </p>
-        </aside>
       </div>
 
       <h3 class="sub">What the pyramid alone gives: NCC on raw pixels, nothing else</h3>
@@ -340,12 +334,6 @@ for lvl in range(coarsest, -1, -1):
             The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
           </p>
         </div>
-        <aside class="formula" aria-label="The numbers">
-          <p class="formula-line">0.55 → 0.30</p>
-          <p>
-            Mean of the robe in the blue plate, then in the red plate. The wall behind it: 0.49 → 0.76. Raw NCC at the true offset 0.264, at the wrong one 0.307. Gradient NCC: 0.493 at the true offset, 0.040 at the wrong one.
-          </p>
-        </aside>
       </div>
     </section>
 
@@ -405,7 +393,7 @@ for lvl in range(coarsest, -1, -1):
             The point is that the robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude.
           </p>
           <p>
-            From here on, "aligned" means step 3: pyramid, NCC, gradients. The church looks the same after this step as after step 2, which is the point. The change costs nothing on the easy plates and rescues the hard one.
+            From here on, "aligned" means step 3: pyramid, NCC, gradients. The change costs nothing on the easy plates and rescues the hard one.
           </p>
         </div>
       </div>
@@ -465,7 +453,7 @@ ssim = ((2*mu_a*mu_b + c1) * (2*cov + c2)) / ((mu_a**2 + mu_b**2 + c1) * (var_a 
 B = torch.stack([tensor(r) for _, r in pairs])      # 32 reference crops
 scores = -net(A, B).flatten()                        # minus LPIPS distance, higher is better</pre>
           <p>
-            So after step 4 the pipeline is exactly what it was after step 3. The extra metrics confirmed the diagnosis; they did not replace the fix.
+            The extra metrics confirmed the diagnosis; they did not replace the fix, so the pipeline after step 4 is the same as after step 3.
           </p>
         </div>
         <aside class="formula" aria-label="SSIM and LPIPS">
@@ -506,7 +494,7 @@ scores = -net(A, B).flatten()                        # minus LPIPS distance, hig
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            The assignment asks for three or more plates of my own from the collection. I picked a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
+            I picked a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
           </p>
           <p>
             All three aligned on the first try with the same parameters, with the basic metrics as well as the extras. The rider did move between exposures: the hut and the tree behind him are pin-sharp at full resolution, but his face and hat have a faint red-green fringe, which no translation can remove. The water at Kivach smears in three colors for the same reason, while the rocks and the man are sharp. The camel plate is also fogged around the edges, so the crop takes a lot off it, and its sepia cast is where the white balance makes the biggest difference.
@@ -590,7 +578,7 @@ for i in range(limit):            # from the edge inward, outer quarter
             <b>Two passes.</b> The strict pass above leaves thin colored fringes where a plate fades toward its edge, because that band is off by 0.3 rather than 0.5. So I run a second, gentler pass on the result (half the row off by 0.3), but only within the outer 6%, where real content cannot form a sustained run. My first version of all this used a threshold relative to how much the interior varied, and it cut half of every image with a calm sky, because a sky varies so little that everything else looked like an outlier. Describing what paper, glass and misregistration physically look like was far more robust.
           </p>
           <p>
-            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in two places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. Both are honest results of the criteria, not tuning, and I left them as they are. The table lists every crop.
+            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in two places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. Both are honest results of the criteria, not tuning, and I left them as they are.
           </p>
         </div>
       </div>
