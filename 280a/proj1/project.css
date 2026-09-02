@@ -347,3 +347,14 @@
     break-inside: avoid;
   }
 }
+
+/* Bells & whistles tag inside a step heading. */
+.part h2 small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.55em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--amber-ink);
+}

@@ -66,7 +66,6 @@
         <p class="param" aria-label="minus 15 to plus 15 pixels"><span>−15</span><i aria-hidden="true">→</i><span>15</span><small>px</small></p>
         <h2>Step 1 · Read, split, and try every shift</h2>
       </header>
-      <p class="delta"><b>Added</b> loading, the split into three plates, two ways to compare plates (L2 and NCC), and an exhaustive search over a 31×31 window of shifts. <b>Result</b> the three small JPEGs align.</p>
 
       <div class="pair pair-3">
         <figure class="shot">
@@ -166,7 +165,6 @@ best = argmax(grid)</pre>
         <p class="param" aria-label="from one thirty-second scale to full scale"><span>1/32</span><i aria-hidden="true">→</i><span>1</span><small>scale</small></p>
         <h2>Step 2 · A pyramid, coarse to fine</h2>
       </header>
-      <p class="delta"><b>Added</b> a 2×2 downsample and a six-level pyramid. <b>Changed</b> the ±15 search now runs only on the smallest level; every finer level searches ±2 around the doubled answer. <b>Result</b> the big TIFs take under a second each; 16 of 17 come out right.</p>
 
       <!--SNIPPET:pyramid-->
       <div class="pyramid" aria-label="The pyramid levels for the Emir plate">
@@ -301,7 +299,6 @@ for lvl in range(coarsest, -1, -1):
         </figure>
       </div>
       <!--/SNIPPET:gallery-raw-->
-      <p class="note">All 17 plates after step 2, exactly as they come out: pyramid plus NCC on pixel values, no cropping, no color work. Offsets are (dy, dx) of green and red relative to blue. Sixteen are right. The Emir is wrong, and the next two sections are about why and how I fixed it. The L2 offsets for the same run are in the table in step 4.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -322,7 +319,6 @@ for lvl in range(coarsest, -1, -1):
         <p class="param" aria-label="542 pixels off"><span>542</span><small>px off</small></p>
         <h2>What broke · the Emir's robe</h2>
       </header>
-      <p class="delta"><b>Nothing added.</b> This is the diagnosis. The fix is step 3.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -357,9 +353,8 @@ for lvl in range(coarsest, -1, -1):
     <section class="part" id="features">
       <header class="part-head">
         <p class="param" aria-label="from pixels to edges"><span>pixels</span><i aria-hidden="true">→</i><span>edges</span></p>
-        <h2>Step 3 · Gradient magnitude instead of brightness</h2>
+        <h2>Step 3 · Gradient magnitude instead of brightness <small>bells &amp; whistles 5</small></h2>
       </header>
-      <p class="delta"><b>Added</b> a gradient-magnitude function and used its output as the thing that gets compared. <b>Changed</b> only the input to the score; the search, the pyramid and the metric stay the same. <b>Result</b> 17 of 17 align; the plates that already worked move by at most a pixel. This is bells &amp; whistles item 5, better features.</p>
 
       <div class="pair pair-4">
         <figure class="shot">
@@ -422,7 +417,6 @@ for lvl in range(coarsest, -1, -1):
         <p class="param" aria-label="L2 to LPIPS"><span>L2</span><i aria-hidden="true">→</i><span>LPIPS</span></p>
         <h2>Step 4 · Two more metrics: SSIM and LPIPS</h2>
       </header>
-      <p class="delta"><b>Added</b> SSIM (written from scratch) and LPIPS (a pretrained network) as extra scores, and reran every plate eight ways. <b>Changed</b> nothing in the pipeline: gradient NCC stayed. <b>Result</b> the table below, which also holds the L2 and NCC offsets for every plate.</p>
 
       <!--SNIPPET:table-->
       <div class="table-wrap">
@@ -493,7 +487,6 @@ scores = -net(A, B).flatten()                        # minus LPIPS distance, hig
         <p class="param" aria-label="1905 to 1915"><span>1905</span><i aria-hidden="true">→</i><span>1915</span></p>
         <h2>Three plates I picked from the collection</h2>
       </header>
-      <p class="delta"><b>Added</b> three master scans I downloaded from the Library of Congress myself. <b>Changed</b> nothing: same code, same parameters. <b>Result</b> all three align with L2, NCC and the rest. Their offsets are in the step-4 table; these are the finished versions.</p>
 
       <div class="pair pair-3">
         <figure class="shot">
@@ -532,9 +525,8 @@ scores = -net(A, B).flatten()                        # minus LPIPS distance, hig
     <section class="part" id="crop">
       <header class="part-head">
         <p class="param" aria-label="0 to 25 percent"><span>0</span><i aria-hidden="true">→</i><span>25</span><small>%</small></p>
-        <h2>Step 5 · Automatic cropping</h2>
+        <h2>Step 5 · Automatic cropping <small>bells &amp; whistles 1</small></h2>
       </header>
-      <p class="delta"><b>Added</b> a border detector that finds where to cut on each side from the image itself. <b>Changed</b> the aligned image is now trimmed before any color work. <b>Result</b> the black frame, the paper margin and the rainbow strips are gone on all 17 plates. Bells &amp; whistles item 1.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -635,9 +627,8 @@ for i in range(limit):            # from the edge inward, outer quarter
     <section class="part" id="color">
       <header class="part-head">
         <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
-        <h2>Step 6 · A better color mapping: one 3×3 matrix</h2>
+        <h2>Step 6 · A better color mapping: one 3×3 matrix <small>bells &amp; whistles 4</small></h2>
       </header>
-      <p class="delta"><b>Added</b> a 3×3 matrix from the three plate channels to R, G, B, fitted by least squares against the Library's own color versions of four scenes. <b>Changed</b> every pixel of every plate goes through it right after the crop. <b>Result</b> the cyan-magenta look of the direct mapping is gone; skin and white cloth stop being pink. Bells &amp; whistles item 4.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -734,9 +725,8 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
     <section class="part" id="balance">
       <header class="part-head">
         <p class="param" aria-label="Minkowski norm p from 1 to 6"><span>1</span><i aria-hidden="true">→</i><span>6</span><small>p</small></p>
-        <h2>Step 7 · Automatic white balance</h2>
+        <h2>Step 7 · Automatic white balance <small>bells &amp; whistles 3</small></h2>
       </header>
-      <p class="delta"><b>Added</b> an illuminant estimate (gray world, white patch, and shades of gray, which is one formula with a knob between them) and a per-channel gain that cancels it. <b>Changed</b> shades of gray with p = 6 runs after the matrix. <b>Result</b> the blue cast that every plate shares is gone; the camel loses most of its sepia. Bells &amp; whistles item 3.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -814,9 +804,8 @@ def white_balance(rgb):
     <section class="part" id="contrast">
       <header class="part-head">
         <p class="param" aria-label="0.5th to 99.5th percentile"><span>0.5</span><i aria-hidden="true">→</i><span>99.5</span><small>%ile</small></p>
-        <h2>Step 8 · Automatic contrast</h2>
+        <h2>Step 8 · Automatic contrast <small>bells &amp; whistles 2</small></h2>
       </header>
-      <p class="delta"><b>Added</b> a percentile stretch to the full range, then a partial histogram equalization on luminance. <b>Changed</b> this is the last thing that touches the image, since it is the only step that clips. <b>Result</b> the flat scans use the whole tonal range; shadows in the interiors open up. Bells &amp; whistles item 2.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -890,7 +879,6 @@ rgb = rgb * (y_new / y)[..., None]</pre>
         <p class="param" aria-label="seventeen plates"><span>17</span><small>plates</small></p>
         <h2>Everything on · the two running examples, then all seventeen</h2>
       </header>
-      <p class="delta"><b>Nothing new.</b> The whole pipeline in order: step 3 alignment, step 5 crop, step 6 matrix, step 7 white balance, step 8 contrast. Same parameters for every plate.</p>
 
       <div class="strip strip-7" aria-label="The church through every step">
         <figure><img src="images/bw/steps-church-0-stacked.jpg" srcset="images/bw/steps-church-0-stacked-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, stacked" width="1500" height="1322"><figcaption>stacked</figcaption></figure>
@@ -984,7 +972,6 @@ rgb = rgb * (y_new / y)[..., None]</pre>
         </figure>
       </div>
       <!--/SNIPPET:gallery-->
-      <p class="note">Offsets are (dy, dx) of the green and red plates relative to blue, from step-3 alignment. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
     </section>
   </main>
 
