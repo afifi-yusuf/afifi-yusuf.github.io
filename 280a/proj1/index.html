@@ -522,7 +522,7 @@ scores = -net(A, B).flatten()                        # minus LPIPS distance, hig
         <aside class="formula" aria-label="Where the plates came from">
           <p class="formula-line">LoC</p>
           <p>
-            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFs. The Library's own color versions (<code>prokc</code>) of these scenes are what the color matrix in step 8 is fitted against.
+            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFs. The Library's own color versions (<code>prokc</code>) of these scenes are what the color matrix in step 6 is fitted against.
           </p>
         </aside>
       </div>
@@ -631,91 +631,116 @@ for i in range(limit):            # from the edge inward, outer quarter
       <!--/SNIPPET:crop-table-->
     </section>
 
-    <!-- ========================================================== contrast -->
-    <section class="part" id="contrast">
+    <!-- ============================================================= color -->
+    <section class="part" id="color">
       <header class="part-head">
-        <p class="param" aria-label="0.5th to 99.5th percentile"><span>0.5</span><i aria-hidden="true">→</i><span>99.5</span><small>%ile</small></p>
-        <h2>Step 6 · Automatic contrast</h2>
+        <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
+        <h2>Step 6 · A better color mapping: one 3×3 matrix</h2>
       </header>
-      <p class="delta"><b>Added</b> a percentile stretch to the full range, then a partial histogram equalization on luminance. <b>Changed</b> runs right after the crop. <b>Result</b> the flat scans use the whole tonal range; shadows in the interiors open up. Bells &amp; whistles item 2.</p>
+      <p class="delta"><b>Added</b> a 3×3 matrix from the three plate channels to R, G, B, fitted by least squares against the Library's own color versions of four scenes. <b>Changed</b> every pixel of every plate goes through it right after the crop. <b>Result</b> the cyan-magenta look of the direct mapping is gone; skin and white cloth stop being pink. Bells &amp; whistles item 4.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w, images/bw/steps-church-3-crop.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the crop, tonally flat" width="1500" height="1311">
-          <figcaption><b class="nounit">Before</b><span>Church · after step 5 · flat</span></figcaption>
+          <img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w, images/bw/steps-church-3-crop.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the crop, plates mapped directly to RGB" width="1500" height="1311">
+          <figcaption><b class="nounit">Before</b><span>Church · after step 5 · plates → R, G, B as is</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w, images/bw/steps-church-4-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the contrast stretch and partial equalization" width="1500" height="1311">
-          <figcaption><b class="nounit">After step 6</b><span>Church · stretch + quarter-strength equalization</span></figcaption>
-        </figure>
-      </div>
-
-      <div class="pair pair-3">
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-before.jpg" srcset="images/bw/contrast-icon-before-750.jpg 750w, images/bw/contrast-icon-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon interior as scanned, flat and gray" width="1500" height="1355">
-          <figcaption><b class="nounit">Before</b><span>Icon · as aligned</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-linear.jpg" srcset="images/bw/contrast-icon-linear-750.jpg 750w, images/bw/contrast-icon-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a linear percentile stretch" width="1500" height="1355">
-          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-eq.jpg" srcset="images/bw/contrast-icon-eq-750.jpg 750w, images/bw/contrast-icon-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a half-strength histogram equalization on top of the stretch" width="1500" height="1355">
-          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
+          <img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w, images/bw/steps-church-4-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church through the fitted colour matrix" width="1500" height="1311">
+          <figcaption><b class="nounit">After step 6</b><span>Church · through the fitted 3×3</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-before.jpg" srcset="images/bw/contrast-wharf-before-750.jpg 750w, images/bw/contrast-wharf-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf as aligned" width="1500" height="1305">
-          <figcaption><b class="nounit">Before</b><span>Wharf · as aligned</span></figcaption>
+          <img src="images/bw/cmap-emir-before.jpg" srcset="images/bw/cmap-emir-before-750.jpg 750w, images/bw/cmap-emir-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir with the plates mapped directly to R, G and B" width="1500" height="1404">
+          <figcaption><b class="nounit">Direct</b><span>Emir · plates → R, G, B as is</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-linear.jpg" srcset="images/bw/contrast-wharf-linear-750.jpg 750w, images/bw/contrast-wharf-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf after the linear stretch" width="1500" height="1305">
-          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
+          <img src="images/bw/cmap-emir-after.jpg" srcset="images/bw/cmap-emir-after-750.jpg 750w, images/bw/cmap-emir-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir after the fitted 3 by 3 color matrix" width="1500" height="1404">
+          <figcaption><b class="nounit">Matrix</b><span>Emir · through the fitted 3×3</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-eq.jpg" srcset="images/bw/contrast-wharf-eq-750.jpg 750w, images/bw/contrast-wharf-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf with the half-strength equalization" width="1500" height="1305">
-          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
+          <img src="images/bw/cmap-emir-loc.jpg" srcset="images/bw/cmap-emir-loc-750.jpg 750w, images/bw/cmap-emir-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library of Congress's own color rendition of the Emir plate" width="1500" height="1464">
+          <figcaption><b class="nounit">LoC</b><span>The Library's version, for reference</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-before.jpg" srcset="images/bw/cmap-lugano-before-750.jpg 750w, images/bw/cmap-lugano-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano with the plates mapped directly" width="1500" height="1241">
+          <figcaption><b class="nounit">Direct</b><span>Lugano</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-after.jpg" srcset="images/bw/cmap-lugano-after-750.jpg 750w, images/bw/cmap-lugano-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano through the fitted matrix" width="1500" height="1241">
+          <figcaption><b class="nounit">Matrix</b><span>Lugano</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-loc.jpg" srcset="images/bw/cmap-lugano-loc-750.jpg 750w, images/bw/cmap-lugano-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library's rendition of Lugano" width="1500" height="1226">
+          <figcaption><b class="nounit">LoC</b><span>Lugano</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/bw/cmap-three_generations-before.jpg" srcset="images/bw/cmap-three_generations-before-750.jpg 750w, images/bw/cmap-three_generations-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations with the plates mapped directly" width="1500" height="1317">
+          <figcaption><b class="nounit">Direct</b><span>Three generations · not in the fit</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-three_generations-after.jpg" srcset="images/bw/cmap-three_generations-after-750.jpg 750w, images/bw/cmap-three_generations-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations through the fitted matrix" width="1500" height="1317">
+          <figcaption><b class="nounit">Matrix</b><span>Three generations</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-melons-after.jpg" srcset="images/bw/cmap-melons-after-750.jpg 750w, images/bw/cmap-melons-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The melon seller through the fitted matrix" width="1500" height="1317">
+          <figcaption><b class="nounit">Matrix</b><span>Melons · not in the fit</span></figcaption>
         </figure>
       </div>
 
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            <b>The stretch.</b> The scans do not use the full range. The icon, for example, has its 0.5th and 99.5th percentiles at 0.08 and 0.93 once the borders are gone, and the wharf at 0.05 and 0.91. I find those two percentiles over all three channels together and map them linearly to 0 and 1, clipping the few pixels outside. Percentiles instead of the true min and max means one speck of dust or one blown highlight cannot pin the range. Using the same two numbers for all three channels changes brightness and contrast but not hue, so this step cannot add a color cast. Hue is the next step's job.
+            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
           </p>
-<pre class="code">lo, hi = np.percentile(rgb, 0.5), np.percentile(rgb, 99.5)
-rgb = np.clip((rgb - lo) / (hi - lo), 0, 1)</pre>
           <p>
-            <b>Histogram equalization.</b> For the nonlinear part I equalize the luminance: build its histogram, take the cumulative sum, normalize it, and that CDF is the new tone curve. Then I only blend part of the way from the original curve to the equalized one, and scale all three channels by the same luminance ratio so colors stay put. Full equalization is too much for these photos, it flattens skies into gray and makes everything look like a poster. Half strength, shown above, opens the shadows in the church interiors without wrecking the highlights. The final pipeline uses a quarter strength on every plate.
+            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
           </p>
-<pre class="code">hist, edges = np.histogram(y, bins=1024, range=(0, 1))
-cdf = np.cumsum(hist) / hist.sum()
-y_eq = np.interp(y, edges[:-1], cdf)
-y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
-rgb = rgb * (y_new / y)[..., None]</pre>
+<pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
+rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
+          <p>
+            <b>What it says.</b> The red row is nearly identity. The green row takes about 11% from each of the red and blue plates, which is the broad green filter. The blue row is scaled down to 0.85 and borrows 11% from green, which desaturates the cyan cast. It does part of what the white balance does for the overall cast, but it also fixes hues no per-channel gain can, like the pink shadows on skin and white cloth. The difference that remains against the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. What is left on the church after this step is a blue cast that every plate shares, which is the next step.
+          </p>
         </div>
-        <aside class="formula" aria-label="The stretch">
-          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
+        <aside class="formula" aria-label="The fitted matrix">
+          <p class="formula-line">[R G B]ᵀ = <var>M</var> · [r g b]ᵀ</p>
+          <div class="matrix" aria-label="M">
+            <!--MATRIX-->
+            <span>0.94</span>
+            <span class="off">+0.01</span>
+            <span class="off">+0.06</span>
+            <span class="off">+0.11</span>
+            <span>0.75</span>
+            <span class="off">+0.11</span>
+            <span class="off">-0.01</span>
+            <span class="off">+0.11</span>
+            <span>0.85</span>
+      <!--/MATRIX-->
+          </div>
           <p>
-            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance, and each channel multiplied by <var>L</var>′/<var>L</var>.
+            Least squares over registered pixels of four scenes against the Library's <code>prokc</code> versions; mean of the four fits. Rows are output R, G, B; columns are the red, green and blue plates.
           </p>
         </aside>
       </div>
     </section>
-
     <!-- =========================================================== balance -->
     <section class="part" id="balance">
       <header class="part-head">
         <p class="param" aria-label="Minkowski norm p from 1 to 6"><span>1</span><i aria-hidden="true">→</i><span>6</span><small>p</small></p>
         <h2>Step 7 · Automatic white balance</h2>
       </header>
-      <p class="delta"><b>Added</b> an illuminant estimate (gray world, white patch, and shades of gray, which is one formula with a knob between them) and a per-channel gain that cancels it. <b>Changed</b> shades of gray with p = 6 now runs after the contrast step. <b>Result</b> the blue cast that every plate shares is gone; the camel loses most of its sepia. Bells &amp; whistles item 3.</p>
+      <p class="delta"><b>Added</b> an illuminant estimate (gray world, white patch, and shades of gray, which is one formula with a knob between them) and a per-channel gain that cancels it. <b>Changed</b> shades of gray with p = 6 runs after the matrix. <b>Result</b> the blue cast that every plate shares is gone; the camel loses most of its sepia. Bells &amp; whistles item 3.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w, images/bw/steps-church-4-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after contrast, still with a blue cast" width="1500" height="1311">
+          <img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w, images/bw/steps-church-4-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the colour matrix, still with a blue cast" width="1500" height="1311">
           <figcaption><b class="nounit">Before</b><span>Church · after step 6 · blue cast</span></figcaption>
         </figure>
         <figure class="shot">
@@ -785,102 +810,75 @@ def white_balance(rgb):
         </aside>
       </div>
     </section>
-
-    <!-- ============================================================= color -->
-    <section class="part" id="color">
+    <!-- ========================================================== contrast -->
+    <section class="part" id="contrast">
       <header class="part-head">
-        <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
-        <h2>Step 8 · A better color mapping: one 3×3 matrix</h2>
+        <p class="param" aria-label="0.5th to 99.5th percentile"><span>0.5</span><i aria-hidden="true">→</i><span>99.5</span><small>%ile</small></p>
+        <h2>Step 8 · Automatic contrast</h2>
       </header>
-      <p class="delta"><b>Added</b> a 3×3 matrix from the three plate channels to R, G, B, fitted by least squares against the Library's own color versions of four scenes. <b>Changed</b> every pixel of every plate goes through it as the last step. <b>Result</b> the cyan-magenta look of the direct mapping is gone; skin and white cloth stop being pink. Bells &amp; whistles item 4.</p>
+      <p class="delta"><b>Added</b> a percentile stretch to the full range, then a partial histogram equalization on luminance. <b>Changed</b> this is the last thing that touches the image, since it is the only step that clips. <b>Result</b> the flat scans use the whole tonal range; shadows in the interiors open up. Bells &amp; whistles item 2.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w, images/bw/steps-church-5-wb.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after white balance, plates mapped directly to RGB" width="1500" height="1311">
-          <figcaption><b class="nounit">Before</b><span>Church · after step 7 · plates → R, G, B as is</span></figcaption>
+          <img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w, images/bw/steps-church-5-wb.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after white balance, tonally flat" width="1500" height="1311">
+          <figcaption><b class="nounit">Before</b><span>Church · after step 7 · flat</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/steps-church-6-matrix.jpg" srcset="images/bw/steps-church-6-matrix-750.jpg 750w, images/bw/steps-church-6-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church through the fitted colour matrix: the finished plate" width="1500" height="1311">
-          <figcaption><b class="nounit">After step 8</b><span>Church · through the fitted 3×3 · done</span></figcaption>
-        </figure>
-      </div>
-
-      <div class="pair pair-3">
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-before.jpg" srcset="images/bw/cmap-emir-before-750.jpg 750w, images/bw/cmap-emir-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir with the plates mapped directly to R, G and B" width="1500" height="1404">
-          <figcaption><b class="nounit">Direct</b><span>Emir · plates → R, G, B as is</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-after.jpg" srcset="images/bw/cmap-emir-after-750.jpg 750w, images/bw/cmap-emir-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir after the fitted 3 by 3 color matrix" width="1500" height="1404">
-          <figcaption><b class="nounit">Matrix</b><span>Emir · through the fitted 3×3</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-loc.jpg" srcset="images/bw/cmap-emir-loc-750.jpg 750w, images/bw/cmap-emir-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library of Congress's own color rendition of the Emir plate" width="1500" height="1464">
-          <figcaption><b class="nounit">LoC</b><span>The Library's version, for reference</span></figcaption>
+          <img src="images/bw/steps-church-6-contrast.jpg" srcset="images/bw/steps-church-6-contrast-750.jpg 750w, images/bw/steps-church-6-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the contrast stretch and partial equalization: the finished plate" width="1500" height="1311">
+          <figcaption><b class="nounit">After step 8</b><span>Church · stretch + quarter-strength equalization · done</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-before.jpg" srcset="images/bw/cmap-lugano-before-750.jpg 750w, images/bw/cmap-lugano-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano with the plates mapped directly" width="1500" height="1241">
-          <figcaption><b class="nounit">Direct</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-before.jpg" srcset="images/bw/contrast-icon-before-750.jpg 750w, images/bw/contrast-icon-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon interior as scanned, flat and gray" width="1500" height="1355">
+          <figcaption><b class="nounit">Before</b><span>Icon · as aligned</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-after.jpg" srcset="images/bw/cmap-lugano-after-750.jpg 750w, images/bw/cmap-lugano-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano through the fitted matrix" width="1500" height="1241">
-          <figcaption><b class="nounit">Matrix</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-linear.jpg" srcset="images/bw/contrast-icon-linear-750.jpg 750w, images/bw/contrast-icon-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a linear percentile stretch" width="1500" height="1355">
+          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-loc.jpg" srcset="images/bw/cmap-lugano-loc-750.jpg 750w, images/bw/cmap-lugano-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library's rendition of Lugano" width="1500" height="1226">
-          <figcaption><b class="nounit">LoC</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-eq.jpg" srcset="images/bw/contrast-icon-eq-750.jpg 750w, images/bw/contrast-icon-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a half-strength histogram equalization on top of the stretch" width="1500" height="1355">
+          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/cmap-three_generations-before.jpg" srcset="images/bw/cmap-three_generations-before-750.jpg 750w, images/bw/cmap-three_generations-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations with the plates mapped directly" width="1500" height="1317">
-          <figcaption><b class="nounit">Direct</b><span>Three generations · not in the fit</span></figcaption>
+          <img src="images/bw/contrast-wharf-before.jpg" srcset="images/bw/contrast-wharf-before-750.jpg 750w, images/bw/contrast-wharf-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf as aligned" width="1500" height="1305">
+          <figcaption><b class="nounit">Before</b><span>Wharf · as aligned</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-three_generations-after.jpg" srcset="images/bw/cmap-three_generations-after-750.jpg 750w, images/bw/cmap-three_generations-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations through the fitted matrix" width="1500" height="1317">
-          <figcaption><b class="nounit">Matrix</b><span>Three generations</span></figcaption>
+          <img src="images/bw/contrast-wharf-linear.jpg" srcset="images/bw/contrast-wharf-linear-750.jpg 750w, images/bw/contrast-wharf-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf after the linear stretch" width="1500" height="1305">
+          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-melons-after.jpg" srcset="images/bw/cmap-melons-after-750.jpg 750w, images/bw/cmap-melons-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The melon seller through the fitted matrix" width="1500" height="1317">
-          <figcaption><b class="nounit">Matrix</b><span>Melons · not in the fit</span></figcaption>
+          <img src="images/bw/contrast-wharf-eq.jpg" srcset="images/bw/contrast-wharf-eq-750.jpg 750w, images/bw/contrast-wharf-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf with the half-strength equalization" width="1500" height="1305">
+          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
         </figure>
       </div>
 
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
+            <b>The stretch.</b> The scans do not use the full range. The icon, for example, has its 0.5th and 99.5th percentiles at 0.08 and 0.93 once the borders are gone, and the wharf at 0.05 and 0.91. I find those two percentiles over all three channels together and map them linearly to 0 and 1, clipping the few pixels outside. Percentiles instead of the true min and max means one speck of dust or one blown highlight cannot pin the range. Using the same two numbers for all three channels changes brightness and contrast but not hue, so this step cannot add a color cast, which matters because it runs after the white balance.
           </p>
+<pre class="code">lo, hi = np.percentile(rgb, 0.5), np.percentile(rgb, 99.5)
+rgb = np.clip((rgb - lo) / (hi - lo), 0, 1)</pre>
           <p>
-            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
+            <b>Histogram equalization.</b> For the nonlinear part I equalize the luminance: build its histogram, take the cumulative sum, normalize it, and that CDF is the new tone curve. Then I only blend part of the way from the original curve to the equalized one, and scale all three channels by the same luminance ratio so colors stay put. Full equalization is too much for these photos, it flattens skies into gray and makes everything look like a poster. Half strength, shown above, opens the shadows in the church interiors without wrecking the highlights. The final pipeline uses a quarter strength on every plate. With this the church is finished; compare it with the stacked plates back in step 2.
           </p>
-<pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
-rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
-          <p>
-            <b>What it says.</b> The red row is nearly identity. The green row takes about 11% from each of the red and blue plates, which is the broad green filter. The blue row is scaled down to 0.85 and borrows 11% from green, which desaturates the cyan cast. It does part of what the white balance does for the overall cast, but it also fixes hues no per-channel gain can, like the pink shadows on skin and white cloth. The difference that remains against the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. With this step the church is finished; compare it with the stacked plates back in step 2.
-          </p>
+<pre class="code">hist, edges = np.histogram(y, bins=1024, range=(0, 1))
+cdf = np.cumsum(hist) / hist.sum()
+y_eq = np.interp(y, edges[:-1], cdf)
+y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
+rgb = rgb * (y_new / y)[..., None]</pre>
         </div>
-        <aside class="formula" aria-label="The fitted matrix">
-          <p class="formula-line">[R G B]ᵀ = <var>M</var> · [r g b]ᵀ</p>
-          <div class="matrix" aria-label="M">
-            <!--MATRIX-->
-            <span>0.94</span>
-            <span class="off">+0.01</span>
-            <span class="off">+0.06</span>
-            <span class="off">+0.11</span>
-            <span>0.75</span>
-            <span class="off">+0.11</span>
-            <span class="off">-0.01</span>
-            <span class="off">+0.11</span>
-            <span>0.85</span>
-      <!--/MATRIX-->
-          </div>
+        <aside class="formula" aria-label="The stretch">
+          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
           <p>
-            Least squares over registered pixels of four scenes against the Library's <code>prokc</code> versions; mean of the four fits. Rows are output R, G, B; columns are the red, green and blue plates.
+            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance, and each channel multiplied by <var>L</var>′/<var>L</var>.
           </p>
         </aside>
       </div>
@@ -892,25 +890,25 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
         <p class="param" aria-label="seventeen plates"><span>17</span><small>plates</small></p>
         <h2>Everything on · the two running examples, then all seventeen</h2>
       </header>
-      <p class="delta"><b>Nothing new.</b> The whole pipeline in order: step 3 alignment, step 5 crop, step 6 contrast, step 7 white balance, step 8 matrix. Same parameters for every plate.</p>
+      <p class="delta"><b>Nothing new.</b> The whole pipeline in order: step 3 alignment, step 5 crop, step 6 matrix, step 7 white balance, step 8 contrast. Same parameters for every plate.</p>
 
       <div class="strip strip-7" aria-label="The church through every step">
         <figure><img src="images/bw/steps-church-0-stacked.jpg" srcset="images/bw/steps-church-0-stacked-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, stacked" width="1500" height="1322"><figcaption>stacked</figcaption></figure>
         <figure><img src="images/bw/steps-church-1-ncc-raw.jpg" srcset="images/bw/steps-church-1-ncc-raw-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 2" width="1500" height="1301"><figcaption>2 · pyramid</figcaption></figure>
         <figure><img src="images/bw/steps-church-2-ncc-grad.jpg" srcset="images/bw/steps-church-2-ncc-grad-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 3" width="1500" height="1301"><figcaption>3 · gradients</figcaption></figure>
         <figure><img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 5" width="1500" height="1311"><figcaption>5 · crop</figcaption></figure>
-        <figure><img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 6" width="1500" height="1311"><figcaption>6 · contrast</figcaption></figure>
+        <figure><img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 6" width="1500" height="1311"><figcaption>6 · matrix</figcaption></figure>
         <figure><img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 7" width="1500" height="1311"><figcaption>7 · balance</figcaption></figure>
-        <figure><img src="images/bw/steps-church-6-matrix.jpg" srcset="images/bw/steps-church-6-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 8" width="1500" height="1311"><figcaption>8 · matrix</figcaption></figure>
+        <figure><img src="images/bw/steps-church-6-contrast.jpg" srcset="images/bw/steps-church-6-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 8" width="1500" height="1311"><figcaption>8 · contrast</figcaption></figure>
       </div>
       <div class="strip strip-7" aria-label="The Emir through every step">
         <figure><img src="images/bw/steps-emir-0-stacked.jpg" srcset="images/bw/steps-emir-0-stacked-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, stacked" width="1500" height="1300"><figcaption>stacked</figcaption></figure>
         <figure><img src="images/bw/steps-emir-1-ncc-raw.jpg" srcset="images/bw/steps-emir-1-ncc-raw-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 2, misaligned" width="1500" height="1391"><figcaption>2 · pyramid ✕</figcaption></figure>
         <figure><img src="images/bw/steps-emir-2-ncc-grad.jpg" srcset="images/bw/steps-emir-2-ncc-grad-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 3" width="1500" height="1271"><figcaption>3 · gradients</figcaption></figure>
         <figure><img src="images/bw/steps-emir-3-crop.jpg" srcset="images/bw/steps-emir-3-crop-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 5" width="1500" height="1404"><figcaption>5 · crop</figcaption></figure>
-        <figure><img src="images/bw/steps-emir-4-contrast.jpg" srcset="images/bw/steps-emir-4-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 6" width="1500" height="1404"><figcaption>6 · contrast</figcaption></figure>
+        <figure><img src="images/bw/steps-emir-4-matrix.jpg" srcset="images/bw/steps-emir-4-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 6" width="1500" height="1404"><figcaption>6 · matrix</figcaption></figure>
         <figure><img src="images/bw/steps-emir-5-wb.jpg" srcset="images/bw/steps-emir-5-wb-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 7" width="1500" height="1404"><figcaption>7 · balance</figcaption></figure>
-        <figure><img src="images/bw/steps-emir-6-matrix.jpg" srcset="images/bw/steps-emir-6-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 8" width="1500" height="1404"><figcaption>8 · matrix</figcaption></figure>
+        <figure><img src="images/bw/steps-emir-6-contrast.jpg" srcset="images/bw/steps-emir-6-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 8" width="1500" height="1404"><figcaption>8 · contrast</figcaption></figure>
       </div>
 
       <h3 class="sub">All seventeen through the full pipeline</h3>

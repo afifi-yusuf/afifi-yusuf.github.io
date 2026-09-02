@@ -317,18 +317,19 @@
   }
 }
 
-/* Short code snippets inside the prose. */
+/* Short code snippets inside the prose: dark indigo, like the hero. */
 .prose pre.code {
   max-width: var(--measure);
   margin: 0.75rem 0 1rem;
-  padding: 0.8rem 1rem;
+  padding: 0.85rem 1.1rem;
   overflow-x: auto;
-  background: var(--surface);
-  border-left: 3px solid var(--indigo);
+  background: var(--indigo-deep);
+  color: var(--on-dark);
+  border-left: 3px solid var(--amber);
+  border-radius: 4px;
   font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.78rem;
-  line-height: 1.5;
-  color: var(--ink);
+  line-height: 1.55;
   white-space: pre;
   tab-size: 4;
 }
@@ -339,6 +340,9 @@
 
 @media print {
   .prose pre.code {
+    background: var(--surface);
+    color: var(--ink);
+    border-left-color: var(--indigo);
     font-size: 7.5pt;
     break-inside: avoid;
   }
