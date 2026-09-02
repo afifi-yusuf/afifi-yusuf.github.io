@@ -922,18 +922,6 @@
       <!--/SNIPPET:gallery-->
       <p class="note">Offsets are (dy, dx) in pixels of the green and red plates relative to blue, from step-3 alignment. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
 
-      <div class="part-body part-body-wide">
-        <div class="prose">
-          <p>
-            <b>Where each deliverable is.</b> Single-scale alignment with L2 and NCC on the JPEGs: step 1. Pyramid alignment with L2 and NCC on raw pixel values, offsets listed for all plates: the step-2 gallery and the step-4 table. My three plates: the picks section, with their offsets in the same table. The failure and why: the section after step 2. Bells and whistles, each with before and after: automatic cropping (step 5), automatic contrast (step 8), automatic white balance (step 7), better colour mapping (step 6), better features (step 3). Two extra metrics beyond L2 and NCC, with the basic ones reported alongside: step 4.
-          </p>
-        </div>
-        <aside class="formula" aria-label="Code">
-          <p class="formula-line">tools/</p>
-          <p>
-            <code>colorize.py</code> (split, scores, search, pyramid, NumPy only), <code>enhance.py</code> (crop, contrast, white balance, colour matrix), <code>lpips_metric.py</code> (the network score), <code>fit_colormap.py</code> (the matrix fit), <code>run_all.py</code> (every image and number on this page). No image files are in the code submission.
-          </p>
-        </aside>
       </div>
     </section>
   </main>
