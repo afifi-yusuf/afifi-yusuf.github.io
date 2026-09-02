@@ -34,7 +34,7 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
-          <p class="spec">Project 1 · Prokudin-Gorskii glass plates · Library of Congress · NumPy only</p>
+          <p class="spec">Project 1 · Prokudin-Gorskii glass plates · Library of Congress · NumPy, from scratch</p>
           <h1>Colorizing the Prokudin-Gorskii collection</h1>
           <p class="lede">
             Between 1907 and 1915 Sergei Prokudin-Gorskii photographed the Russian Empire three times per scene, through a blue, a green and a red filter, onto one tall glass plate. He never got to project them in color. The Library of Congress scanned the plates, and this project puts the three exposures back on top of each other. The hard part is that nothing lines up: the plates shifted by up to 180 pixels between exposures, the emir's robe looks completely different in each filter, and the scans are 3700 pixels on a side. I wrote the alignment from scratch in NumPy, first as a brute-force search, then as a coarse-to-fine pyramid, then with gradients instead of pixels, and finished with automatic cropping, contrast, white balance and a fitted color matrix.
@@ -105,6 +105,9 @@
             At this size a brute-force search is fine. For every displacement (dy, dx) in a 31×31 window from −15 to +15 pixels I score how well the shifted plate matches the reference, and keep the best. The one thing that matters is what gets scored. The plates have black and white borders that do not belong to the picture, and a shifted plate leaves an empty strip along two edges, so I only score the interior: 10% is trimmed from every side of the reference, and the moving plate is compared on the same pixels through slicing rather than <code>np.roll</code>, so the wrapped-around strip is never seen. Without that trim the borders dominate the score and the search happily aligns the frames instead of the photograph.
           </p>
           <p>
+            A word on what is library code and what is not, since the assignment draws that line. The alignment on this page is NumPy array arithmetic: the split, the four scores, the shift, the search, the downsampling and the pyramid are all written out in <code>colorize.py</code>. The only library calls in that file read the file and write the JPEG. The bells and whistles below are likewise plain NumPy, except two things the assignment permits for them: the resize used to register my composites against the Library's renditions, and PyTorch for the LPIPS score, which is a pretrained network and could not be anything else.
+          </p>
+          <p>
             I implemented four scores. <span class="tag">L2</span> is the root mean squared difference of the two plates (smaller is better, so I negate it). <span class="tag">NCC</span> subtracts each plate's mean, normalizes to unit length and takes the dot product, which makes it indifferent to the fact that a red filter and a blue filter simply let through different amounts of light. <span class="tag">SSIM</span> and <span class="tag">LPIPS</span> are my two extra ones and are described in the metrics section. On the three small plates all four land on the same answer.
           </p>
         </div>
@@ -113,7 +116,7 @@
       <!--SNIPPET:single-table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Plate</th><th>L2</th><th>NCC</th><th>SSIM</th><th>LPIPS</th><th>s: L2 / NCC / SSIM / LPIPS</th></tr></thead>
+          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>SSIM (dy, dx)</th><th>LPIPS (dy, dx)</th><th>s: L2 / NCC / SSIM / LPIPS</th></tr></thead>
           <tbody>
           <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2 / 4.1 / 3.0</td></tr>
           <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2 / 5.0 / 2.7</td></tr>
@@ -194,7 +197,82 @@
         </aside>
       </div>
 
-      <h3 class="sub">All fourteen plates, plus my three</h3>
+      <h3 class="sub">The basic pipeline: pyramid + NCC on raw pixel values, nothing else</h3>
+      <!--SNIPPET:gallery-raw-->
+      <div class="gallery">
+        <figure>
+          <img src="images/aligned/cathedral-ncc-raw.jpg" loading="lazy" decoding="async" alt="Cathedral, pyramid alignment with NCC on raw pixels" width="387" height="329">
+          <figcaption><b>Cathedral</b>G (5, 2) · R (12, 3)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/monastery-ncc-raw.jpg" loading="lazy" decoding="async" alt="Monastery, pyramid alignment with NCC on raw pixels" width="389" height="335">
+          <figcaption><b>Monastery</b>G (-3, 2) · R (3, 2)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/tobolsk-ncc-raw.jpg" loading="lazy" decoding="async" alt="Tobolsk, pyramid alignment with NCC on raw pixels" width="393" height="335">
+          <figcaption><b>Tobolsk</b>G (3, 3) · R (6, 3)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/church-ncc-raw.jpg" srcset="images/aligned/church-ncc-raw-750.jpg 750w, images/aligned/church-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Church, pyramid alignment with NCC on raw pixels" width="1500" height="1301">
+          <figcaption><b>Church</b>G (25, 4) · R (58, -4)</figcaption>
+        </figure>
+        <figure class="bad">
+          <img src="images/aligned/emir-ncc-raw.jpg" srcset="images/aligned/emir-ncc-raw-750.jpg 750w, images/aligned/emir-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Emir of Bukhara, pyramid alignment with NCC on raw pixels · misaligned" width="1500" height="1391">
+          <figcaption><b>Emir of Bukhara · misaligned</b>G (49, 24) · R (300, -542)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/harvesters-ncc-raw.jpg" srcset="images/aligned/harvesters-ncc-raw-750.jpg 750w, images/aligned/harvesters-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Harvesters, pyramid alignment with NCC on raw pixels" width="1500" height="1266">
+          <figcaption><b>Harvesters</b>G (60, 17) · R (124, 13)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/icon-ncc-raw.jpg" srcset="images/aligned/icon-ncc-raw-750.jpg 750w, images/aligned/icon-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Icon, pyramid alignment with NCC on raw pixels" width="1500" height="1273">
+          <figcaption><b>Icon</b>G (41, 17) · R (89, 23)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/ilemselga-ncc-raw.jpg" srcset="images/aligned/ilemselga-ncc-raw-750.jpg 750w, images/aligned/ilemselga-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Ilemselga, pyramid alignment with NCC on raw pixels" width="1500" height="1243">
+          <figcaption><b>Ilemselga</b>G (40, 7) · R (130, 11)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/melons-ncc-raw.jpg" srcset="images/aligned/melons-ncc-raw-750.jpg 750w, images/aligned/melons-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Melons, pyramid alignment with NCC on raw pixels" width="1500" height="1223">
+          <figcaption><b>Melons</b>G (82, 11) · R (178, 13)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/religous_painting-ncc-raw.jpg" srcset="images/aligned/religous_painting-ncc-raw-750.jpg 750w, images/aligned/religous_painting-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Religious painting, pyramid alignment with NCC on raw pixels" width="1500" height="1255">
+          <figcaption><b>Religious painting</b>G (28, 3) · R (68, 7)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/self_portrait-ncc-raw.jpg" srcset="images/aligned/self_portrait-ncc-raw-750.jpg 750w, images/aligned/self_portrait-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Self-portrait, pyramid alignment with NCC on raw pixels" width="1500" height="1223">
+          <figcaption><b>Self-portrait</b>G (79, 29) · R (176, 37)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/siren-ncc-raw.jpg" srcset="images/aligned/siren-ncc-raw-750.jpg 750w, images/aligned/siren-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lilacs (Siren), pyramid alignment with NCC on raw pixels" width="1500" height="1248">
+          <figcaption><b>Lilacs (Siren)</b>G (49, -6) · R (96, -25)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/three_generations-ncc-raw.jpg" srcset="images/aligned/three_generations-ncc-raw-750.jpg 750w, images/aligned/three_generations-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Three generations, pyramid alignment with NCC on raw pixels" width="1500" height="1256">
+          <figcaption><b>Three generations</b>G (53, 14) · R (112, 11)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/wharf-ncc-raw.jpg" srcset="images/aligned/wharf-ncc-raw-750.jpg 750w, images/aligned/wharf-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Wharf, pyramid alignment with NCC on raw pixels" width="1500" height="1266">
+          <figcaption><b>Wharf</b>G (15, -7) · R (83, -16)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/camel-ncc-raw.jpg" srcset="images/aligned/camel-ncc-raw-750.jpg 750w, images/aligned/camel-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Man on a camel, pyramid alignment with NCC on raw pixels" width="1500" height="1256">
+          <figcaption><b>Man on a camel · LoC pick</b>G (45, 30) · R (104, 41)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/lugano-ncc-raw.jpg" srcset="images/aligned/lugano-ncc-raw-750.jpg 750w, images/aligned/lugano-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lugano, pyramid alignment with NCC on raw pixels" width="1500" height="1267">
+          <figcaption><b>Lugano · LoC pick</b>G (37, 13) · R (86, 38)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/aligned/kivach-ncc-raw.jpg" srcset="images/aligned/kivach-ncc-raw-750.jpg 750w, images/aligned/kivach-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Kivach falls, pyramid alignment with NCC on raw pixels" width="1500" height="1267">
+          <figcaption><b>Kivach falls · LoC pick</b>G (18, 17) · R (89, 30)</figcaption>
+        </figure>
+      </div>
+      <!--/SNIPPET:gallery-raw-->
+      <p class="note">This is the result the assignment asks for first: every plate aligned with the plain pyramid and NCC on pixel values (offsets as (dy, dx) of the green and red plates relative to blue), with no cropping, no colour work and no gradient trick. Sixteen of the seventeen are right; the Emir is the one allowed failure and is dissected below. The L2 offsets are in the table in the next section.</p>
+
+      <h3 class="sub">All seventeen through the full pipeline</h3>
       <!--SNIPPET:gallery-->
       <div class="gallery">
         <figure>
@@ -267,7 +345,7 @@
         </figure>
       </div>
       <!--/SNIPPET:gallery-->
-      <p class="note">Every plate above went through the same pipeline: gradient NCC alignment, the automatic crop, the fitted color matrix, shades-of-gray white balance and a percentile contrast stretch, all described below. Offsets are (dy, dx) in pixels of the green and red plates relative to blue. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
+      <p class="note">The same seventeen after everything on this page: gradient NCC alignment, the automatic crop, the fitted colour matrix, shades-of-gray white balance and a percentile contrast stretch. Offsets are (dy, dx) in pixels of the green and red plates relative to blue. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
     </section>
 
     <!-- =========================================================== metrics -->
@@ -281,6 +359,7 @@
       <div class="table-wrap">
         <table class="results">
           <thead><tr><th>Plate</th><th>L2<br>pixels</th><th>NCC<br>pixels</th><th>SSIM<br>pixels</th><th>LPIPS<br>pixels</th><th>L2<br>gradients</th><th>NCC<br>gradients</th><th>SSIM<br>gradients</th><th>LPIPS<br>gradients</th><th>s: NCC / SSIM / LPIPS</th></tr></thead>
+          <caption class="sr">Offsets are (dy, dx) in pixels of the green and red plates relative to blue.</caption>
           <tbody>
           <tr><td>Cathedral</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">0.2 / 4 / 2.7</td></tr>
           <tr><td>Monastery</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">0.2 / 5 / 2.7</td></tr>
