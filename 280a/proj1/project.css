@@ -1,0 +1,250 @@
+/* Project 1: project-specific rules. The shared system is ../shared/base.css. */
+
+/* Gradescope asks for the page URL in the header of the printed PDF. */
+@media print {
+  @page {
+    @top-right {
+      content: "https://afifi-yusuf.github.io/280a/proj1/";
+      font: 600 8pt "Pathway Extreme", "Helvetica Neue", Arial, sans-serif;
+      color: #444;
+    }
+  }
+}
+
+/* The plates are roughly square, not 3:4. */
+.shot img,
+.strip img,
+.hero-photo img,
+.entry img {
+  aspect-ratio: 1 / 1;
+}
+
+.wipe-frame {
+  aspect-ratio: 1 / 1;
+}
+
+/* .shot captions: the big numeral is a pixel offset, not a focal length. */
+.shot figcaption b::after {
+  content: "px";
+}
+
+.shot figcaption b.nounit::after {
+  content: none;
+}
+
+/* Three or four shots in a row (before / after / reference). */
+.pair.pair-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pair.pair-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .pair.pair-3,
+  .pair.pair-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* The pyramid walk: six levels, coarse on the left, drawn at relative size. */
+.pyramid {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin: 1.5rem 0 0;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.pyramid figure {
+  margin: 0;
+  flex: 0 0 auto;
+  width: var(--w);
+  min-width: 3.25rem;
+}
+
+.pyramid img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--mat);
+  image-rendering: auto;
+}
+
+.pyramid figcaption {
+  margin-top: 0.35rem;
+  font-family: var(--display);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  color: var(--ink-2);
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pyramid figcaption b {
+  display: block;
+  font-stretch: 60%;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--indigo);
+}
+
+/* The gallery of every plate, offsets under each. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1.25rem 1rem;
+  margin: 1.5rem 0 0;
+}
+
+.gallery figure {
+  margin: 0;
+}
+
+.gallery img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--mat);
+}
+
+.gallery figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--display);
+  font-size: 0.82rem;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.gallery figcaption b {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.gallery figcaption code {
+  font-family: var(--display);
+  font-stretch: 70%;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--indigo);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Offset tables. */
+.results {
+  width: 100%;
+  margin: 1.5rem 0 0;
+  border-collapse: collapse;
+  font-family: var(--display);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.results th,
+.results td {
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.results th {
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-bottom: 2px solid var(--indigo);
+}
+
+.results td.num {
+  font-stretch: 70%;
+  font-weight: 700;
+  color: var(--indigo);
+}
+
+.results td.bad {
+  color: var(--amber-ink);
+}
+
+.results td.bad::after {
+  content: " ✕";
+  font-size: 0.8em;
+}
+
+.results tr.loc td:first-child::after {
+  content: " · mine";
+  font-size: 0.8em;
+  color: var(--amber-ink);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+/* Matrix aside. */
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 0.2rem 1rem;
+  justify-content: start;
+  margin: 0.4rem 0 0.8rem;
+  font-family: var(--display);
+  font-stretch: 70%;
+  font-weight: 750;
+  font-size: 1.3rem;
+  color: var(--indigo);
+  font-variant-numeric: tabular-nums;
+}
+
+.matrix span.off {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* Small in-line pill for method names. */
+.tag {
+  display: inline-block;
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 0.78em;
+  font-weight: 650;
+  color: var(--indigo);
+  vertical-align: 0.08em;
+}
+
+@media print {
+  .gallery {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+  }
+  .results {
+    font-size: 8pt;
+  }
+  .pyramid {
+    overflow: visible;
+  }
+}
+
+/* Sub-heads and notes inside a part. */
+.part h3.sub {
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--indigo);
+}
+
+.note {
+  max-width: var(--measure);
+  margin: 1rem 0 0;
+  font-size: 0.92em;
+  color: var(--ink-2);
+}

@@ -1,0 +1,4487 @@
+{
+ "cathedral": {
+  "file": "raw/data/cathedral.jpg",
+  "plate_shape": [
+   1024,
+   390
+  ],
+  "single": true,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 0.07
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 0.07
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 0.19
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 0.2
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 4.08
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 3.89
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 2.95
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      5,
+      2
+     ],
+     "r": [
+      12,
+      3
+     ]
+    },
+    "seconds": 2.67
+   }
+  },
+  "final_size": [
+   365,
+   322
+  ]
+ },
+ "monastery": {
+  "file": "raw/data/monastery.jpg",
+  "plate_shape": [
+   1024,
+   391
+  ],
+  "single": true,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 0.07
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 0.07
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 0.2
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 0.2
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 4.95
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 4.96
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 2.68
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      -3,
+      2
+     ],
+     "r": [
+      3,
+      2
+     ]
+    },
+    "seconds": 2.67
+   }
+  },
+  "final_size": [
+   364,
+   300
+  ]
+ },
+ "tobolsk": {
+  "file": "raw/data/tobolsk.jpg",
+  "plate_shape": [
+   1024,
+   396
+  ],
+  "single": true,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 0.07
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      3,
+      2
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 0.07
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 0.2
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      3,
+      2
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 0.2
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 4.33
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 4.43
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      7,
+      3
+     ]
+    },
+    "seconds": 2.7
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      6,
+      3
+     ]
+    },
+    "seconds": 2.68
+   }
+  },
+  "final_size": [
+   367,
+   326
+  ]
+ },
+ "church": {
+  "file": "raw/data/church.tif",
+  "plate_shape": [
+   9607,
+   3634
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      25,
+      4
+     ],
+     "r": [
+      64,
+      267
+     ]
+    },
+    "seconds": 0.28
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      25,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 0.29
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      25,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 0.63
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      25,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 0.67
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      34,
+      7
+     ],
+     "r": [
+      56,
+      -8
+     ]
+    },
+    "seconds": 14.97
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      25,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 14.99
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      24,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 10.64
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      24,
+      4
+     ],
+     "r": [
+      58,
+      -4
+     ]
+    },
+    "seconds": 10.61
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     100,
+     113
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     227
+    ],
+    "radius": 2,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     400,
+     454
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     800,
+     908
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     1
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1601,
+     1817
+    ],
+    "radius": 2,
+    "offset": [
+     12,
+     2
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3202,
+     3634
+    ],
+    "radius": 2,
+    "offset": [
+     25,
+     4
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     100,
+     113
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     227
+    ],
+    "radius": 2,
+    "offset": [
+     4,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     400,
+     454
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     -1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     800,
+     908
+    ],
+    "radius": 2,
+    "offset": [
+     15,
+     -1
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1601,
+     1817
+    ],
+    "radius": 2,
+    "offset": [
+     29,
+     -2
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3202,
+     3634
+    ],
+    "radius": 2,
+    "offset": [
+     58,
+     -4
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1311
+  ]
+ },
+ "emir": {
+  "file": "raw/data/emir.tif",
+  "plate_shape": [
+   9627,
+   3702
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      49,
+      24
+     ],
+     "r": [
+      103,
+      57
+     ]
+    },
+    "seconds": 0.24
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      49,
+      24
+     ],
+     "r": [
+      107,
+      40
+     ]
+    },
+    "seconds": 0.31
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      49,
+      24
+     ],
+     "r": [
+      300,
+      -542
+     ]
+    },
+    "seconds": 0.64
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      49,
+      24
+     ],
+     "r": [
+      107,
+      40
+     ]
+    },
+    "seconds": 0.7
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      46,
+      23
+     ],
+     "r": [
+      100,
+      36
+     ]
+    },
+    "seconds": 15.53
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      49,
+      23
+     ],
+     "r": [
+      107,
+      40
+     ]
+    },
+    "seconds": 15.3
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      48,
+      23
+     ],
+     "r": [
+      106,
+      41
+     ]
+    },
+    "seconds": 10.73
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      49,
+      24
+     ],
+     "r": [
+      106,
+      41
+     ]
+    },
+    "seconds": 10.81
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     100,
+     115
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     231
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     462
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     3
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     802,
+     925
+    ],
+    "radius": 2,
+    "offset": [
+     12,
+     6
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1604,
+     1851
+    ],
+    "radius": 2,
+    "offset": [
+     25,
+     12
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3209,
+     3702
+    ],
+    "radius": 2,
+    "offset": [
+     49,
+     24
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     100,
+     115
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     231
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     462
+    ],
+    "radius": 2,
+    "offset": [
+     13,
+     5
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     802,
+     925
+    ],
+    "radius": 2,
+    "offset": [
+     27,
+     10
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1604,
+     1851
+    ],
+    "radius": 2,
+    "offset": [
+     53,
+     20
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3209,
+     3702
+    ],
+    "radius": 2,
+    "offset": [
+     107,
+     40
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1404
+  ]
+ },
+ "harvesters": {
+  "file": "raw/data/harvesters.tif",
+  "plate_shape": [
+   9656,
+   3683
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      59,
+      16
+     ],
+     "r": [
+      124,
+      13
+     ]
+    },
+    "seconds": 0.23
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      60,
+      17
+     ],
+     "r": [
+      124,
+      14
+     ]
+    },
+    "seconds": 0.28
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      60,
+      17
+     ],
+     "r": [
+      124,
+      13
+     ]
+    },
+    "seconds": 0.66
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      60,
+      17
+     ],
+     "r": [
+      124,
+      14
+     ]
+    },
+    "seconds": 0.72
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      55,
+      12
+     ],
+     "r": [
+      121,
+      10
+     ]
+    },
+    "seconds": 15.22
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      60,
+      18
+     ],
+     "r": [
+      123,
+      14
+     ]
+    },
+    "seconds": 15.46
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      59,
+      17
+     ],
+     "r": [
+      123,
+      14
+     ]
+    },
+    "seconds": 10.76
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      59,
+      17
+     ],
+     "r": [
+      123,
+      15
+     ]
+    },
+    "seconds": 10.82
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     100,
+     115
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     201,
+     230
+    ],
+    "radius": 2,
+    "offset": [
+     4,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     402,
+     460
+    ],
+    "radius": 2,
+    "offset": [
+     8,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     804,
+     920
+    ],
+    "radius": 2,
+    "offset": [
+     15,
+     4
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1609,
+     1841
+    ],
+    "radius": 2,
+    "offset": [
+     30,
+     9
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3218,
+     3683
+    ],
+    "radius": 2,
+    "offset": [
+     60,
+     17
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     100,
+     115
+    ],
+    "radius": 15,
+    "offset": [
+     4,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     201,
+     230
+    ],
+    "radius": 2,
+    "offset": [
+     8,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     402,
+     460
+    ],
+    "radius": 2,
+    "offset": [
+     16,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     804,
+     920
+    ],
+    "radius": 2,
+    "offset": [
+     31,
+     3
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1609,
+     1841
+    ],
+    "radius": 2,
+    "offset": [
+     62,
+     7
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3218,
+     3683
+    ],
+    "radius": 2,
+    "offset": [
+     124,
+     14
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1347
+  ]
+ },
+ "icon": {
+  "file": "raw/data/icon.tif",
+  "plate_shape": [
+   9732,
+   3741
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      41,
+      17
+     ],
+     "r": [
+      90,
+      23
+     ]
+    },
+    "seconds": 0.28
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      42,
+      17
+     ],
+     "r": [
+      90,
+      23
+     ]
+    },
+    "seconds": 0.34
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      41,
+      17
+     ],
+     "r": [
+      89,
+      23
+     ]
+    },
+    "seconds": 0.69
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      42,
+      17
+     ],
+     "r": [
+      90,
+      23
+     ]
+    },
+    "seconds": 0.74
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      40,
+      20
+     ],
+     "r": [
+      88,
+      26
+     ]
+    },
+    "seconds": 15.99
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      41,
+      16
+     ],
+     "r": [
+      90,
+      23
+     ]
+    },
+    "seconds": 16.05
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      41,
+      18
+     ],
+     "r": [
+      90,
+      23
+     ]
+    },
+    "seconds": 11.02
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      42,
+      18
+     ],
+     "r": [
+      89,
+      23
+     ]
+    },
+    "seconds": 10.93
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     233
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     467
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     935
+    ],
+    "radius": 2,
+    "offset": [
+     10,
+     4
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1870
+    ],
+    "radius": 2,
+    "offset": [
+     20,
+     8
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3741
+    ],
+    "radius": 2,
+    "offset": [
+     42,
+     17
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     233
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     467
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     3
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     935
+    ],
+    "radius": 2,
+    "offset": [
+     22,
+     6
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1870
+    ],
+    "radius": 2,
+    "offset": [
+     45,
+     11
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3741
+    ],
+    "radius": 2,
+    "offset": [
+     90,
+     23
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1355
+  ]
+ },
+ "ilemselga": {
+  "file": "raw/data/ilemselga.tif",
+  "plate_shape": [
+   9812,
+   3800
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      39,
+      7
+     ],
+     "r": [
+      130,
+      11
+     ]
+    },
+    "seconds": 0.32
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      40,
+      7
+     ],
+     "r": [
+      131,
+      11
+     ]
+    },
+    "seconds": 0.38
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      40,
+      7
+     ],
+     "r": [
+      130,
+      11
+     ]
+    },
+    "seconds": 0.7
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      40,
+      7
+     ],
+     "r": [
+      131,
+      11
+     ]
+    },
+    "seconds": 0.73
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      32,
+      8
+     ],
+     "r": [
+      125,
+      4
+     ]
+    },
+    "seconds": 16.24
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      40,
+      7
+     ],
+     "r": [
+      130,
+      11
+     ]
+    },
+    "seconds": 16.28
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      41,
+      7
+     ],
+     "r": [
+      132,
+      11
+     ]
+    },
+    "seconds": 11.02
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      41,
+      7
+     ],
+     "r": [
+      110,
+      11
+     ]
+    },
+    "seconds": 11.34
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     102,
+     118
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     204,
+     237
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     408,
+     475
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     817,
+     950
+    ],
+    "radius": 2,
+    "offset": [
+     10,
+     2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1635,
+     1900
+    ],
+    "radius": 2,
+    "offset": [
+     20,
+     4
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3270,
+     3800
+    ],
+    "radius": 2,
+    "offset": [
+     40,
+     7
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     102,
+     118
+    ],
+    "radius": 15,
+    "offset": [
+     4,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     204,
+     237
+    ],
+    "radius": 2,
+    "offset": [
+     8,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     408,
+     475
+    ],
+    "radius": 2,
+    "offset": [
+     16,
+     1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     817,
+     950
+    ],
+    "radius": 2,
+    "offset": [
+     33,
+     3
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1635,
+     1900
+    ],
+    "radius": 2,
+    "offset": [
+     65,
+     5
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3270,
+     3800
+    ],
+    "radius": 2,
+    "offset": [
+     131,
+     11
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1135
+  ]
+ },
+ "melons": {
+  "file": "raw/data/melons.tif",
+  "plate_shape": [
+   9724,
+   3770
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      82,
+      11
+     ],
+     "r": [
+      178,
+      13
+     ]
+    },
+    "seconds": 0.24
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      80,
+      10
+     ],
+     "r": [
+      177,
+      13
+     ]
+    },
+    "seconds": 0.28
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      82,
+      11
+     ],
+     "r": [
+      178,
+      13
+     ]
+    },
+    "seconds": 0.69
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      80,
+      10
+     ],
+     "r": [
+      177,
+      13
+     ]
+    },
+    "seconds": 0.73
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      81,
+      12
+     ],
+     "r": [
+      176,
+      10
+     ]
+    },
+    "seconds": 16.09
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      80,
+      10
+     ],
+     "r": [
+      177,
+      13
+     ]
+    },
+    "seconds": 15.76
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      84,
+      9
+     ],
+     "r": [
+      180,
+      13
+     ]
+    },
+    "seconds": 10.95
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      81,
+      10
+     ],
+     "r": [
+      179,
+      13
+     ]
+    },
+    "seconds": 11.12
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     471
+    ],
+    "radius": 2,
+    "offset": [
+     10,
+     1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     810,
+     942
+    ],
+    "radius": 2,
+    "offset": [
+     20,
+     2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1620,
+     1885
+    ],
+    "radius": 2,
+    "offset": [
+     40,
+     5
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3241,
+     3770
+    ],
+    "radius": 2,
+    "offset": [
+     80,
+     10
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     6,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     471
+    ],
+    "radius": 2,
+    "offset": [
+     22,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     810,
+     942
+    ],
+    "radius": 2,
+    "offset": [
+     44,
+     3
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1620,
+     1885
+    ],
+    "radius": 2,
+    "offset": [
+     88,
+     6
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3241,
+     3770
+    ],
+    "radius": 2,
+    "offset": [
+     177,
+     13
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1317
+  ]
+ },
+ "religous_painting": {
+  "file": "raw/data/religous_painting.tif",
+  "plate_shape": [
+   9579,
+   3742
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      28,
+      3
+     ],
+     "r": [
+      68,
+      7
+     ]
+    },
+    "seconds": 0.22
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      30,
+      6
+     ],
+     "r": [
+      70,
+      6
+     ]
+    },
+    "seconds": 0.26
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      28,
+      3
+     ],
+     "r": [
+      68,
+      7
+     ]
+    },
+    "seconds": 0.65
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      30,
+      6
+     ],
+     "r": [
+      70,
+      6
+     ]
+    },
+    "seconds": 0.71
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      28,
+      5
+     ],
+     "r": [
+      73,
+      6
+     ]
+    },
+    "seconds": 15.26
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      29,
+      4
+     ],
+     "r": [
+      69,
+      6
+     ]
+    },
+    "seconds": 15.36
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      27,
+      3
+     ],
+     "r": [
+      69,
+      7
+     ]
+    },
+    "seconds": 22.79
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      28,
+      3
+     ],
+     "r": [
+      69,
+      7
+     ]
+    },
+    "seconds": 23.42
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     99,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     199,
+     233
+    ],
+    "radius": 2,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     399,
+     467
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     798,
+     935
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     1
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1596,
+     1871
+    ],
+    "radius": 2,
+    "offset": [
+     15,
+     3
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3193,
+     3742
+    ],
+    "radius": 2,
+    "offset": [
+     30,
+     6
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     99,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     199,
+     233
+    ],
+    "radius": 2,
+    "offset": [
+     4,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     399,
+     467
+    ],
+    "radius": 2,
+    "offset": [
+     8,
+     1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     798,
+     935
+    ],
+    "radius": 2,
+    "offset": [
+     17,
+     2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1596,
+     1871
+    ],
+    "radius": 2,
+    "offset": [
+     35,
+     3
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3193,
+     3742
+    ],
+    "radius": 2,
+    "offset": [
+     70,
+     6
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1187
+  ]
+ },
+ "self_portrait": {
+  "file": "raw/data/self_portrait.tif",
+  "plate_shape": [
+   9754,
+   3810
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      79,
+      29
+     ],
+     "r": [
+      176,
+      37
+     ]
+    },
+    "seconds": 0.29
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      78,
+      29
+     ],
+     "r": [
+      175,
+      37
+     ]
+    },
+    "seconds": 0.35
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      79,
+      29
+     ],
+     "r": [
+      176,
+      37
+     ]
+    },
+    "seconds": 0.7
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      78,
+      29
+     ],
+     "r": [
+      175,
+      37
+     ]
+    },
+    "seconds": 0.75
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      77,
+      31
+     ],
+     "r": [
+      177,
+      32
+     ]
+    },
+    "seconds": 16.97
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      78,
+      29
+     ],
+     "r": [
+      175,
+      37
+     ]
+    },
+    "seconds": 16.04
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      77,
+      29
+     ],
+     "r": [
+      175,
+      37
+     ]
+    },
+    "seconds": 11.14
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      77,
+      29
+     ],
+     "r": [
+      175,
+      37
+     ]
+    },
+    "seconds": 11.21
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     119
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     238
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     476
+    ],
+    "radius": 2,
+    "offset": [
+     10,
+     4
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     952
+    ],
+    "radius": 2,
+    "offset": [
+     20,
+     7
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1625,
+     1905
+    ],
+    "radius": 2,
+    "offset": [
+     39,
+     14
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3251,
+     3810
+    ],
+    "radius": 2,
+    "offset": [
+     78,
+     29
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     119
+    ],
+    "radius": 15,
+    "offset": [
+     5,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     238
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     476
+    ],
+    "radius": 2,
+    "offset": [
+     22,
+     5
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     952
+    ],
+    "radius": 2,
+    "offset": [
+     44,
+     9
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1625,
+     1905
+    ],
+    "radius": 2,
+    "offset": [
+     88,
+     18
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3251,
+     3810
+    ],
+    "radius": 2,
+    "offset": [
+     175,
+     37
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1350
+  ]
+ },
+ "siren": {
+  "file": "raw/data/siren.tif",
+  "plate_shape": [
+   9752,
+   3817
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      49,
+      -6
+     ],
+     "r": [
+      96,
+      -25
+     ]
+    },
+    "seconds": 0.24
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      49,
+      -6
+     ],
+     "r": [
+      96,
+      -24
+     ]
+    },
+    "seconds": 0.33
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      49,
+      -6
+     ],
+     "r": [
+      96,
+      -25
+     ]
+    },
+    "seconds": 0.68
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      49,
+      -6
+     ],
+     "r": [
+      96,
+      -24
+     ]
+    },
+    "seconds": 0.73
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      45,
+      -10
+     ],
+     "r": [
+      92,
+      -23
+     ]
+    },
+    "seconds": 15.97
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      49,
+      -6
+     ],
+     "r": [
+      96,
+      -24
+     ]
+    },
+    "seconds": 15.99
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      49,
+      -5
+     ],
+     "r": [
+      96,
+      -23
+     ]
+    },
+    "seconds": 11.52
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      48,
+      -5
+     ],
+     "r": [
+      96,
+      -23
+     ]
+    },
+    "seconds": 11.49
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     119
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     238
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     477
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     -1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     954
+    ],
+    "radius": 2,
+    "offset": [
+     12,
+     -2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1625,
+     1908
+    ],
+    "radius": 2,
+    "offset": [
+     24,
+     -3
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3250,
+     3817
+    ],
+    "radius": 2,
+    "offset": [
+     49,
+     -6
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     119
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     -1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     238
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     -2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     477
+    ],
+    "radius": 2,
+    "offset": [
+     12,
+     -3
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     954
+    ],
+    "radius": 2,
+    "offset": [
+     24,
+     -6
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1625,
+     1908
+    ],
+    "radius": 2,
+    "offset": [
+     48,
+     -12
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3250,
+     3817
+    ],
+    "radius": 2,
+    "offset": [
+     96,
+     -24
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1458
+  ]
+ },
+ "three_generations": {
+  "file": "raw/data/three_generations.tif",
+  "plate_shape": [
+   9629,
+   3714
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      53,
+      14
+     ],
+     "r": [
+      112,
+      11
+     ]
+    },
+    "seconds": 0.22
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      54,
+      12
+     ],
+     "r": [
+      111,
+      9
+     ]
+    },
+    "seconds": 0.26
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      53,
+      14
+     ],
+     "r": [
+      112,
+      11
+     ]
+    },
+    "seconds": 0.65
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      54,
+      12
+     ],
+     "r": [
+      111,
+      9
+     ]
+    },
+    "seconds": 0.71
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      53,
+      14
+     ],
+     "r": [
+      106,
+      11
+     ]
+    },
+    "seconds": 15.43
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      55,
+      13
+     ],
+     "r": [
+      111,
+      9
+     ]
+    },
+    "seconds": 15.86
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      50,
+      16
+     ],
+     "r": [
+      109,
+      13
+     ]
+    },
+    "seconds": 10.97
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      50,
+      15
+     ],
+     "r": [
+      109,
+      13
+     ]
+    },
+    "seconds": 10.88
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     100,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     2,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     232
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     464
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     802,
+     928
+    ],
+    "radius": 2,
+    "offset": [
+     13,
+     3
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1604,
+     1857
+    ],
+    "radius": 2,
+    "offset": [
+     27,
+     6
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3209,
+     3714
+    ],
+    "radius": 2,
+    "offset": [
+     54,
+     12
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     100,
+     116
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     232
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     464
+    ],
+    "radius": 2,
+    "offset": [
+     14,
+     1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     802,
+     928
+    ],
+    "radius": 2,
+    "offset": [
+     28,
+     2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1604,
+     1857
+    ],
+    "radius": 2,
+    "offset": [
+     55,
+     4
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3209,
+     3714
+    ],
+    "radius": 2,
+    "offset": [
+     111,
+     9
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1317
+  ]
+ },
+ "wharf": {
+  "file": "raw/data/wharf.tif",
+  "plate_shape": [
+   9734,
+   3761
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      83,
+      -16
+     ]
+    },
+    "seconds": 0.24
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      83,
+      -16
+     ]
+    },
+    "seconds": 0.36
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      83,
+      -16
+     ]
+    },
+    "seconds": 0.69
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      83,
+      -16
+     ]
+    },
+    "seconds": 0.74
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      15,
+      -13
+     ],
+     "r": [
+      81,
+      -13
+     ]
+    },
+    "seconds": 16.04
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      83,
+      -17
+     ]
+    },
+    "seconds": 15.89
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      15,
+      -7
+     ],
+     "r": [
+      81,
+      -15
+     ]
+    },
+    "seconds": 10.95
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      15,
+      -6
+     ],
+     "r": [
+      81,
+      -15
+     ]
+    },
+    "seconds": 11.13
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     0,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     1,
+     0
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     470
+    ],
+    "radius": 2,
+    "offset": [
+     2,
+     -1
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     940
+    ],
+    "radius": 2,
+    "offset": [
+     4,
+     -2
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1880
+    ],
+    "radius": 2,
+    "offset": [
+     8,
+     -3
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3761
+    ],
+    "radius": 2,
+    "offset": [
+     15,
+     -7
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     -1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     470
+    ],
+    "radius": 2,
+    "offset": [
+     10,
+     -2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     940
+    ],
+    "radius": 2,
+    "offset": [
+     21,
+     -4
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1880
+    ],
+    "radius": 2,
+    "offset": [
+     41,
+     -8
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3761
+    ],
+    "radius": 2,
+    "offset": [
+     83,
+     -16
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1305
+  ]
+ },
+ "camel": {
+  "file": "raw/loc/camel.tif",
+  "plate_shape": [
+   9636,
+   3752
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      45,
+      30
+     ],
+     "r": [
+      104,
+      41
+     ]
+    },
+    "seconds": 0.23
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      45,
+      31
+     ],
+     "r": [
+      104,
+      41
+     ]
+    },
+    "seconds": 0.3
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      45,
+      30
+     ],
+     "r": [
+      104,
+      41
+     ]
+    },
+    "seconds": 0.68
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      45,
+      31
+     ],
+     "r": [
+      104,
+      41
+     ]
+    },
+    "seconds": 0.84
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      48,
+      30
+     ],
+     "r": [
+      101,
+      39
+     ]
+    },
+    "seconds": 16.3
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      45,
+      31
+     ],
+     "r": [
+      103,
+      41
+     ]
+    },
+    "seconds": 15.9
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      46,
+      28
+     ],
+     "r": [
+      105,
+      39
+     ]
+    },
+    "seconds": 11.16
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      46,
+      28
+     ],
+     "r": [
+      105,
+      39
+     ]
+    },
+    "seconds": 11.22
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     100,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     234
+    ],
+    "radius": 2,
+    "offset": [
+     3,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     469
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     4
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     803,
+     938
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     7
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1606,
+     1876
+    ],
+    "radius": 2,
+    "offset": [
+     22,
+     15
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3212,
+     3752
+    ],
+    "radius": 2,
+    "offset": [
+     45,
+     31
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     100,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     200,
+     234
+    ],
+    "radius": 2,
+    "offset": [
+     7,
+     3
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     401,
+     469
+    ],
+    "radius": 2,
+    "offset": [
+     13,
+     5
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     803,
+     938
+    ],
+    "radius": 2,
+    "offset": [
+     26,
+     10
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1606,
+     1876
+    ],
+    "radius": 2,
+    "offset": [
+     52,
+     20
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3212,
+     3752
+    ],
+    "radius": 2,
+    "offset": [
+     104,
+     41
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1368
+  ]
+ },
+ "lugano": {
+  "file": "raw/loc/lugano.tif",
+  "plate_shape": [
+   9733,
+   3778
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      37,
+      13
+     ],
+     "r": [
+      86,
+      38
+     ]
+    },
+    "seconds": 0.24
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      37,
+      13
+     ],
+     "r": [
+      86,
+      38
+     ]
+    },
+    "seconds": 0.32
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      37,
+      13
+     ],
+     "r": [
+      86,
+      38
+     ]
+    },
+    "seconds": 0.67
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      37,
+      13
+     ],
+     "r": [
+      86,
+      38
+     ]
+    },
+    "seconds": 0.73
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      36,
+      14
+     ],
+     "r": [
+      85,
+      37
+     ]
+    },
+    "seconds": 15.8
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      37,
+      13
+     ],
+     "r": [
+      86,
+      38
+     ]
+    },
+    "seconds": 15.87
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      35,
+      14
+     ],
+     "r": [
+      84,
+      38
+     ]
+    },
+    "seconds": 10.95
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      35,
+      14
+     ],
+     "r": [
+      84,
+      38
+     ]
+    },
+    "seconds": 11.05
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     118
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     0
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     236
+    ],
+    "radius": 2,
+    "offset": [
+     2,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     472
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     944
+    ],
+    "radius": 2,
+    "offset": [
+     9,
+     3
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1889
+    ],
+    "radius": 2,
+    "offset": [
+     18,
+     6
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3778
+    ],
+    "radius": 2,
+    "offset": [
+     37,
+     13
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     118
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     202,
+     236
+    ],
+    "radius": 2,
+    "offset": [
+     5,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     405,
+     472
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     5
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     811,
+     944
+    ],
+    "radius": 2,
+    "offset": [
+     21,
+     9
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1622,
+     1889
+    ],
+    "radius": 2,
+    "offset": [
+     43,
+     19
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3244,
+     3778
+    ],
+    "radius": 2,
+    "offset": [
+     86,
+     38
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1241
+  ]
+ },
+ "kivach": {
+  "file": "raw/loc/kivach.tif",
+  "plate_shape": [
+   9748,
+   3770
+  ],
+  "single": false,
+  "runs": {
+   "l2-raw": {
+    "offsets": {
+     "g": [
+      18,
+      17
+     ],
+     "r": [
+      89,
+      30
+     ]
+    },
+    "seconds": 0.23
+   },
+   "l2-grad": {
+    "offsets": {
+     "g": [
+      17,
+      17
+     ],
+     "r": [
+      88,
+      31
+     ]
+    },
+    "seconds": 0.28
+   },
+   "ncc-raw": {
+    "offsets": {
+     "g": [
+      18,
+      17
+     ],
+     "r": [
+      89,
+      30
+     ]
+    },
+    "seconds": 0.68
+   },
+   "ncc-grad": {
+    "offsets": {
+     "g": [
+      17,
+      17
+     ],
+     "r": [
+      88,
+      31
+     ]
+    },
+    "seconds": 0.73
+   },
+   "ssim-raw": {
+    "offsets": {
+     "g": [
+      17,
+      19
+     ],
+     "r": [
+      94,
+      25
+     ]
+    },
+    "seconds": 15.89
+   },
+   "ssim-grad": {
+    "offsets": {
+     "g": [
+      17,
+      17
+     ],
+     "r": [
+      88,
+      31
+     ]
+    },
+    "seconds": 15.98
+   },
+   "lpips-raw": {
+    "offsets": {
+     "g": [
+      18,
+      18
+     ],
+     "r": [
+      91,
+      31
+     ]
+    },
+    "seconds": 10.97
+   },
+   "lpips-grad": {
+    "offsets": {
+     "g": [
+      18,
+      16
+     ],
+     "r": [
+      91,
+      30
+     ]
+    },
+    "seconds": 11.64
+   }
+  },
+  "trace": [
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     1,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     1,
+     1
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     471
+    ],
+    "radius": 2,
+    "offset": [
+     2,
+     2
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     942
+    ],
+    "radius": 2,
+    "offset": [
+     4,
+     4
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1624,
+     1885
+    ],
+    "radius": 2,
+    "offset": [
+     9,
+     8
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3249,
+     3770
+    ],
+    "radius": 2,
+    "offset": [
+     17,
+     17
+    ]
+   },
+   {
+    "level": 5,
+    "shape": [
+     101,
+     117
+    ],
+    "radius": 15,
+    "offset": [
+     3,
+     1
+    ]
+   },
+   {
+    "level": 4,
+    "shape": [
+     203,
+     235
+    ],
+    "radius": 2,
+    "offset": [
+     6,
+     2
+    ]
+   },
+   {
+    "level": 3,
+    "shape": [
+     406,
+     471
+    ],
+    "radius": 2,
+    "offset": [
+     11,
+     4
+    ]
+   },
+   {
+    "level": 2,
+    "shape": [
+     812,
+     942
+    ],
+    "radius": 2,
+    "offset": [
+     22,
+     8
+    ]
+   },
+   {
+    "level": 1,
+    "shape": [
+     1624,
+     1885
+    ],
+    "radius": 2,
+    "offset": [
+     44,
+     16
+    ]
+   },
+   {
+    "level": 0,
+    "shape": [
+     3249,
+     3770
+    ],
+    "radius": 2,
+    "offset": [
+     88,
+     31
+    ]
+   }
+  ],
+  "final_size": [
+   1500,
+   1318
+  ]
+ },
+ "_bw": {
+  "crop": {
+   "cathedral": {
+    "box": [
+     0,
+     322,
+     10,
+     375
+    ],
+    "shape": [
+     329,
+     387
+    ],
+    "removed_pct": 7.7
+   },
+   "monastery": {
+    "box": [
+     11,
+     311,
+     11,
+     375
+    ],
+    "shape": [
+     335,
+     389
+    ],
+    "removed_pct": 16.2
+   },
+   "tobolsk": {
+    "box": [
+     0,
+     326,
+     11,
+     378
+    ],
+    "shape": [
+     335,
+     393
+    ],
+    "removed_pct": 9.1
+   },
+   "church": {
+    "box": [
+     192,
+     3014,
+     85,
+     3315
+    ],
+    "shape": [
+     3144,
+     3626
+    ],
+    "removed_pct": 20.0
+   },
+   "emir": {
+    "box": [
+     42,
+     3010,
+     183,
+     3353
+    ],
+    "shape": [
+     3102,
+     3662
+    ],
+    "removed_pct": 17.2
+   },
+   "harvesters": {
+    "box": [
+     269,
+     3045,
+     346,
+     3438
+    ],
+    "shape": [
+     3094,
+     3666
+    ],
+    "removed_pct": 24.3
+   },
+   "icon": {
+    "box": [
+     104,
+     3094,
+     187,
+     3498
+    ],
+    "shape": [
+     3154,
+     3718
+    ],
+    "removed_pct": 15.6
+   },
+   "ilemselga": {
+    "box": [
+     620,
+     3030,
+     377,
+     3563
+    ],
+    "shape": [
+     3139,
+     3789
+    ],
+    "removed_pct": 35.4
+   },
+   "melons": {
+    "box": [
+     101,
+     3064,
+     141,
+     3515
+    ],
+    "shape": [
+     3064,
+     3757
+    ],
+    "removed_pct": 13.2
+   },
+   "religous_painting": {
+    "box": [
+     299,
+     2935,
+     222,
+     3553
+    ],
+    "shape": [
+     3123,
+     3736
+    ],
+    "removed_pct": 24.7
+   },
+   "self_portrait": {
+    "box": [
+     24,
+     3005,
+     303,
+     3616
+    ],
+    "shape": [
+     3076,
+     3773
+    ],
+    "removed_pct": 14.9
+   },
+   "siren": {
+    "box": [
+     110,
+     3014,
+     434,
+     3421
+    ],
+    "shape": [
+     3154,
+     3793
+    ],
+    "removed_pct": 27.5
+   },
+   "three_generations": {
+    "box": [
+     132,
+     3076,
+     121,
+     3475
+    ],
+    "shape": [
+     3098,
+     3702
+    ],
+    "removed_pct": 13.9
+   },
+   "wharf": {
+    "box": [
+     66,
+     3024,
+     97,
+     3498
+    ],
+    "shape": [
+     3161,
+     3745
+    ],
+    "removed_pct": 15.0
+   },
+   "camel": {
+    "box": [
+     264,
+     3049,
+     337,
+     3391
+    ],
+    "shape": [
+     3108,
+     3711
+    ],
+    "removed_pct": 26.3
+   },
+   "lugano": {
+    "box": [
+     146,
+     2842,
+     286,
+     3544
+    ],
+    "shape": [
+     3158,
+     3740
+    ],
+    "removed_pct": 25.6
+   },
+   "kivach": {
+    "box": [
+     133,
+     3114,
+     148,
+     3541
+    ],
+    "shape": [
+     3161,
+     3739
+    ],
+    "removed_pct": 14.4
+   }
+  },
+  "contrast": {
+   "icon": {
+    "before_range": [
+     0.08299382030963898,
+     0.9316242933273315
+    ],
+    "before_minmax": [
+     0.0235294122248888,
+     0.9523308277130127
+    ]
+   },
+   "wharf": {
+    "before_range": [
+     0.0784313753247261,
+     0.9090715050697327
+    ],
+    "before_minmax": [
+     0.003921568859368563,
+     1.0
+    ]
+   },
+   "monastery": {
+    "before_range": [
+     0.0784313753247261,
+     0.9921568632125854
+    ],
+    "before_minmax": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  "wb": {
+   "church": {
+    "gray_world": [
+     1.0053294897079468,
+     1.0,
+     1.5214364528656006
+    ],
+    "white_patch": [
+     1.0349801778793335,
+     1.0,
+     1.0938693284988403
+    ],
+    "shades_of_gray": [
+     0.9953303933143616,
+     1.0,
+     1.4342702627182007
+    ]
+   },
+   "camel": {
+    "gray_world": [
+     1.1519705057144165,
+     1.0,
+     0.7151612043380737
+    ],
+    "white_patch": [
+     1.0157630443572998,
+     1.0,
+     0.9994779825210571
+    ],
+    "shades_of_gray": [
+     1.0827597379684448,
+     1.0,
+     0.8798962235450745
+    ]
+   },
+   "cathedral": {
+    "gray_world": [
+     1.0991264581680298,
+     1.0,
+     0.7886894941329956
+    ],
+    "white_patch": [
+     1.0091742277145386,
+     1.0,
+     0.9537976980209351
+    ],
+    "shades_of_gray": [
+     1.026328444480896,
+     1.0,
+     0.974801778793335
+    ]
+   }
+  },
+  "colormap": {
+   "matrix": [
+    [
+     0.9401,
+     0.0137,
+     0.0636
+    ],
+    [
+     0.1072,
+     0.7546,
+     0.1147
+    ],
+    [
+     -0.0126,
+     0.1087,
+     0.848
+    ]
+   ],
+   "fit": {
+    "emir": {
+     "shift": [
+      57,
+      15
+     ],
+     "ncc": 0.5318331718444824,
+     "rms_identity": 0.12691397964954376,
+     "rms_fit": 0.10732556879520416,
+     "M": [
+      [
+       0.9991066455841064,
+       -0.10448462516069412,
+       0.20386584103107452
+      ],
+      [
+       0.1641964614391327,
+       0.5947660803794861,
+       0.16979661583900452
+      ],
+      [
+       0.01419801265001297,
+       0.1050666943192482,
+       0.7241438031196594
+      ]
+     ]
+    },
+    "camel": {
+     "shift": [
+      60,
+      4
+     ],
+     "ncc": 0.5783673524856567,
+     "rms_identity": 0.13234929740428925,
+     "rms_fit": 0.12942326068878174,
+     "M": [
+      [
+       0.9916579723358154,
+       -0.013015391305088997,
+       0.01650194637477398
+      ],
+      [
+       0.24143670499324799,
+       0.5951891541481018,
+       0.15664805471897125
+      ],
+      [
+       -0.009032406844198704,
+       0.21812275052070618,
+       0.740439772605896
+      ]
+     ]
+    },
+    "lugano": {
+     "shift": [
+      60,
+      -3
+     ],
+     "ncc": 0.6227914094924927,
+     "rms_identity": 0.09439684450626373,
+     "rms_fit": 0.09288264065980911,
+     "M": [
+      [
+       0.8405010104179382,
+       0.14845411479473114,
+       -0.003445487469434738
+      ],
+      [
+       -0.0325828455388546,
+       0.9636349678039551,
+       0.06401550024747849
+      ],
+      [
+       -0.06471957266330719,
+       0.11331328004598618,
+       0.9372456669807434
+      ]
+     ]
+    },
+    "kivach": {
+     "shift": [
+      60,
+      -2
+     ],
+     "ncc": 0.6863248348236084,
+     "rms_identity": 0.09548067301511765,
+     "rms_fit": 0.09505140781402588,
+     "M": [
+      [
+       0.9291598796844482,
+       0.024042248725891113,
+       0.03756772354245186
+      ],
+      [
+       0.05582117289304733,
+       0.8647342920303345,
+       0.06841357797384262
+      ],
+      [
+       0.009087678976356983,
+       -0.0015412892680615187,
+       0.9900088310241699
+      ]
+     ]
+    }
+   }
+  }
+ }
+}
