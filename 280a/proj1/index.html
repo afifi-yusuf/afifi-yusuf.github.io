@@ -39,7 +39,7 @@
           <p class="spec">Project 1 · Prokudin-Gorskii glass plates · Library of Congress · NumPy, from scratch</p>
           <h1>Colorizing the Prokudin-Gorskii collection</h1>
           <p class="lede">
-            Between 1907 and 1915 Sergei Prokudin-Gorskii photographed the Russian Empire three times per scene, through a blue, a green and a red filter, onto one tall glass plate. He never got to project them in color. The Library of Congress scanned the plates, and this project puts the three exposures back on top of each other. This page is written in the order I built it: each step says what I added, what changed, and what it did to the same two plates, a church on a lake and the Emir of Bukhara, so you can watch them go from a stack of three gray exposures to a finished color photograph.
+            Prokudin-Gorskii photographed each scene three times, through a blue, a green and a red filter, onto one tall glass plate. The Library of Congress scanned the plates. My job is to cut each scan into its three exposures, line them up, and stack them into one color image. This page goes in the order I built it. Each step says what I added, shows the code that does it, and shows what it did to the same two plates: a church on a lake and the Emir of Bukhara.
           </p>
         </div>
         <figure class="hero-photo">
@@ -64,9 +64,9 @@
     <section class="part" id="single">
       <header class="part-head">
         <p class="param" aria-label="minus 15 to plus 15 pixels"><span>−15</span><i aria-hidden="true">→</i><span>15</span><small>px</small></p>
-        <h2>Step 1 · Split the plate, try every shift, keep the best</h2>
+        <h2>Step 1 · Read, split, and try every shift</h2>
       </header>
-      <p class="delta"><b>Added</b> the split into three plates, two scores (L2 and NCC), and an exhaustive search over a 31×31 window of shifts, scored on the interior only. <b>Result</b> the three small JPEGs align.</p>
+      <p class="delta"><b>Added</b> loading, the split into three plates, two ways to compare plates (L2 and NCC), and an exhaustive search over a 31×31 window of shifts. <b>Result</b> the three small JPEGs align.</p>
 
       <div class="pair pair-3">
         <figure class="shot">
@@ -97,21 +97,37 @@
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the stacked and the aligned Tobolsk plate">
           </div>
           <img class="print-only" loading="lazy" src="images/aligned/tobolsk.jpg" alt="Tobolsk aligned" width="393" height="335">
-          <figcaption>Tobolsk. Drag the line: the stacked plate has a red and a blue ghost of every roofline, the aligned one has none. G (3, 3), R (6, 3).</figcaption>
+          <figcaption>Tobolsk. Drag the line: stacked on the left, aligned on the right. G (3, 3), R (6, 3).</figcaption>
         </figure>
 
         <div class="prose">
           <p>
-            Each scan is one tall grayscale image with the blue exposure on top, green in the middle and red at the bottom, so the first thing the program does is cut it into thirds. I convert to floats in [0, 1] whatever the file's bit depth (the JPEGs are 8-bit, the TIFFs 16-bit), take the blue plate as the fixed reference, and look for the translation of the green and the red plates that makes them look most like it. Stacking the three plates without moving them is the "before" above: every edge has a red and a blue ghost.
+            <b>Reading the files.</b> The files are JPG and TIF. I use <code>imread</code> to load each one as a NumPy array, convert it to float32, and scale it to [0, 1] (divide by 255 for the 8-bit JPGs, by 65535 for the 16-bit TIFs). If a scan comes in with 3 channels I average them into one, since the plate is grayscale anyway. The split function cuts the scan into the three stacked exposures using <code>shape[0]</code> divided by 3. The order on the plate is blue, green, red from top to bottom.
           </p>
+<pre class="code">def split(im):
+    h = im.shape[0] // 3
+    return im[:h], im[h:2*h], im[2*h:3*h]      # B, G, R</pre>
           <p>
-            At this size a brute-force search is fine. For every displacement (dy, dx) in a 31×31 window from −15 to +15 pixels I score how well the shifted plate matches the reference, and keep the best. The one thing that matters is what gets scored. The plates have black and white borders that do not belong to the picture, and a shifted plate leaves an empty strip along two edges, so I only score the interior: 10% is trimmed from every side of the reference, and the moving plate is compared on the same pixels through slicing rather than <code>np.roll</code>, so the wrapped-around strip is never seen. Without that trim the borders dominate the score and the search happily aligns the frames instead of the photograph.
+            <b>Comparing two plates.</b> I keep the blue plate fixed and move green and red to match it. To say how well a shift matches I need a score. I first use the L2 norm, the Euclidean distance between the two plates (smaller is better, so I negate it so that every score reads "bigger is better"). Then I use NCC, normalized cross-correlation: subtract each plate's mean, divide by its length, and take the dot product. NCC does not care that a red filter and a blue filter let through different amounts of light, which L2 does.
           </p>
+<pre class="code">def l2(a, b):
+    d = a - b
+    return -np.sqrt(np.mean(d * d))
+
+def ncc(a, b):
+    a = a - a.mean(); b = b - b.mean()
+    den = np.sqrt(np.sum(a * a) * np.sum(b * b))
+    return np.sum(a * b) / den</pre>
           <p>
-            A word on what is library code and what is not, since the assignment draws that line. The alignment on this page is NumPy array arithmetic: the split, the scores, the shift, the search, the downsampling and the pyramid are all written out in <code>colorize.py</code>. The only library calls in that file read the file and write the JPEG. The bells and whistles further down are likewise plain NumPy, except two things the assignment permits for them: the resize used to register my composites against the Library's renditions, and PyTorch for the LPIPS score, which is a pretrained network and could not be anything else.
+            <b>The search.</b> The align function takes the metric and the feature as parameters and does an exhaustive search: two for loops over every (dy, dx) from −15 to +15, 961 shifts, scoring each one and keeping the best. One detail matters a lot. The plates have black and white borders that are not part of the picture, and a shifted plate has an empty strip along two edges. So I only score the interior: I trim 10% from every side of the blue plate, and I take the matching pixels of the moving plate by slicing rather than with <code>np.roll</code>, so the strip that wraps around is never compared. Without this the search aligns the borders instead of the picture.
           </p>
+<pre class="code">for dy in range(-15, 16):
+    for dx in range(-15, 16):
+        m, r = crops(mov, ref, dy, dx, margin=0.1)   # interior slices
+        grid[dy, dx] = metric(m, r)
+best = argmax(grid)</pre>
           <p>
-            Two scores to start with. <span class="tag">L2</span> is the root mean squared difference of the two plates (smaller is better, so I negate it). <span class="tag">NCC</span> subtracts each plate's mean, normalizes to unit length and takes the dot product, which makes it indifferent to the fact that a red filter and a blue filter simply let through different amounts of light. The table also has the two extra scores I added in step 4, since the code was rerun with them; on the three small plates all four land on the same answer.
+            <b>What is from scratch.</b> The assignment says to implement almost everything by hand. Everything in this section and the next is NumPy arithmetic: the split, the scores, the search, and later the downsampling and the pyramid. The only library calls in the alignment file read the image and write the JPEG. The bells and whistles further down are also plain NumPy, except two things the assignment allows for them: a resize when I fit the color matrix, and PyTorch for the LPIPS score, which is a pretrained network.
           </p>
         </div>
       </div>
@@ -132,13 +148,13 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Offsets are (dy, dx) in pixels of the green and the red plate relative to the blue one, and the last column is the wall-clock time for the full 961-shift search. L2 and NCC take a tenth of a second on a 390-pixel-wide plate. That is the whole single-scale method; what it cannot do is a 3700-pixel plate whose offsets run to 180 pixels, which is the next step.
+            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. The two extra scores on the right, SSIM and LPIPS, come in step 4; I include them here because the same code ran with them. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
           </p>
         </div>
         <aside class="formula" aria-label="Normalized cross-correlation">
           <p class="formula-line">NCC = ⟨<var>â</var>, <var>b̂</var>⟩</p>
           <p>
-            where <var>â</var> = (<var>a</var> − mean <var>a</var>) / ‖<var>a</var> − mean <var>a</var>‖ and likewise for <var>b</var>. A shift is scored on the overlapping interior only, and the search takes the argmax over the 31×31 window.
+            where <var>â</var> = (<var>a</var> − mean <var>a</var>) / ‖<var>a</var> − mean <var>a</var>‖ and likewise for <var>b</var>. It is the cosine of the angle between the two plates as vectors.
           </p>
         </aside>
       </div>
@@ -148,9 +164,9 @@
     <section class="part" id="pyramid">
       <header class="part-head">
         <p class="param" aria-label="from one thirty-second scale to full scale"><span>1/32</span><i aria-hidden="true">→</i><span>1</span><small>scale</small></p>
-        <h2>Step 2 · Coarse to fine: an image pyramid for the big plates</h2>
+        <h2>Step 2 · A pyramid, coarse to fine</h2>
       </header>
-      <p class="delta"><b>Added</b> a hand-written 2×2 box downsample and a coarse-to-fine search. <b>Changed</b> the ±15 window now runs on the smallest level; every finer level only re-searches ±2. <b>Result</b> the 3700-pixel TIFFs align in under a second each, 16 of 17 correctly.</p>
+      <p class="delta"><b>Added</b> a 2×2 downsample and a six-level pyramid. <b>Changed</b> the ±15 search now runs only on the smallest level; every finer level searches ±2 around the doubled answer. <b>Result</b> the big TIFs take under a second each; 16 of 17 come out right.</p>
 
       <!--SNIPPET:pyramid-->
       <div class="pyramid" aria-label="The pyramid levels for the Emir plate">
@@ -184,24 +200,35 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            The TIFF scans are about 3700 × 3200 pixels per plate and the plates are misaligned by up to 180 pixels, so the step-1 search would need a window of a few hundred pixels on a side, tens of thousands of shifts, each one a pass over 12 million pixels. Instead I search at a scale where the offset is small, then refine.
+            <b>Why.</b> The TIF plates are about 3700 × 3200 pixels and the offsets go up to 180 pixels. The step-1 search would need a window a few hundred pixels wide, tens of thousands of shifts, each one a pass over 12 million pixels. That is far too slow. So I search at a small scale first, where the offset is small, and refine.
           </p>
           <p>
-            The pyramid is built by hand: each level is the previous one with every 2×2 block averaged into one pixel. The averaging is the anti-aliasing filter, and I stop before the short side drops below 64 pixels, which gives six levels for these scans (full size down to 1/32). At the coarsest level, roughly 100 × 115 pixels, I run the same exhaustive ±15 search as in step 1, which at that scale covers ±480 pixels of the full-resolution image. Every step up, the offset is doubled and re-searched only within ±2 pixels, because the coarse answer is right up to the rounding of the halving. The strip above is the actual walk for the Emir's blue plate: six searches, 961 shifts on the tiny image and 25 on each of the others, less than a second in total for both plates.
+            <b>Downsampling.</b> I downsample with a 2×2 kernel and a stride of 2: every 2×2 block is averaged into one pixel, which halves the image. The averaging is the anti-aliasing filter. I do this repeatedly until the short side would drop under 64 pixels, which gives six levels for these scans: full size, 1/2, 1/4, 1/8, 1/16 and 1/32. No library resize or pyramid function is used.
           </p>
+<pre class="code">def downsample(im):
+    return 0.25 * (im[0::2, 0::2] + im[1::2, 0::2] + im[0::2, 1::2] + im[1::2, 1::2])</pre>
           <p>
-            Every parameter (the 10% scoring margin, the ±15 coarse window, the ±2 refinement, the 64-pixel floor) is the same for every image on this page. Nothing is tuned per plate.
+            <b>Coarse to fine.</b> I start at the 1/32 level, about 100 × 115 pixels, and run the same ±15 exhaustive search as step 1. At that scale ±15 covers ±480 pixels of the full image, more than any real offset. Then I move one level finer, double the offset (one pixel there is two pixels here), and search only ±2 around it, because the coarse answer is right up to rounding. I repeat until full resolution. The strip above is the real walk for the Emir's blue plate: (2, 1) at 1/32 becomes (49, 24) at full size. That is 961 shifts on a tiny image plus 25 on each of five larger ones, under a second for both plates.
+          </p>
+<pre class="code">d = (0, 0)
+for lvl in range(coarsest, -1, -1):
+    radius = 15 if lvl == coarsest else 2
+    d = align_single(pm[lvl], pr[lvl], radius, center=d)
+    if lvl > 0:
+        d = (2 * d[0], 2 * d[1])</pre>
+          <p>
+            All parameters are the same for every image: 10% scoring margin, ±15 coarse window, ±2 refinement, 64-pixel floor. Nothing is tuned per plate.
           </p>
         </div>
         <aside class="formula" aria-label="Downsampling">
           <p class="formula-line"><var>d</var>[<var>i</var>,<var>j</var>] = ¼ Σ <var>s</var>[2<var>i</var>+<var>u</var>, 2<var>j</var>+<var>v</var>]</p>
           <p>
-            for <var>u</var>, <var>v</var> ∈ {0, 1}: the box-filtered half-size image. At level <var>k</var> one pixel is 2<sup><var>k</var></sup> pixels of the scan, so an offset found there is multiplied by 2 on the way to level <var>k</var> − 1 and refined within ±2.
+            for <var>u</var>, <var>v</var> ∈ {0, 1}. At level <var>k</var> one pixel is 2<sup><var>k</var></sup> pixels of the scan, so an offset found there is doubled on the way down and refined within ±2.
           </p>
         </aside>
       </div>
 
-      <h3 class="sub">What the pyramid alone produces: NCC on raw pixel values, nothing else</h3>
+      <h3 class="sub">What the pyramid alone gives: NCC on raw pixels, nothing else</h3>
       <!--SNIPPET:gallery-raw-->
       <div class="gallery">
         <figure>
@@ -274,7 +301,7 @@
         </figure>
       </div>
       <!--/SNIPPET:gallery-raw-->
-      <p class="note">Every plate through step 2 exactly as it stands: pyramid plus NCC on pixel values, no cropping, no colour work, no gradient trick. Offsets are (dy, dx) of the green and red plates relative to blue. Sixteen of the seventeen are right. The Emir is wrong, and is the subject of the next two sections. The L2 offsets for the same run are in the big table in step 4.</p>
+      <p class="note">All 17 plates after step 2, exactly as they come out: pyramid plus NCC on pixel values, no cropping, no color work. Offsets are (dy, dx) of green and red relative to blue. Sixteen are right. The Emir is wrong, and the next two sections are about why and how I fixed it. The L2 offsets for the same run are in the table in step 4.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -286,16 +313,16 @@
           <figcaption><b class="nounit">After step 2</b><span>Church · pyramid + NCC · G (25, 4) · R (58, −4)</span></figcaption>
         </figure>
       </div>
-      <p class="note">The running example. The church is aligned now (the steeple is one steeple), but it still has its borders, a blue cast and a flat tone. Each of the remaining steps changes one of those.</p>
+      <p class="note">The church is my running example. It is aligned now (one steeple, not three), but it still has its borders, a blue cast and a flat tone. Each later step fixes one of those.</p>
     </section>
 
     <!-- ========================================================== failures -->
     <section class="part" id="failures">
       <header class="part-head">
         <p class="param" aria-label="542 pixels off"><span>542</span><small>px off</small></p>
-        <h2>What broke · the Emir of Bukhara</h2>
+        <h2>What broke · the Emir's robe</h2>
       </header>
-      <p class="delta"><b>Nothing added yet.</b> This section is the diagnosis; the fix is step 3.</p>
+      <p class="delta"><b>Nothing added.</b> This is the diagnosis. The fix is step 3.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -311,16 +338,16 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            With step 2 as it stands (pyramid, NCC, raw pixel values) one of the fourteen plates fails: the Emir of Bukhara. The green plate lands correctly at (49, 24) but the red plate is placed at (300, −542), which is not a near miss, it is a different part of the search space entirely. The coarsest level is where it goes wrong: at 1/32 scale the blue plate shows a bright robe on a mid-gray wall and the red plate shows a dark robe on a bright wall, so the correlation of intensities is actually negative at the true offset, and the best correlation the search can find is a spurious match of the plate's edge against the door frame. Once the coarse level is wrong the refinements cannot recover, since they only look ±2 pixels around it.
+            Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), which is not a near miss, it is a completely different place. The reason is in the numbers. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
           </p>
           <p>
-            The church fails the same way with L2 on raw pixels (red at (64, 267)) and for the same reason: L2 rewards the shift that makes the brightness histograms overlap, and a bright sky in the blue plate against a dark sky in the red one pulls it off the true answer. The common cause is that brightness is not a property of the scene, it is a property of the scene <em>and</em> the filter. That points at the fix.
+            The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
           </p>
         </div>
-        <aside class="formula" aria-label="The count">
-          <p class="formula-line">16 / 17</p>
+        <aside class="formula" aria-label="The numbers">
+          <p class="formula-line">0.55 → 0.30</p>
           <p>
-            After step 2, with NCC on raw pixels. The assignment allows one failure among the fourteen provided plates; I wanted zero, so the next step goes after it.
+            Mean of the robe in the blue plate, then in the red plate. The wall behind it: 0.49 → 0.76. Raw NCC at the true offset 0.264, at the wrong one 0.307. Gradient NCC: 0.493 at the true offset, 0.040 at the wrong one.
           </p>
         </aside>
       </div>
@@ -330,9 +357,9 @@
     <section class="part" id="features">
       <header class="part-head">
         <p class="param" aria-label="from pixels to edges"><span>pixels</span><i aria-hidden="true">→</i><span>edges</span></p>
-        <h2>Step 3 · Better features: align the edges, not the brightness</h2>
+        <h2>Step 3 · Gradient magnitude instead of brightness</h2>
       </header>
-      <p class="delta"><b>Added</b> a gradient-magnitude image of each plate, computed by hand. <b>Changed</b> only the input to the score; the pyramid, the window and the metric are untouched. <b>Result</b> 17 of 17 align, and the plates that already worked move by at most a pixel. This is bells &amp; whistles item 5.</p>
+      <p class="delta"><b>Added</b> a gradient-magnitude function and used its output as the thing that gets compared. <b>Changed</b> only the input to the score; the search, the pyramid and the metric stay the same. <b>Result</b> 17 of 17 align; the plates that already worked move by at most a pixel. This is bells &amp; whistles item 5, better features.</p>
 
       <div class="pair pair-4">
         <figure class="shot">
@@ -367,18 +394,23 @@
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the Emir aligned on raw pixels and on gradients">
           </div>
           <img class="print-only" loading="lazy" src="images/aligned/emir.jpg" alt="The Emir aligned on gradients" width="1500" height="1271">
-          <figcaption>Before and after this step on the Emir: NCC on pixels (left, red plate 542 px off) against NCC on gradient magnitudes (right, R (107, 40)). Same pyramid, same parameters, only the feature changed.</figcaption>
+          <figcaption>Before and after on the Emir: NCC on pixels (left, red plate 542 px off) against NCC on gradient magnitudes (right, R (107, 40)). Same pyramid, same parameters, only the feature changed.</figcaption>
         </figure>
 
         <div class="prose">
           <p>
-            A blue robe is bright through blue glass and black through red glass, so any score that compares brightness can prefer a wrong shift where bright happens to land on bright. Edges, on the other hand, are a property of the scene. The boundary between the robe and the wall is in the same place in every plate, whichever way the contrast goes across it.
+            The gradient magnitude function makes an edge map of the image. It measures how much the brightness changes from one pixel to the next by taking the central difference in the vertical direction and in the horizontal direction, then combining the two with Pythagoras. Where the picture is flat the result is near zero; on an edge it is large. It is two array subtractions and a square root, no library.
+          </p>
+<pre class="code">def gradient_magnitude(im):
+    gy = np.zeros_like(im); gx = np.zeros_like(im)
+    gy[1:-1] = (im[2:] - im[:-2]) * 0.5        # vertical change
+    gx[:, 1:-1] = (im[:, 2:] - im[:, :-2]) * 0.5   # horizontal change
+    return np.sqrt(gx * gx + gy * gy)</pre>
+          <p>
+            The point is that the robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude.
           </p>
           <p>
-            So before scoring I replace each plate with its gradient magnitude, the length of the central-difference gradient at every pixel, computed with two array subtractions. The pyramid is then built from the gradient images and the search is unchanged. With this one substitution the Emir lands at G (49, 24), R (107, 40), the church's L2 failure goes away too, and on the plates that already worked the offsets move by at most a pixel. I also tried a softer edge map (the gradient squashed through 1 − exp(−g/2ḡ), so that a few very strong edges do not dominate); it gives the same answers, so the plain magnitude is what every later step uses.
-          </p>
-          <p>
-            From here on, "aligned" means step 3: pyramid, NCC, gradient features. The church gains nothing visible from this step (it was already right with NCC), which is the point: the change costs nothing on the easy plates and rescues the hard one.
+            From here on, "aligned" means step 3: pyramid, NCC, gradients. The church looks the same after this step as after step 2, which is the point. The change costs nothing on the easy plates and rescues the hard one.
           </p>
         </div>
       </div>
@@ -388,9 +420,9 @@
     <section class="part" id="metrics">
       <header class="part-head">
         <p class="param" aria-label="L2 to LPIPS"><span>L2</span><i aria-hidden="true">→</i><span>LPIPS</span></p>
-        <h2>Step 4 · Two more scores, and the whole experiment in one table</h2>
+        <h2>Step 4 · Two more metrics: SSIM and LPIPS</h2>
       </header>
-      <p class="delta"><b>Added</b> SSIM (from scratch) and LPIPS (a pretrained network) as alternative scores, and reran every plate eight ways. <b>Changed</b> nothing in the pipeline: gradient NCC stayed the winner. <b>Result</b> the table below, which is also where the L2 and NCC offsets for every plate live.</p>
+      <p class="delta"><b>Added</b> SSIM (written from scratch) and LPIPS (a pretrained network) as extra scores, and reran every plate eight ways. <b>Changed</b> nothing in the pipeline: gradient NCC stayed. <b>Result</b> the table below, which also holds the L2 and NCC offsets for every plate.</p>
 
       <!--SNIPPET:table-->
       <div class="table-wrap">
@@ -423,29 +455,33 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Each plate aligned eight ways: four scores on raw pixel values and the same four on gradient magnitudes. Amber cells with a cross are runs that disagree with the gradient-NCC answer by more than 3 pixels. The last column is the time for the full pyramid alignment of both plates with NCC, SSIM and LPIPS on gradients. The first two column pairs are the basic metrics the assignment asks for; the rest is what I tried on top.
+            Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, and every one of them is visibly wrong. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all three hand-written scores agree on every plate.
           </p>
           <p>
-            The pattern is clear. On raw pixels, L2 loses the church (red plate off by 271 pixels) and misses the Emir by 17, and NCC loses the Emir outright (red plate off by 582). All three fail for the same reason: the metric is comparing brightness, and a red filter and a blue filter see a scene completely differently. On gradient magnitudes, L2, NCC and SSIM agree on every plate, because edges sit in the same place no matter which filter produced them. LPIPS gets the Emir right even on raw pixels, since it is not really looking at brightness either; SSIM comes within 7 pixels of it.
+            <b>SSIM.</b> Structural similarity compares two images through local statistics. For every 7×7 window it computes the two means, the two variances and the covariance, and combines them into a score that is high when the windows have the same local brightness, contrast and structure. I get all five maps from one integral image each, so every window sum is four lookups. I expected it to be the most robust score and it was the least. On raw pixels it never picks something crazy, but on nine of the seventeen plates it settles 4 to 9 pixels off, and you can see the fringes on the church's steeple. The reason is its luminance term: it rewards windows whose mean brightness matches, and between two filters that is exactly the thing that does not match. On gradients the brightness term stops mattering and SSIM agrees with NCC everywhere. It is also slow, about 16 s per plate, because every one of the 25 shifts at full resolution recomputes five 12-megapixel box filters.
           </p>
+<pre class="code">mu_a, mu_b = box(a), box(b)                      # 7x7 means via integral image
+var_a, var_b = box(a*a) - mu_a**2, box(b*b) - mu_b**2
+cov = box(a*b) - mu_a*mu_b
+ssim = ((2*mu_a*mu_b + c1) * (2*cov + c2)) / ((mu_a**2 + mu_b**2 + c1) * (var_a + var_b + c2))</pre>
           <p>
-            <b>SSIM, custom metric one.</b> The structural similarity index compares two images through local statistics: for every 7×7 window it forms the two means, the two variances and the covariance, and combines them into a score in [−1, 1] that is high when the windows have the same local brightness, the same local contrast and the same structure. I compute all five maps with a 2-D integral image so each window sum is four array lookups, then average the map over the interior. I expected it to be the most robust score and it was the least: on raw pixels it never picks a wildly wrong offset, but on nine of the seventeen plates it settles 4 to 9 pixels away from where every other method agrees, and the fringes are visible (the church's steeple, the Ilemselga bell tower). The reason is the luminance term. SSIM rewards windows whose mean brightness matches, and between two filters mean brightness is exactly the thing that does not match, so the score is pulled toward shifts that pair bright patches with bright patches instead of edges with edges. On gradient magnitudes, where the brightness term becomes meaningless, SSIM agrees with NCC on every plate. It is also slow: every one of the 25 shifts at full resolution recomputes five 12-megapixel box filters.
+            <b>LPIPS.</b> The learned perceptual image patch similarity runs both images through a pretrained AlexNet, normalizes the activations of five layers, and takes a learned weighting of their squared differences. It was trained to agree with people about which of two distorted patches looks closer to a reference, so it looks at features rather than brightness. To make it affordable I score the central 512×512 of the overlap at each pyramid level and push the shifts through the network in batches of 32 on the GPU, which took a plate from about 60 s to 11 s. Where it is better: on raw pixels it gets the Emir right, which NCC and SSIM do not. Where it fails: its score surface is noisy, so it wanders by a pixel or two on most plates and by 4 on the melons and the three generations, and on gradient images it loses the Ilemselga red plate by 21 pixels, because AlexNet was trained on photographs and an edge map is not a photograph. It also cannot work on a 100-pixel image (the first layer has stride 4), so its pyramid stops at 1/8 scale with a ±25 window. This is the one place I use a library for the alignment, which the assignment allows for bells and whistles.
           </p>
+<pre class="code">A = torch.stack([tensor(m) for m, _ in pairs])      # 32 shifted crops
+B = torch.stack([tensor(r) for _, r in pairs])      # 32 reference crops
+scores = -net(A, B).flatten()                        # minus LPIPS distance, higher is better</pre>
           <p>
-            <b>LPIPS, custom metric two.</b> The learned perceptual image patch similarity (Zhang et al., 2018) runs both images through a pretrained AlexNet, normalizes the activations of five layers, and takes a learned weighting of their squared differences. It was trained to agree with people about which of two distorted patches looks closer to a reference, which is a different question from alignment, but it means the score depends on features (edges, textures, parts of things) and not on which way the contrast goes across them. To keep it affordable I evaluate it on the central 512×512 of the overlap at every pyramid level, which is plenty of structure to pin a global translation, and run it on the GPU through PyTorch (the one library-heavy piece of this project, allowed for bells and whistles). On raw pixels it has no gross failure, the Emir included, and it runs at a speed between NCC and SSIM. It is not perfect: its score surface is noisier than NCC's, so its answers wander by a pixel or two on most plates and by 4 on the melons and the three generations, and on gradient images it loses the Ilemselga red plate by 21 pixels. That last one makes sense: AlexNet was trained on photographs, and an edge map is not a photograph. The other catch is that it is a black box, with no formula to point at for <em>why</em> it prefers a shift. It also needed its own pyramid settings: on a 100-pixel image the network's first stride-4 layer sees almost nothing, so its coarse search starts at 1/8 scale with a ±25 window instead of 1/32 with ±15, and the shifts are scored in batches of 32 on the GPU to keep that affordable.
-          </p>
-          <p>
-            So after step 4 the pipeline is exactly what it was after step 3. The extra scores confirmed the diagnosis rather than replacing the fix.
+            So after step 4 the pipeline is exactly what it was after step 3. The extra metrics confirmed the diagnosis; they did not replace the fix.
           </p>
         </div>
         <aside class="formula" aria-label="SSIM and LPIPS">
           <p class="formula-line">SSIM = (2<var>μ</var><sub>a</sub><var>μ</var><sub>b</sub> + <var>c</var><sub>1</sub>)(2<var>σ</var><sub>ab</sub> + <var>c</var><sub>2</sub>) / (<var>μ</var><sub>a</sub>² + <var>μ</var><sub>b</sub>² + <var>c</var><sub>1</sub>)(<var>σ</var><sub>a</sub>² + <var>σ</var><sub>b</sub>² + <var>c</var><sub>2</sub>)</p>
           <p>
-            Computed per 7×7 window with <var>c</var><sub>1</sub> = 0.01², <var>c</var><sub>2</sub> = 0.03², then averaged. The five local moments come from one integral image each.
+            Per 7×7 window with <var>c</var><sub>1</sub> = 0.01², <var>c</var><sub>2</sub> = 0.03², then averaged.
           </p>
           <p class="formula-line" style="margin-top:1rem">LPIPS = Σ<sub>l</sub> ‖<var>w</var><sub>l</sub> ⊙ (<var>φ̂</var><sub>l</sub>(<var>a</var>) − <var>φ̂</var><sub>l</sub>(<var>b</var>))‖² / <var>H</var><sub>l</sub><var>W</var><sub>l</sub></p>
           <p>
-            <var>φ̂</var><sub>l</sub> are the unit-normalized activations of AlexNet layer <var>l</var>, <var>w</var><sub>l</sub> the learned channel weights. The search maximizes −LPIPS.
+            <var>φ̂</var><sub>l</sub> are unit-normalized AlexNet activations at layer <var>l</var>, <var>w</var><sub>l</sub> the learned weights.
           </p>
         </aside>
       </div>
@@ -455,9 +491,9 @@
     <section class="part" id="chosen">
       <header class="part-head">
         <p class="param" aria-label="1905 to 1915"><span>1905</span><i aria-hidden="true">→</i><span>1915</span></p>
-        <h2>Three plates of my own from the collection</h2>
+        <h2>Three plates I picked from the collection</h2>
       </header>
-      <p class="delta"><b>Added</b> three master scans I pulled from the Library of Congress myself. <b>Changed</b> nothing: same code, same parameters. <b>Result</b> all three align with L2, NCC and the rest; the offsets are in the step-4 table, and these are the finished versions.</p>
+      <p class="delta"><b>Added</b> three master scans I downloaded from the Library of Congress myself. <b>Changed</b> nothing: same code, same parameters. <b>Result</b> all three align with L2, NCC and the rest. Their offsets are in the step-4 table; these are the finished versions.</p>
 
       <div class="pair pair-3">
         <figure class="shot">
@@ -477,16 +513,16 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            I pulled three more master scans straight from the Library of Congress: a man on a camel in front of a mud-brick wall (the earliest, from Prokudin-Gorskii's Central Asian trip around 1905), the lakefront at Lugano from his travels in Switzerland the same year, and a study at the Kivach waterfall on the Suna river from 1915. I wanted one portrait with a subject that could move, one landscape with fine repeated structure, and one with water that is a different picture in every exposure.
+            The assignment asks for three or more plates of my own from the collection. I picked a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
           </p>
           <p>
-            All three aligned on the first try with the same parameters, with the basic metrics as well as the extras (their rows in the step-2 gallery and the step-4 table). The rider did move between the exposures: at full resolution the hut and the tree behind him are pin-sharp while his face and hat carry a faint red-green fringe, which no translation can remove and which is the same effect as the smeared water at Kivach. The camel plate is also fogged around its edges (the automatic crop takes a lot off it, see below), and its overall sepia cast is the one place where the white balance makes a large difference. The waterfall is the interesting one: the rushing water is a smooth blur in each plate and cannot help the alignment, so the score is carried entirely by the rocks, the trees and the man, which is exactly what you want and what the gradient features encourage.
+            All three aligned on the first try with the same parameters, with the basic metrics as well as the extras. The rider did move between exposures: the hut and the tree behind him are pin-sharp at full resolution, but his face and hat have a faint red-green fringe, which no translation can remove. The water at Kivach smears in three colors for the same reason, while the rocks and the man are sharp. The camel plate is also fogged around the edges, so the crop takes a lot off it, and its sepia cast is where the white balance makes the biggest difference.
           </p>
         </div>
         <aside class="formula" aria-label="Where the plates came from">
           <p class="formula-line">LoC</p>
           <p>
-            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFFs. The Library's own color renditions (<code>prokc</code>) of these scenes are what the color matrix in step 6 is fitted against.
+            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFs. The Library's own color versions (<code>prokc</code>) of these scenes are what the color matrix in step 8 is fitted against.
           </p>
         </aside>
       </div>
@@ -498,7 +534,7 @@
         <p class="param" aria-label="0 to 25 percent"><span>0</span><i aria-hidden="true">→</i><span>25</span><small>%</small></p>
         <h2>Step 5 · Automatic cropping</h2>
       </header>
-      <p class="delta"><b>Added</b> a border detector that finds the cut on each side from the image itself. <b>Changed</b> the aligned composite is now trimmed before any colour work. <b>Result</b> the black frame, the paper margin and the rainbow strips are gone on all 17 plates. Bells &amp; whistles item 1.</p>
+      <p class="delta"><b>Added</b> a border detector that finds where to cut on each side from the image itself. <b>Changed</b> the aligned image is now trimmed before any color work. <b>Result</b> the black frame, the paper margin and the rainbow strips are gone on all 17 plates. Bells &amp; whistles item 1.</p>
 
       <div class="pair">
         <figure class="shot">
@@ -518,7 +554,7 @@
         </figure>
         <figure class="shot">
           <img src="images/bw/crop-three_generations-after.jpg" srcset="images/bw/crop-three_generations-after-750.jpg 750w, images/bw/crop-three_generations-after.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="Three generations after the automatic crop: only the photograph remains" width="1500" height="1317">
-          <figcaption><b class="nounit">After</b><span>Three generations · detected crop box</span></figcaption>
+          <figcaption><b class="nounit">After</b><span>Three generations · detected crop box · 14% removed</span></figcaption>
         </figure>
       </div>
 
@@ -536,18 +572,33 @@
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the harvesters plate before and after the automatic crop">
           </div>
           <img class="print-only" loading="lazy" src="images/bw/crop-harvesters-after.jpg" alt="Harvesters after the automatic crop" width="1500" height="1347">
-          <figcaption>Harvesters. The "after" side is scaled to fill the same frame, so drag to see how much border the detector took, and that the overexposed sky at the top survived.</figcaption>
+          <figcaption>Harvesters, a good case. The "after" side is scaled to fill the same frame, so drag to see how much border went, and that the overexposed sky at the top survived.</figcaption>
         </figure>
 
         <div class="prose">
           <p>
-            After alignment each composite is wrapped in junk: the scanner's paper-white margin, the black edge of the glass, the film rebate, and, along two sides of each moved plate, a strip where only one or two channels have any picture. The assignment is to find these edges rather than trim a fixed amount. I do it with a one-dimensional profile per side.
+            After alignment each image is wrapped in junk: the scanner's paper-white margin, the black edge of the glass, the film rebate, and, on two sides of each moved plate, a strip where only one or two channels have any picture. The assignment says to detect these edges rather than cut a fixed margin, so I do it with a one-dimensional profile per side.
           </p>
           <p>
-            For every row I compute the fraction of its pixels that are border-like. A pixel is border-like if it is a gray extreme (near black or near white in all three channels: the glass edge and the paper) or strongly miscolored (two channels differ by more than half the range, which is what the rebate and the unshared strips look like once the plates have been shifted). A row is a border row if more than a third of it is border-like, or if nearly the whole row is paper white. Then, from each edge, I look inward through the outer quarter of the image for the innermost <em>sustained</em> run of border rows (at least 0.3% of the height) and cut just past it, plus a half-percent pad for the soft, vignetted edge of the rebate. The quarter only bounds the search: where the cut falls is measured. Isolated bad rows inside the picture, a saturated stripe of the Emir's robe for example, do not form a run and are ignored. Columns are handled identically.
+            <b>The border profile.</b> For each row, the border profile function asks three yes/no questions. Is nearly the whole row paper white (over 95% of pixels above 0.9 in all three channels)? Is more than a third of the row black in all three channels (below 0.08)? Is more than a third of the row strongly miscolored, meaning two channels differ by more than 0.5? The white catches the paper, the black catches the glass edge, and the miscolor catches the rebate and the strips where the plates do not overlap. Real picture content, even a bright sky or a saturated robe, rarely fills a whole row like that. Columns get the same three questions.
+          </p>
+<pre class="code">white    = (rgb > 0.9).all(axis=2).mean(axis=1) > 0.95
+black    = (rgb < 0.08).all(axis=2)
+miscolor = max(|r-g|, |g-b|, |r-b|) > 0.5
+bad_row  = white | ((black | miscolor).mean(axis=1) > 0.35)</pre>
+          <p>
+            <b>The walk.</b> Then I scan inward from each edge through the outer quarter of the image and look for the innermost sustained run of bad rows, at least 0.3% of the height in a row, and cut just past it, plus a half-percent pad for the soft edge of the rebate. The quarter only bounds the search; where the cut lands is measured. A single bad row inside the picture does not form a run, so it is ignored.
+          </p>
+<pre class="code">cut, run = 0, 0
+for i in range(limit):            # from the edge inward, outer quarter
+    run = run + 1 if bad[i] else 0
+    if run >= min_run:
+        cut = i + 1               # innermost sustained run so far</pre>
+          <p>
+            <b>Two passes.</b> The strict pass above leaves thin colored fringes where a plate fades toward its edge, because that band is off by 0.3 rather than 0.5. So I run a second, gentler pass on the result (half the row off by 0.3), but only within the outer 6%, where real content cannot form a sustained run. My first version of all this used a threshold relative to how much the interior varied, and it cut half of every image with a calm sky, because a sky varies so little that everything else looked like an outlier. Describing what paper, glass and misregistration physically look like was far more robust.
           </p>
           <p>
-            <b>What changed along the way.</b> The first version used a threshold relative to the interior's spread, and cut half of every image with a smooth sky, because a calm sky has almost no spread and anything else looks like an outlier next to it. The fixed, physical criteria above (what paper, glass and misregistration actually look like) were far more robust, but left thin coloured fringes where a plate fades toward its edge, so a second, gentler pass (half the row off by 0.3 rather than a third off by 0.5) runs on the result, confined to the outer 6% where picture content cannot form a sustained run. The same numbers work on all seventeen plates and on the tiny JPEGs. The table lists what was removed. The camel plate loses the most because its edges are genuinely fogged; Ilemselga's top band is the one debatable call: the red exposure fades toward the top edge, so the top of the sky is purple, and the detector treats that band as border.
+            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in two places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. Both are honest results of the criteria, not tuning, and I left them as they are. The table lists every crop.
           </p>
         </div>
       </div>
@@ -580,99 +631,75 @@
       <!--/SNIPPET:crop-table-->
     </section>
 
-    <!-- ============================================================= color -->
-    <section class="part" id="color">
+    <!-- ========================================================== contrast -->
+    <section class="part" id="contrast">
       <header class="part-head">
-        <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
-        <h2>Step 6 · A better color mapping, fitted to the Library's renditions</h2>
+        <p class="param" aria-label="0.5th to 99.5th percentile"><span>0.5</span><i aria-hidden="true">→</i><span>99.5</span><small>%ile</small></p>
+        <h2>Step 6 · Automatic contrast</h2>
       </header>
-      <p class="delta"><b>Added</b> one 3×3 matrix from the three plate channels to R, G, B, fitted by least squares against the Library's own colour versions of four scenes. <b>Changed</b> every pixel of every plate goes through it, right after the crop. <b>Result</b> the cyan-magenta look of the direct mapping is gone; skin and white cloth stop being pink. Bells &amp; whistles item 4.</p>
+      <p class="delta"><b>Added</b> a percentile stretch to the full range, then a partial histogram equalization on luminance. <b>Changed</b> runs right after the crop. <b>Result</b> the flat scans use the whole tonal range; shadows in the interiors open up. Bells &amp; whistles item 2.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w, images/bw/steps-church-3-crop.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the crop, plates mapped directly to RGB" width="1500" height="1311">
-          <figcaption><b class="nounit">Before</b><span>Church · after step 5 · plates → R, G, B as is</span></figcaption>
+          <img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w, images/bw/steps-church-3-crop.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the crop, tonally flat" width="1500" height="1311">
+          <figcaption><b class="nounit">Before</b><span>Church · after step 5 · flat</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w, images/bw/steps-church-4-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church through the fitted colour matrix" width="1500" height="1311">
-          <figcaption><b class="nounit">After step 6</b><span>Church · through the fitted 3×3</span></figcaption>
-        </figure>
-      </div>
-
-      <div class="pair pair-3">
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-before.jpg" srcset="images/bw/cmap-emir-before-750.jpg 750w, images/bw/cmap-emir-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir with the plates mapped directly to R, G and B" width="1500" height="1404">
-          <figcaption><b class="nounit">Direct</b><span>Emir · plates → R, G, B as is</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-after.jpg" srcset="images/bw/cmap-emir-after-750.jpg 750w, images/bw/cmap-emir-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir after the fitted 3 by 3 color matrix" width="1500" height="1404">
-          <figcaption><b class="nounit">Matrix</b><span>Emir · through the fitted 3×3</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/cmap-emir-loc.jpg" srcset="images/bw/cmap-emir-loc-750.jpg 750w, images/bw/cmap-emir-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library of Congress's own color rendition of the Emir plate" width="1500" height="1464">
-          <figcaption><b class="nounit">LoC</b><span>The Library's rendition, for reference</span></figcaption>
+          <img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w, images/bw/steps-church-4-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the contrast stretch and partial equalization" width="1500" height="1311">
+          <figcaption><b class="nounit">After step 6</b><span>Church · stretch + quarter-strength equalization</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-before.jpg" srcset="images/bw/cmap-lugano-before-750.jpg 750w, images/bw/cmap-lugano-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano with the plates mapped directly" width="1500" height="1241">
-          <figcaption><b class="nounit">Direct</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-before.jpg" srcset="images/bw/contrast-icon-before-750.jpg 750w, images/bw/contrast-icon-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon interior as scanned, flat and gray" width="1500" height="1355">
+          <figcaption><b class="nounit">Before</b><span>Icon · as aligned</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-after.jpg" srcset="images/bw/cmap-lugano-after-750.jpg 750w, images/bw/cmap-lugano-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano through the fitted matrix" width="1500" height="1241">
-          <figcaption><b class="nounit">Matrix</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-linear.jpg" srcset="images/bw/contrast-icon-linear-750.jpg 750w, images/bw/contrast-icon-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a linear percentile stretch" width="1500" height="1355">
+          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-lugano-loc.jpg" srcset="images/bw/cmap-lugano-loc-750.jpg 750w, images/bw/cmap-lugano-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library's rendition of Lugano" width="1500" height="1226">
-          <figcaption><b class="nounit">LoC</b><span>Lugano</span></figcaption>
+          <img src="images/bw/contrast-icon-eq.jpg" srcset="images/bw/contrast-icon-eq-750.jpg 750w, images/bw/contrast-icon-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a half-strength histogram equalization on top of the stretch" width="1500" height="1355">
+          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/cmap-three_generations-before.jpg" srcset="images/bw/cmap-three_generations-before-750.jpg 750w, images/bw/cmap-three_generations-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations with the plates mapped directly" width="1500" height="1317">
-          <figcaption><b class="nounit">Direct</b><span>Three generations · not in the fit</span></figcaption>
+          <img src="images/bw/contrast-wharf-before.jpg" srcset="images/bw/contrast-wharf-before-750.jpg 750w, images/bw/contrast-wharf-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf as aligned" width="1500" height="1305">
+          <figcaption><b class="nounit">Before</b><span>Wharf · as aligned</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-three_generations-after.jpg" srcset="images/bw/cmap-three_generations-after-750.jpg 750w, images/bw/cmap-three_generations-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations through the fitted matrix" width="1500" height="1317">
-          <figcaption><b class="nounit">Matrix</b><span>Three generations</span></figcaption>
+          <img src="images/bw/contrast-wharf-linear.jpg" srcset="images/bw/contrast-wharf-linear-750.jpg 750w, images/bw/contrast-wharf-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf after the linear stretch" width="1500" height="1305">
+          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/cmap-melons-after.jpg" srcset="images/bw/cmap-melons-after-750.jpg 750w, images/bw/cmap-melons-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The melon seller through the fitted matrix" width="1500" height="1317">
-          <figcaption><b class="nounit">Matrix</b><span>Melons · not in the fit</span></figcaption>
+          <img src="images/bw/contrast-wharf-eq.jpg" srcset="images/bw/contrast-wharf-eq-750.jpg 750w, images/bw/contrast-wharf-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf with the half-strength equalization" width="1500" height="1305">
+          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
         </figure>
       </div>
 
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            There is no reason the three filters Prokudin-Gorskii used in 1910 should correspond to the R, G and B primaries of a modern display. His "green" glass let through a broad band, his "red" was a deep orange-red, and the emulsion's sensitivity was anything but flat. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every composite so far has the same cyan-magenta look. A camera solves the same problem with a color correction matrix: a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than eyeball it.
+            <b>The stretch.</b> The scans do not use the full range. The icon, for example, has its 0.5th and 99.5th percentiles at 0.08 and 0.93 once the borders are gone, and the wharf at 0.05 and 0.91. I find those two percentiles over all three channels together and map them linearly to 0 and 1, clipping the few pixels outside. Percentiles instead of the true min and max means one speck of dust or one blown highlight cannot pin the range. Using the same two numbers for all three channels changes brightness and contrast but not hue, so this step cannot add a color cast. Hue is the next step's job.
           </p>
+<pre class="code">lo, hi = np.percentile(rgb, 0.5), np.percentile(rgb, 99.5)
+rgb = np.clip((rgb - lo) / (hi - lo), 0, 1)</pre>
           <p>
-            The reference I used is the Library of Congress itself. For every plate in the collection the Library publishes its own color rendition, made by hand from the same scan by its conservators. For four scenes (the Emir, and my three picks) I registered my composite to the Library's image and solved, by least squares over roughly half a million matching pixels, for the 3×3 matrix <var>M</var> that best predicts their colors from my plate values. Registration was the fiddly part: the Library's renditions are re-framed and cropped differently from a naive split into thirds, so I searched over a small grid of per-axis scales and then ran my own pyramid alignment on edge features to find the residual translation. The four matrices agree on their structure and I average them; the result is the single matrix on the right, applied unchanged to all seventeen plates, including the thirteen that had no say in the fit (the three generations and the melons above are two of those).
+            <b>Histogram equalization.</b> For the nonlinear part I equalize the luminance: build its histogram, take the cumulative sum, normalize it, and that CDF is the new tone curve. Then I only blend part of the way from the original curve to the equalized one, and scale all three channels by the same luminance ratio so colors stay put. Full equalization is too much for these photos, it flattens skies into gray and makes everything look like a poster. Half strength, shown above, opens the shadows in the church interiors without wrecking the highlights. The final pipeline uses a quarter strength on every plate.
           </p>
-          <p>
-            What the matrix says is physically sensible. The red row is nearly clean. The green row takes about 11% from each of the red and the blue plates, which is the broad green filter. The blue row is scaled down and borrows 11% from green, which desaturates the cyan cast. It does part of what a white balance does for the overall cast, but it also fixes hues that no per-channel gain can, like the pink-magenta shadows on skin and on white cloth. The remaining difference to the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. What is left on the church after this step is a blue cast that is the same on every plate, which is the next step's job.
-          </p>
+<pre class="code">hist, edges = np.histogram(y, bins=1024, range=(0, 1))
+cdf = np.cumsum(hist) / hist.sum()
+y_eq = np.interp(y, edges[:-1], cdf)
+y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
+rgb = rgb * (y_new / y)[..., None]</pre>
         </div>
-        <aside class="formula" aria-label="The fitted matrix">
-          <p class="formula-line">[R G B]ᵀ = <var>M</var> · [r g b]ᵀ</p>
-          <div class="matrix" aria-label="M">
-            <!--MATRIX-->
-            <span>0.94</span>
-            <span class="off">+0.01</span>
-            <span class="off">+0.06</span>
-            <span class="off">+0.11</span>
-            <span>0.75</span>
-            <span class="off">+0.11</span>
-            <span class="off">-0.01</span>
-            <span class="off">+0.11</span>
-            <span>0.85</span>
-      <!--/MATRIX-->
-          </div>
+        <aside class="formula" aria-label="The stretch">
+          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
           <p>
-            Least squares over registered pixels of four scenes against the Library's <code>prokc</code> renditions; mean of the four fits. Rows are output R, G, B; columns are the red, green and blue plates.
+            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance, and each channel multiplied by <var>L</var>′/<var>L</var>.
           </p>
         </aside>
       </div>
@@ -684,11 +711,11 @@
         <p class="param" aria-label="Minkowski norm p from 1 to 6"><span>1</span><i aria-hidden="true">→</i><span>6</span><small>p</small></p>
         <h2>Step 7 · Automatic white balance</h2>
       </header>
-      <p class="delta"><b>Added</b> an illuminant estimate (gray world, white patch, and shades of gray, which is one formula with a knob between them) and a per-channel gain to cancel it. <b>Changed</b> shades of gray with p = 6 now runs after the matrix. <b>Result</b> the blue cast common to every plate is gone; the camel plate loses most of its sepia. Bells &amp; whistles item 3.</p>
+      <p class="delta"><b>Added</b> an illuminant estimate (gray world, white patch, and shades of gray, which is one formula with a knob between them) and a per-channel gain that cancels it. <b>Changed</b> shades of gray with p = 6 now runs after the contrast step. <b>Result</b> the blue cast that every plate shares is gone; the camel loses most of its sepia. Bells &amp; whistles item 3.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w, images/bw/steps-church-4-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the colour matrix, still with a blue cast" width="1500" height="1311">
+          <img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w, images/bw/steps-church-4-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after contrast, still with a blue cast" width="1500" height="1311">
           <figcaption><b class="nounit">Before</b><span>Church · after step 6 · blue cast</span></figcaption>
         </figure>
         <figure class="shot">
@@ -738,10 +765,16 @@
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            White balance is two problems: guess the color of the light, then divide it out. The second half is easy and I do it the von Kries way, one gain per channel, normalized so green is untouched. The first half is the guess, and I implemented the three classic guesses, which turn out to be one formula with a knob. <em>Gray world</em> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <em>White patch</em> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <em>Shades of gray</em> (Finlayson and Trezzi) takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits between them, weighting bright pixels more than the mean does but not staking everything on the single brightest patch.
+            White balance is two problems: guess the color of the light (the illuminant), then divide it out. The second half is easy. The illuminant function returns one RGB triple; the white balance function divides each channel by it, normalized so green stays put, which keeps the overall brightness about the same. The hard half is the guess, and I implemented the three classic guesses. <b>Gray world</b> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <b>White patch</b> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <b>Shades of gray</b> takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits in between, weighting bright pixels more than the mean does without betting everything on the single brightest patch.
           </p>
+<pre class="code">def illuminant(rgb, p=6):
+    return np.mean(rgb.reshape(-1, 3) ** p, axis=0) ** (1 / p)   # p=1 gray world, p→∞ white patch
+
+def white_balance(rgb):
+    ill = illuminant(rgb)
+    return np.clip(rgb * (ill[1] / ill), 0, 1)                   # green untouched</pre>
           <p>
-            <b>What I compared.</b> Gray world overcorrects scenes that really are mostly one color (it turns the church's lake and sky beige, because it insists the picture average out to gray). White patch is at the mercy of whichever pixels happen to be brightest: on the camel plate that is the fogged edge, not a white object. Shades of gray with p = 6 is the one I kept: it removes the blue cast the plates share, which I think is a property of the blue exposure being the reference, without flattening a genuinely blue scene. On the camel plate it takes out most of the sepia; the rest is real, that plate was photographed at midday in the desert. The four-way comparisons above are made on step-5 output so the three guesses can be seen side by side; the running example goes through the matrix first, as the final pipeline does.
+            <b>What I saw.</b> Gray world overcorrects scenes that really are mostly one color: it turns the church's lake and sky beige because it insists the whole picture average out to gray. White patch depends on whichever pixels happen to be brightest, and on the camel plate that is the fogged edge, not a white object. Shades of gray with p = 6 is what I kept. It removes the blue cast the plates share, which I think comes from the blue exposure being the reference, without flattening a scene that really is blue. On the camel it takes out most of the sepia; the rest is real, it was shot at midday in the desert.
           </p>
         </div>
         <aside class="formula" aria-label="Shades of gray">
@@ -753,68 +786,101 @@
       </div>
     </section>
 
-    <!-- ========================================================== contrast -->
-    <section class="part" id="contrast">
+    <!-- ============================================================= color -->
+    <section class="part" id="color">
       <header class="part-head">
-        <p class="param" aria-label="0.5th to 99.5th percentile"><span>0.5</span><i aria-hidden="true">→</i><span>99.5</span><small>%ile</small></p>
-        <h2>Step 8 · Automatic contrast</h2>
+        <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
+        <h2>Step 8 · A better color mapping: one 3×3 matrix</h2>
       </header>
-      <p class="delta"><b>Added</b> a percentile stretch to the full range, and a partial histogram equalization on luminance. <b>Changed</b> this is the last thing that touches the image. <b>Result</b> the flat scans use the whole tonal range; shadows in the interiors open up. Bells &amp; whistles item 2.</p>
+      <p class="delta"><b>Added</b> a 3×3 matrix from the three plate channels to R, G, B, fitted by least squares against the Library's own color versions of four scenes. <b>Changed</b> every pixel of every plate goes through it as the last step. <b>Result</b> the cyan-magenta look of the direct mapping is gone; skin and white cloth stop being pink. Bells &amp; whistles item 4.</p>
 
       <div class="pair">
         <figure class="shot">
-          <img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w, images/bw/steps-church-5-wb.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after white balance, tonally flat" width="1500" height="1311">
-          <figcaption><b class="nounit">Before</b><span>Church · after step 7 · flat</span></figcaption>
+          <img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w, images/bw/steps-church-5-wb.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after white balance, plates mapped directly to RGB" width="1500" height="1311">
+          <figcaption><b class="nounit">Before</b><span>Church · after step 7 · plates → R, G, B as is</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/steps-church-6-contrast.jpg" srcset="images/bw/steps-church-6-contrast-750.jpg 750w, images/bw/steps-church-6-contrast.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after the contrast stretch and partial equalization: the finished plate" width="1500" height="1311">
-          <figcaption><b class="nounit">After step 8</b><span>Church · stretch + quarter-strength equalization · done</span></figcaption>
-        </figure>
-      </div>
-
-      <div class="pair pair-3">
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-before.jpg" srcset="images/bw/contrast-icon-before-750.jpg 750w, images/bw/contrast-icon-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon interior as scanned, flat and gray" width="1500" height="1355">
-          <figcaption><b class="nounit">Before</b><span>Icon · as aligned</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-linear.jpg" srcset="images/bw/contrast-icon-linear-750.jpg 750w, images/bw/contrast-icon-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a linear percentile stretch" width="1500" height="1355">
-          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/bw/contrast-icon-eq.jpg" srcset="images/bw/contrast-icon-eq-750.jpg 750w, images/bw/contrast-icon-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The icon after a half-strength histogram equalization on top of the stretch" width="1500" height="1355">
-          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
+          <img src="images/bw/steps-church-6-matrix.jpg" srcset="images/bw/steps-church-6-matrix-750.jpg 750w, images/bw/steps-church-6-matrix.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church through the fitted colour matrix: the finished plate" width="1500" height="1311">
+          <figcaption><b class="nounit">After step 8</b><span>Church · through the fitted 3×3 · done</span></figcaption>
         </figure>
       </div>
 
       <div class="pair pair-3">
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-before.jpg" srcset="images/bw/contrast-wharf-before-750.jpg 750w, images/bw/contrast-wharf-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf as aligned" width="1500" height="1305">
-          <figcaption><b class="nounit">Before</b><span>Wharf · as aligned</span></figcaption>
+          <img src="images/bw/cmap-emir-before.jpg" srcset="images/bw/cmap-emir-before-750.jpg 750w, images/bw/cmap-emir-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir with the plates mapped directly to R, G and B" width="1500" height="1404">
+          <figcaption><b class="nounit">Direct</b><span>Emir · plates → R, G, B as is</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-linear.jpg" srcset="images/bw/contrast-wharf-linear-750.jpg 750w, images/bw/contrast-wharf-linear.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf after the linear stretch" width="1500" height="1305">
-          <figcaption><b class="nounit">Linear</b><span>Percentiles to 0 and 1</span></figcaption>
+          <img src="images/bw/cmap-emir-after.jpg" srcset="images/bw/cmap-emir-after-750.jpg 750w, images/bw/cmap-emir-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Emir after the fitted 3 by 3 color matrix" width="1500" height="1404">
+          <figcaption><b class="nounit">Matrix</b><span>Emir · through the fitted 3×3</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/contrast-wharf-eq.jpg" srcset="images/bw/contrast-wharf-eq-750.jpg 750w, images/bw/contrast-wharf-eq.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The wharf with the half-strength equalization" width="1500" height="1305">
-          <figcaption><b class="nounit">Nonlinear</b><span>+ half-strength equalization</span></figcaption>
+          <img src="images/bw/cmap-emir-loc.jpg" srcset="images/bw/cmap-emir-loc-750.jpg 750w, images/bw/cmap-emir-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library of Congress's own color rendition of the Emir plate" width="1500" height="1464">
+          <figcaption><b class="nounit">LoC</b><span>The Library's version, for reference</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-before.jpg" srcset="images/bw/cmap-lugano-before-750.jpg 750w, images/bw/cmap-lugano-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano with the plates mapped directly" width="1500" height="1241">
+          <figcaption><b class="nounit">Direct</b><span>Lugano</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-after.jpg" srcset="images/bw/cmap-lugano-after-750.jpg 750w, images/bw/cmap-lugano-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Lugano through the fitted matrix" width="1500" height="1241">
+          <figcaption><b class="nounit">Matrix</b><span>Lugano</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-lugano-loc.jpg" srcset="images/bw/cmap-lugano-loc-750.jpg 750w, images/bw/cmap-lugano-loc.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The Library's rendition of Lugano" width="1500" height="1226">
+          <figcaption><b class="nounit">LoC</b><span>Lugano</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/bw/cmap-three_generations-before.jpg" srcset="images/bw/cmap-three_generations-before-750.jpg 750w, images/bw/cmap-three_generations-before.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations with the plates mapped directly" width="1500" height="1317">
+          <figcaption><b class="nounit">Direct</b><span>Three generations · not in the fit</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-three_generations-after.jpg" srcset="images/bw/cmap-three_generations-after-750.jpg 750w, images/bw/cmap-three_generations-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Three generations through the fitted matrix" width="1500" height="1317">
+          <figcaption><b class="nounit">Matrix</b><span>Three generations</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/cmap-melons-after.jpg" srcset="images/bw/cmap-melons-after-750.jpg 750w, images/bw/cmap-melons-after.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The melon seller through the fitted matrix" width="1500" height="1317">
+          <figcaption><b class="nounit">Matrix</b><span>Melons · not in the fit</span></figcaption>
         </figure>
       </div>
 
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            The scans do not use the full range: the icon, for example, has its 0.5th and 99.5th percentiles at 0.08 and 0.93 once the borders are gone, and the wharf at 0.05 and 0.91. The safe fix is the one the assignment suggests. I find the 0.5th and 99.5th percentiles over all three channels together and map them linearly to 0 and 1, clipping the handful of pixels outside. Using percentiles instead of the true minimum and maximum means one speck of dust or one blown highlight cannot pin the range, and using the same two numbers for all three channels means the stretch changes brightness and contrast but not hue, so it cannot introduce a color cast (a per-channel stretch would, and that is what step 7 was for).
+            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
           </p>
           <p>
-            <b>What I compared.</b> For the nonlinear version I histogram-equalize the luminance, then blend only part of the way from the original tone curve to the equalized one, and scale the three channels by the resulting luminance ratio so colors are left alone. Full equalization is too much for these photographs, it flattens the skies into gray and makes everything look like a poster; half of it (shown above) opens the shadows in the church interiors without wrecking the highlights. The final pipeline uses the linear stretch plus a quarter-strength equalization, the same for every plate. With that, the church is finished: compare it with the stacked plates back in step 2.
+            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
+          </p>
+<pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
+rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
+          <p>
+            <b>What it says.</b> The red row is nearly identity. The green row takes about 11% from each of the red and blue plates, which is the broad green filter. The blue row is scaled down to 0.85 and borrows 11% from green, which desaturates the cyan cast. It does part of what the white balance does for the overall cast, but it also fixes hues no per-channel gain can, like the pink shadows on skin and white cloth. The difference that remains against the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. With this step the church is finished; compare it with the stacked plates back in step 2.
           </p>
         </div>
-        <aside class="formula" aria-label="The stretch">
-          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
+        <aside class="formula" aria-label="The fitted matrix">
+          <p class="formula-line">[R G B]ᵀ = <var>M</var> · [r g b]ᵀ</p>
+          <div class="matrix" aria-label="M">
+            <!--MATRIX-->
+            <span>0.94</span>
+            <span class="off">+0.01</span>
+            <span class="off">+0.06</span>
+            <span class="off">+0.11</span>
+            <span>0.75</span>
+            <span class="off">+0.11</span>
+            <span class="off">-0.01</span>
+            <span class="off">+0.11</span>
+            <span>0.85</span>
+      <!--/MATRIX-->
+          </div>
           <p>
-            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance with <var>s</var> = ¼, and each channel multiplied by <var>L</var>′/<var>L</var>.
+            Least squares over registered pixels of four scenes against the Library's <code>prokc</code> versions; mean of the four fits. Rows are output R, G, B; columns are the red, green and blue plates.
           </p>
         </aside>
       </div>
@@ -826,25 +892,25 @@
         <p class="param" aria-label="seventeen plates"><span>17</span><small>plates</small></p>
         <h2>Everything on · the two running examples, then all seventeen</h2>
       </header>
-      <p class="delta"><b>Nothing new.</b> The whole pipeline in order: step 3 alignment, step 5 crop, step 6 matrix, step 7 white balance, step 8 contrast. Same parameters for every plate.</p>
+      <p class="delta"><b>Nothing new.</b> The whole pipeline in order: step 3 alignment, step 5 crop, step 6 contrast, step 7 white balance, step 8 matrix. Same parameters for every plate.</p>
 
       <div class="strip strip-7" aria-label="The church through every step">
         <figure><img src="images/bw/steps-church-0-stacked.jpg" srcset="images/bw/steps-church-0-stacked-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, stacked" width="1500" height="1322"><figcaption>stacked</figcaption></figure>
         <figure><img src="images/bw/steps-church-1-ncc-raw.jpg" srcset="images/bw/steps-church-1-ncc-raw-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 2" width="1500" height="1301"><figcaption>2 · pyramid</figcaption></figure>
         <figure><img src="images/bw/steps-church-2-ncc-grad.jpg" srcset="images/bw/steps-church-2-ncc-grad-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 3" width="1500" height="1301"><figcaption>3 · gradients</figcaption></figure>
         <figure><img src="images/bw/steps-church-3-crop.jpg" srcset="images/bw/steps-church-3-crop-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 5" width="1500" height="1311"><figcaption>5 · crop</figcaption></figure>
-        <figure><img src="images/bw/steps-church-4-matrix.jpg" srcset="images/bw/steps-church-4-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 6" width="1500" height="1311"><figcaption>6 · matrix</figcaption></figure>
+        <figure><img src="images/bw/steps-church-4-contrast.jpg" srcset="images/bw/steps-church-4-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 6" width="1500" height="1311"><figcaption>6 · contrast</figcaption></figure>
         <figure><img src="images/bw/steps-church-5-wb.jpg" srcset="images/bw/steps-church-5-wb-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 7" width="1500" height="1311"><figcaption>7 · balance</figcaption></figure>
-        <figure><img src="images/bw/steps-church-6-contrast.jpg" srcset="images/bw/steps-church-6-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 8" width="1500" height="1311"><figcaption>8 · contrast</figcaption></figure>
+        <figure><img src="images/bw/steps-church-6-matrix.jpg" srcset="images/bw/steps-church-6-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Church, step 8" width="1500" height="1311"><figcaption>8 · matrix</figcaption></figure>
       </div>
       <div class="strip strip-7" aria-label="The Emir through every step">
         <figure><img src="images/bw/steps-emir-0-stacked.jpg" srcset="images/bw/steps-emir-0-stacked-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, stacked" width="1500" height="1300"><figcaption>stacked</figcaption></figure>
         <figure><img src="images/bw/steps-emir-1-ncc-raw.jpg" srcset="images/bw/steps-emir-1-ncc-raw-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 2, misaligned" width="1500" height="1391"><figcaption>2 · pyramid ✕</figcaption></figure>
         <figure><img src="images/bw/steps-emir-2-ncc-grad.jpg" srcset="images/bw/steps-emir-2-ncc-grad-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 3" width="1500" height="1271"><figcaption>3 · gradients</figcaption></figure>
         <figure><img src="images/bw/steps-emir-3-crop.jpg" srcset="images/bw/steps-emir-3-crop-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 5" width="1500" height="1404"><figcaption>5 · crop</figcaption></figure>
-        <figure><img src="images/bw/steps-emir-4-matrix.jpg" srcset="images/bw/steps-emir-4-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 6" width="1500" height="1404"><figcaption>6 · matrix</figcaption></figure>
+        <figure><img src="images/bw/steps-emir-4-contrast.jpg" srcset="images/bw/steps-emir-4-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 6" width="1500" height="1404"><figcaption>6 · contrast</figcaption></figure>
         <figure><img src="images/bw/steps-emir-5-wb.jpg" srcset="images/bw/steps-emir-5-wb-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 7" width="1500" height="1404"><figcaption>7 · balance</figcaption></figure>
-        <figure><img src="images/bw/steps-emir-6-contrast.jpg" srcset="images/bw/steps-emir-6-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 8" width="1500" height="1404"><figcaption>8 · contrast</figcaption></figure>
+        <figure><img src="images/bw/steps-emir-6-matrix.jpg" srcset="images/bw/steps-emir-6-matrix-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 8" width="1500" height="1404"><figcaption>8 · matrix</figcaption></figure>
       </div>
 
       <h3 class="sub">All seventeen through the full pipeline</h3>
@@ -920,9 +986,7 @@
         </figure>
       </div>
       <!--/SNIPPET:gallery-->
-      <p class="note">Offsets are (dy, dx) in pixels of the green and red plates relative to blue, from step-3 alignment. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
-
-      </div>
+      <p class="note">Offsets are (dy, dx) of the green and red plates relative to blue, from step-3 alignment. Plates marked "LoC pick" are the three I chose from the collection myself.</p>
     </section>
   </main>
 

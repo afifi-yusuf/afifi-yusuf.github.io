@@ -316,3 +316,30 @@
     font-size: 8.5pt;
   }
 }
+
+/* Short code snippets inside the prose. */
+.prose pre.code {
+  max-width: var(--measure);
+  margin: 0.75rem 0 1rem;
+  padding: 0.8rem 1rem;
+  overflow-x: auto;
+  background: var(--surface);
+  border-left: 3px solid var(--indigo);
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: pre;
+  tab-size: 4;
+}
+
+.prose pre.code + p {
+  margin-top: 0;
+}
+
+@media print {
+  .prose pre.code {
+    font-size: 7.5pt;
+    break-inside: avoid;
+  }
+}
