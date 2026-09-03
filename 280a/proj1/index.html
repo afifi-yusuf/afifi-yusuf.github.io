@@ -28,6 +28,7 @@
       <a href="#metrics"><b>L2→MI</b> Metrics</a>
       <a href="#chosen"><b>1905→1915</b> Picks</a>
       <a href="#crop"><b>5</b> Bells &amp; whistles</a>
+      <a href="#local"><b>0.1°</b> Beyond translation</a>
       <a href="#final"><b>17</b> Final</a>
     </nav>
   </header>
@@ -862,6 +863,104 @@ y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
 rgb = rgb * (y_new / y)[..., None]</pre>
         </div>
       </div>
+    </section>
+
+    <!-- ============================================================= local -->
+    <section class="part" id="local">
+      <header class="part-head">
+        <p class="param" aria-label="a tenth of a degree"><span>0.1</span><small>°</small></p>
+        <h2>Step 9 · Beyond translation: a field of local shifts <small>optional · better transformations</small></h2>
+      </header>
+
+      <div class="pair">
+        <figure class="shot natural">
+          <img src="images/bw/local-camel-field.jpg" srcset="images/bw/local-camel-field-750.jpg 750w, images/bw/local-camel-field.jpg 1237w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The camel plate with an arrow at every tile showing the local shift of the red plate; the arrows swirl slowly around the centre" width="1251" height="1071">
+          <figcaption><b class="nounit">Field</b><span>Camel · red plate · one arrow per 320-px tile, ×10 · gray = not trusted</span></figcaption>
+        </figure>
+        <figure class="wipe" data-wipe>
+          <div class="wipe-frame" style="--pos:50%">
+            <img class="wipe-under" src="images/bw/local-camel-after.jpg" loading="lazy" decoding="async" alt="" width="400" height="400">
+            <img class="wipe-over" src="images/bw/local-camel-before.jpg" loading="lazy" decoding="async" alt="" width="400" height="400">
+            <span class="wipe-tag wipe-tag-l">one shift</span>
+            <span class="wipe-tag wipe-tag-r">local field</span>
+            <span class="wipe-line" aria-hidden="true"></span>
+            <span class="wipe-knob" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+            </span>
+            <input type="range" min="0" max="100" value="50" aria-label="Wipe between the rider aligned with one global shift and with the local field">
+          </div>
+          <img class="print-only" loading="lazy" src="images/bw/local-camel-after.jpg" alt="The rider after the local field" width="400" height="400">
+          <figcaption>The rider, full resolution. Left: one global shift, his face and hat carry a red-green fringe because he moved. Right: the local field, which follows him.</figcaption>
+        </figure>
+      </div>
+
+      <div class="pair">
+        <figure class="shot">
+          <img src="images/bw/local-emir-before.jpg" loading="lazy" decoding="async" alt="The Emir's face with one global shift" width="400" height="400">
+          <figcaption><b class="nounit">Before</b><span>Emir · one global shift · a faint fringe at the eyes</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/local-emir-after.jpg" loading="lazy" decoding="async" alt="The Emir's face after the local field" width="400" height="400">
+          <figcaption><b class="nounit">After</b><span>Emir · local field · the eyes and turban edge line up</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="Similarity fit">
+          <p class="formula-line">[<var>y</var>′ <var>x</var>′] = <var>s</var>·R(<var>θ</var>)·[<var>y</var> <var>x</var>] + <var>t</var></p>
+          <p>
+            Fitted by least squares to the trusted tile shifts, around the image centre. Every red plate comes out with a small negative <var>θ</var>, and on 13 of the 14 plates the red is rotated more than the green.
+          </p>
+        </aside>
+        <div class="prose">
+          <p>
+            <b>Why.</b> Two things on this page could not be fixed by sliding a whole plate: the camel rider moved between the three exposures, and the assignment's own suggestion that the plates may differ by a small rotation or scale, not just a shift. A brute-force search over rotation and scale would add two dimensions to every level of the pyramid. Instead I measure them. After the global alignment I cut the moving plate into 320-pixel tiles and re-align each tile on its own, with the same gradient NCC search, over ±10 pixels. That gives one arrow per tile: how far that part of the plate still wants to move.
+          </p>
+<pre class="code">for each 320x320 tile (ty, tx), skipping the outer 8%:
+    r = grad_ref[ty:ty+320, tx:tx+320]
+    best over dy, dx in [-10, 10]: ncc(grad_mov[ty-dy:ty-dy+320, tx-dx:tx-dx+320], r)
+    trust the tile if peak ncc > 0.35 and the tile has texture</pre>
+          <p>
+            <b>Trusting a tile.</b> A tile of blank sky or flat sand has no edges to lock onto, so its arrow is noise. I only keep tiles whose gradient NCC peak is above 0.35 and whose gradient image has some energy; the gray arrows in the figure are the ones thrown away. On the camel plate 106 of 144 tiles are trusted; on the church, which is mostly sky and lake, only 12, and the fit there rests on those.
+          </p>
+          <p>
+            <b>Rotation and scale for free.</b> A least-squares fit of a similarity transform, rotation θ, scale s and a translation, through the trusted arrows gives the two extra dimensions the assignment suggests searching for, without searching. The result is systematic: on every one of the 14 large plates the red exposure comes out rotated by −0.03° to −0.29°, the green by less, in the same direction on all but Lugano's green (+0.04°), and on 13 of the 14 the red plate is rotated more than the green. Red was exposed last, so the plate holder crept the same way each time. The scales are within 0.4% of one. A tenth of a degree is 5 pixels at the corner of a 3700-pixel plate, which is exactly the size of fringe the global alignment leaves at the edges.
+          </p>
+<pre class="code">A = [[y, -x, 1, 0], [x, y, 0, 1]] per trusted tile      # unknowns a = s cos θ, b = s sin θ, ty, tx
+(a, b, ty, tx) = lstsq(A, tile_centre + tile_shift)
+theta = atan2(b, a); scale = hypot(a, b)</pre>
+          <p>
+            <b>The local warp.</b> For the rider I need more than a rigid transform, so I turn the arrows into a dense field: untrusted tiles borrow the nearest trusted arrow, the coarse grid is smoothed with a small Gaussian, and it is upsampled to every pixel. Each plate is then resampled so pixel (y, x) takes its value from (y − dy, x − dx). That is a bilinear lookup, the one place I use a library for the alignment (<code>scipy.ndimage.map_coordinates</code>), allowed for bells and whistles. The field follows the rider because his tiles disagree with the tiles around him, and the smoothing keeps the seams between tiles from showing.
+          </p>
+          <p>
+            <b>What it does and does not fix.</b> Gradient NCC between the plates goes up on every plate, most on the icon (0.35 → 0.57) and the wharf (0.58 → 0.79), where the tenth-of-a-degree rotation was leaving fringes along the edges. The rider's face and hat come back into register, and the Emir's eyes and turban edge sharpen. Kivach's water does not improve, and cannot: the water is a different picture in each exposure, not a shifted one, so there is no arrow that describes it. I keep this as a separate step rather than part of the final gallery, because a warp can invent detail where the arrows are wrong, and I would rather the seventeen finished plates be the plain, honest translation.
+          </p>
+        </div>
+      </div>
+
+      <!--SNIPPET:local-table-->
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Plate</th><th>Green · rotation, scale</th><th>Red · rotation, scale</th><th>Trusted tiles</th><th>Gradient NCC before → after</th></tr></thead>
+          <tbody>
+          <tr><td>Church</td><td class="num">-0.07° · ×1.0030</td><td class="num">-0.17° · ×1.0007</td><td class="num">12 / 144</td><td class="num">0.52 → 0.61</td></tr>
+          <tr><td>Emir of Bukhara</td><td class="num">-0.06° · ×1.0023</td><td class="num">-0.14° · ×0.9992</td><td class="num">34 / 144</td><td class="num">0.48 → 0.52</td></tr>
+          <tr><td>Harvesters</td><td class="num">-0.23° · ×1.0034</td><td class="num">-0.29° · ×1.0023</td><td class="num">55 / 144</td><td class="num">0.32 → 0.47</td></tr>
+          <tr><td>Icon</td><td class="num">-0.10° · ×1.0033</td><td class="num">-0.10° · ×1.0025</td><td class="num">107 / 144</td><td class="num">0.35 → 0.57</td></tr>
+          <tr><td>Ilemselga</td><td class="num">-0.04° · ×0.9977</td><td class="num">-0.11° · ×0.9969</td><td class="num">22 / 144</td><td class="num">0.58 → 0.70</td></tr>
+          <tr><td>Melons</td><td class="num">-0.10° · ×1.0044</td><td class="num">-0.15° · ×1.0035</td><td class="num">28 / 144</td><td class="num">0.39 → 0.64</td></tr>
+          <tr><td>Religious painting</td><td class="num">-0.03° · ×1.0034</td><td class="num">-0.09° · ×1.0021</td><td class="num">67 / 144</td><td class="num">0.44 → 0.73</td></tr>
+          <tr><td>Self-portrait</td><td class="num">-0.20° · ×1.0034</td><td class="num">-0.25° · ×1.0026</td><td class="num">80 / 160</td><td class="num">0.40 → 0.70</td></tr>
+          <tr><td>Lilacs (Siren)</td><td class="num">-0.11° · ×1.0034</td><td class="num">-0.21° · ×1.0017</td><td class="num">52 / 160</td><td class="num">0.41 → 0.64</td></tr>
+          <tr><td>Three generations</td><td class="num">-0.15° · ×1.0045</td><td class="num">-0.21° · ×1.0015</td><td class="num">20 / 144</td><td class="num">0.45 → 0.65</td></tr>
+          <tr><td>Wharf</td><td class="num">-0.04° · ×0.9983</td><td class="num">-0.12° · ×0.9969</td><td class="num">64 / 144</td><td class="num">0.58 → 0.79</td></tr>
+          <tr><td>Man on a camel</td><td class="num">-0.13° · ×1.0037</td><td class="num">-0.17° · ×1.0021</td><td class="num">106 / 144</td><td class="num">0.36 → 0.58</td></tr>
+          <tr><td>Lugano</td><td class="num">+0.04° · ×1.0033</td><td class="num">-0.04° · ×1.0015</td><td class="num">78 / 144</td><td class="num">0.55 → 0.72</td></tr>
+          <tr><td>Kivach falls</td><td class="num">-0.05° · ×0.9981</td><td class="num">-0.12° · ×0.9964</td><td class="num">28 / 144</td><td class="num">0.49 → 0.62</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!--/SNIPPET:local-table-->
     </section>
 
     <!-- ============================================================= final -->

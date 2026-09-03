@@ -450,3 +450,9 @@
     width: 16rem;
   }
 }
+
+/* A shot that keeps its natural aspect (the arrow field). */
+.shot.natural img {
+  aspect-ratio: auto;
+  object-fit: contain;
+}
