@@ -25,7 +25,7 @@
       <a href="#single"><b>±15</b> Search</a>
       <a href="#pyramid"><b>1/32→1</b> Pyramid</a>
       <a href="#features"><b>∇</b> Gradients</a>
-      <a href="#metrics"><b>L2→LPIPS</b> Metrics</a>
+      <a href="#metrics"><b>L2→MI</b> Metrics</a>
       <a href="#chosen"><b>1905→1915</b> Picks</a>
       <a href="#crop"><b>5</b> Bells &amp; whistles</a>
       <a href="#final"><b>17</b> Final</a>
@@ -126,7 +126,7 @@ def ncc(a, b):
         grid[dy, dx] = metric(m, r)
 best = argmax(grid)</pre>
           <p>
-            <b>What is from scratch.</b> The assignment says to implement almost everything by hand. Everything in this section and the next is NumPy arithmetic: the split, the scores, the search, and later the downsampling and the pyramid. The only library calls in the alignment file read the image and write the JPEG. The bells and whistles further down are also plain NumPy, except two things the assignment allows for them: a resize when I fit the color matrix, and PyTorch for the LPIPS score, which is a pretrained network.
+            <b>What is from scratch.</b> The assignment says to implement almost everything by hand. Everything in this section and the next is NumPy arithmetic: the split, the scores, the search, and later the downsampling and the pyramid. The only library calls in the alignment file read the image and write the JPEG. The bells and whistles further down are also plain NumPy, except one thing the assignment allows for them: a resize when I fit the color matrix.
           </p>
         </div>
       </div>
@@ -134,11 +134,11 @@ best = argmax(grid)</pre>
       <!--SNIPPET:single-table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>SSIM (dy, dx)</th><th>LPIPS (dy, dx)</th><th>s: L2 / NCC / SSIM / LPIPS</th></tr></thead>
+          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>SSIM (dy, dx)</th><th>MI (dy, dx)</th><th>s: L2 / NCC / SSIM / MI</th></tr></thead>
           <tbody>
-          <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2 / 4.1 / 3.0</td></tr>
-          <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2 / 5.0 / 2.7</td></tr>
-          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (7, 3)</td><td class="num">0.1 / 0.2 / 4.3 / 2.7</td></tr>
+          <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2 / 4.1 / 0.4</td></tr>
+          <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2 / 5.0 / 0.5</td></tr>
+          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">0.1 / 0.2 / 4.3 / 0.5</td></tr>
           </tbody>
         </table>
       </div>
@@ -147,7 +147,7 @@ best = argmax(grid)</pre>
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. SSIM and LPIPS are the two extra scores from step 4. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
+            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. SSIM and MI are the two extra scores from step 4. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
           </p>
         </div>
         <aside class="formula" aria-label="Normalized cross-correlation">
@@ -402,33 +402,33 @@ for lvl in range(coarsest, -1, -1):
     <!-- =========================================================== metrics -->
     <section class="part" id="metrics">
       <header class="part-head">
-        <p class="param" aria-label="L2 to LPIPS"><span>L2</span><i aria-hidden="true">→</i><span>LPIPS</span></p>
-        <h2>Step 4 · Two more metrics: SSIM and LPIPS</h2>
+        <p class="param" aria-label="L2 to mutual information"><span>L2</span><i aria-hidden="true">→</i><span>MI</span></p>
+        <h2>Step 4 · Two more metrics: SSIM and mutual information</h2>
       </header>
 
       <!--SNIPPET:table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Plate</th><th>L2<br>pixels</th><th>NCC<br>pixels</th><th>SSIM<br>pixels</th><th>LPIPS<br>pixels</th><th>L2<br>gradients</th><th>NCC<br>gradients</th><th>SSIM<br>gradients</th><th>LPIPS<br>gradients</th><th>s: NCC / SSIM / LPIPS</th></tr></thead>
+          <thead><tr><th>Plate</th><th>L2<br>pixels</th><th>NCC<br>pixels</th><th>SSIM<br>pixels</th><th>MI<br>pixels</th><th>L2<br>gradients</th><th>NCC<br>gradients</th><th>SSIM<br>gradients</th><th>MI<br>gradients</th><th>s: NCC / SSIM / MI</th></tr></thead>
           <caption class="sr">Offsets are (dy, dx) in pixels of the green and red plates relative to blue.</caption>
           <tbody>
-          <tr><td>Cathedral</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">0.2 / 4 / 2.7</td></tr>
-          <tr><td>Monastery</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">0.2 / 5 / 2.7</td></tr>
-          <tr><td>Tobolsk</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (7, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">0.2 / 4 / 2.7</td></tr>
-          <tr><td>Church</td><td class="num bad">G (25, 4)<br>R (64, 267)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num bad">G (34, 7)<br>R (56, -8)</td><td class="num">G (24, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (24, 4)<br>R (58, -4)</td><td class="num">0.7 / 15 / 11</td></tr>
-          <tr><td>Emir of Bukhara</td><td class="num bad">G (49, 24)<br>R (103, 57)</td><td class="num bad">G (49, 24)<br>R (300, -542)</td><td class="num bad">G (46, 23)<br>R (100, 36)</td><td class="num">G (48, 23)<br>R (106, 41)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 23)<br>R (107, 40)</td><td class="num">G (49, 24)<br>R (106, 41)</td><td class="num">0.7 / 15 / 11</td></tr>
-          <tr><td>Harvesters</td><td class="num">G (59, 16)<br>R (124, 13)</td><td class="num">G (60, 17)<br>R (124, 13)</td><td class="num bad">G (55, 12)<br>R (121, 10)</td><td class="num">G (59, 17)<br>R (123, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 18)<br>R (123, 14)</td><td class="num">G (59, 17)<br>R (123, 15)</td><td class="num">0.7 / 15 / 11</td></tr>
-          <tr><td>Icon</td><td class="num">G (41, 17)<br>R (90, 23)</td><td class="num">G (41, 17)<br>R (89, 23)</td><td class="num">G (40, 20)<br>R (88, 26)</td><td class="num">G (41, 18)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (41, 16)<br>R (90, 23)</td><td class="num">G (42, 18)<br>R (89, 23)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Ilemselga</td><td class="num">G (39, 7)<br>R (130, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num bad">G (32, 8)<br>R (125, 4)</td><td class="num">G (41, 7)<br>R (132, 11)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num bad">G (41, 7)<br>R (110, 11)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Melons</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (81, 12)<br>R (176, 10)</td><td class="num bad">G (84, 9)<br>R (180, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (81, 10)<br>R (179, 13)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Religious painting</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 5)<br>R (73, 6)</td><td class="num">G (27, 3)<br>R (69, 7)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (29, 4)<br>R (69, 6)</td><td class="num">G (28, 3)<br>R (69, 7)</td><td class="num">0.7 / 15 / 23</td></tr>
-          <tr><td>Self-portrait</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num bad">G (77, 31)<br>R (177, 32)</td><td class="num">G (77, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (77, 29)<br>R (175, 37)</td><td class="num">0.8 / 16 / 11</td></tr>
-          <tr><td>Lilacs (Siren)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num bad">G (45, -10)<br>R (92, -23)</td><td class="num">G (49, -5)<br>R (96, -23)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (48, -5)<br>R (96, -23)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Three generations</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num bad">G (53, 14)<br>R (106, 11)</td><td class="num bad">G (50, 16)<br>R (109, 13)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (55, 13)<br>R (111, 9)</td><td class="num bad">G (50, 15)<br>R (109, 13)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Wharf</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num bad">G (15, -13)<br>R (81, -13)</td><td class="num">G (15, -7)<br>R (81, -15)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -17)</td><td class="num">G (15, -6)<br>R (81, -15)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Man on a camel</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (48, 30)<br>R (101, 39)</td><td class="num">G (46, 28)<br>R (105, 39)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (103, 41)</td><td class="num">G (46, 28)<br>R (105, 39)</td><td class="num">0.8 / 16 / 11</td></tr>
-          <tr><td>Lugano</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (36, 14)<br>R (85, 37)</td><td class="num">G (35, 14)<br>R (84, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (35, 14)<br>R (84, 38)</td><td class="num">0.7 / 16 / 11</td></tr>
-          <tr><td>Kivach falls</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num bad">G (17, 19)<br>R (94, 25)</td><td class="num">G (18, 18)<br>R (91, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (18, 16)<br>R (91, 30)</td><td class="num">0.7 / 16 / 12</td></tr>
+          <tr><td>Cathedral</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">0.2 / 4 / 0.5</td></tr>
+          <tr><td>Monastery</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">0.2 / 5 / 0.5</td></tr>
+          <tr><td>Tobolsk</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">0.2 / 4 / 0.5</td></tr>
+          <tr><td>Church</td><td class="num bad">G (25, 4)<br>R (64, 267)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num bad">G (34, 7)<br>R (56, -8)</td><td class="num">G (25, 4)<br>R (59, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">0.7 / 15 / 2.0</td></tr>
+          <tr><td>Emir of Bukhara</td><td class="num bad">G (49, 24)<br>R (103, 57)</td><td class="num bad">G (49, 24)<br>R (300, -542)</td><td class="num bad">G (46, 23)<br>R (100, 36)</td><td class="num">G (49, 23)<br>R (106, 40)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 23)<br>R (107, 40)</td><td class="num">G (49, 23)<br>R (107, 40)</td><td class="num">0.7 / 15 / 1.9</td></tr>
+          <tr><td>Harvesters</td><td class="num">G (59, 16)<br>R (124, 13)</td><td class="num">G (60, 17)<br>R (124, 13)</td><td class="num bad">G (55, 12)<br>R (121, 10)</td><td class="num">G (59, 17)<br>R (123, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 18)<br>R (123, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">0.7 / 15 / 1.7</td></tr>
+          <tr><td>Icon</td><td class="num">G (41, 17)<br>R (90, 23)</td><td class="num">G (41, 17)<br>R (89, 23)</td><td class="num">G (40, 20)<br>R (88, 26)</td><td class="num">G (41, 17)<br>R (89, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (41, 16)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Ilemselga</td><td class="num">G (39, 7)<br>R (130, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num bad">G (32, 8)<br>R (125, 4)</td><td class="num">G (40, 6)<br>R (131, 9)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num">0.7 / 16 / 1.9</td></tr>
+          <tr><td>Melons</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (81, 12)<br>R (176, 10)</td><td class="num">G (81, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">0.7 / 16 / 1.8</td></tr>
+          <tr><td>Religious painting</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 5)<br>R (73, 6)</td><td class="num">G (29, 3)<br>R (69, 6)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (29, 4)<br>R (69, 6)</td><td class="num">G (29, 4)<br>R (69, 7)</td><td class="num">0.7 / 15 / 1.6</td></tr>
+          <tr><td>Self-portrait</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num bad">G (77, 31)<br>R (177, 32)</td><td class="num">G (78, 29)<br>R (176, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">0.8 / 16 / 1.6</td></tr>
+          <tr><td>Lilacs (Siren)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num bad">G (45, -10)<br>R (92, -23)</td><td class="num">G (48, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Three generations</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num bad">G (53, 14)<br>R (106, 11)</td><td class="num">G (53, 15)<br>R (112, 12)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (55, 13)<br>R (111, 9)</td><td class="num bad">G (55, 16)<br>R (114, 11)</td><td class="num">0.7 / 16 / 1.8</td></tr>
+          <tr><td>Wharf</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num bad">G (15, -13)<br>R (81, -13)</td><td class="num">G (15, -7)<br>R (82, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -17)</td><td class="num">G (15, -7)<br>R (83, -17)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Man on a camel</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (48, 30)<br>R (101, 39)</td><td class="num">G (47, 28)<br>R (105, 39)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (103, 41)</td><td class="num">G (45, 30)<br>R (104, 40)</td><td class="num">0.8 / 16 / 1.6</td></tr>
+          <tr><td>Lugano</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (36, 14)<br>R (85, 37)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Kivach falls</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num bad">G (17, 19)<br>R (94, 25)</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">0.7 / 16 / 1.8</td></tr>
           </tbody>
         </table>
       </div>
@@ -437,7 +437,7 @@ for lvl in range(coarsest, -1, -1):
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, and every one of them is visibly wrong. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all three hand-written scores agree on every plate.
+            Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, and every one of them is visibly wrong. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all four scores agree on every plate.
           </p>
           <p>
             <b>SSIM.</b> Structural similarity compares two images through local statistics. For every 7×7 window it computes the two means, the two variances and the covariance, and combines them into a score that is high when the windows have the same local brightness, contrast and structure. I get all five maps from one integral image each, so every window sum is four lookups. I expected it to be the most robust score and it was the least. On raw pixels it never picks something crazy, but on nine of the seventeen plates it settles 4 to 9 pixels off, and you can see the fringes on the church's steeple. The reason is its luminance term: it rewards windows whose mean brightness matches, and between two filters that is exactly the thing that does not match. On gradients the brightness term stops mattering and SSIM agrees with NCC everywhere. It is also slow, about 16 s per plate, because every one of the 25 shifts at full resolution recomputes five 12-megapixel box filters.
@@ -447,23 +447,25 @@ var_a, var_b = box(a*a) - mu_a**2, box(b*b) - mu_b**2
 cov = box(a*b) - mu_a*mu_b
 ssim = ((2*mu_a*mu_b + c1) * (2*cov + c2)) / ((mu_a**2 + mu_b**2 + c1) * (var_a + var_b + c2))</pre>
           <p>
-            <b>LPIPS.</b> The learned perceptual image patch similarity runs both images through a pretrained AlexNet, normalizes the activations of five layers, and takes a learned weighting of their squared differences. It was trained to agree with people about which of two distorted patches looks closer to a reference, so it looks at features rather than brightness. To make it affordable I score the central 512×512 of the overlap at each pyramid level and push the shifts through the network in batches of 32 on the GPU, which took a plate from about 60 s to 11 s. Where it is better: on raw pixels it gets the Emir right, which NCC and SSIM do not. Where it fails: its score surface is noisy, so it wanders by a pixel or two on most plates and by 4 on the melons and the three generations, and on gradient images it loses the Ilemselga red plate by 21 pixels, because AlexNet was trained on photographs and an edge map is not a photograph. It also cannot work on a 100-pixel image (the first layer has stride 4), so its pyramid stops at 1/8 scale with a ±25 window. This is the one place I use a library for the alignment, which the assignment allows for bells and whistles.
+            <b>Mutual information.</b> This one is built for exactly the Emir's problem. Instead of asking whether the two plates are bright in the same places, it asks whether knowing a pixel's value in one plate tells you its value in the other, whichever way that relation goes. I quantize both plates to 64 levels, build their 64×64 joint histogram with one <code>np.bincount</code>, and compute H(a) + H(b) − H(a, b) from it. A robe that is bright in blue and black in red still gives a sharp joint histogram at the right shift, because "bright here" reliably means "dark there". Where it is better: on raw pixels it gets the Emir right, R (106, 40), which NCC and SSIM do not. Where it is weaker: with only 64 bins the score surface is a little flatter than NCC's, so it wanders by 1 to 4 pixels on the softer plates, and it is the one score that does not get sharper on gradients, since a gradient image is mostly near-zero and the histogram is dominated by that. It costs about 1.4 s per plate, twice NCC.
           </p>
-<pre class="code">A = torch.stack([tensor(m) for m, _ in pairs])      # 32 shifted crops
-B = torch.stack([tensor(r) for _, r in pairs])      # 32 reference crops
-scores = -net(A, B).flatten()                        # minus LPIPS distance, higher is better</pre>
+<pre class="code">ia, ib = (a * 64).astype(int), (b * 64).astype(int)          # quantize both plates
+joint = np.bincount((ia * 64 + ib).ravel(), minlength=4096)   # 64x64 joint histogram
+joint = joint / joint.sum()
+pa, pb = joint.reshape(64, 64).sum(1), joint.reshape(64, 64).sum(0)
+mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p log p</pre>
           <p>
             The extra metrics confirmed the diagnosis; they did not replace the fix, so the pipeline after step 4 is the same as after step 3.
           </p>
         </div>
-        <aside class="formula" aria-label="SSIM and LPIPS">
+        <aside class="formula" aria-label="SSIM and mutual information">
           <p class="formula-line">SSIM = (2<var>μ</var><sub>a</sub><var>μ</var><sub>b</sub> + <var>c</var><sub>1</sub>)(2<var>σ</var><sub>ab</sub> + <var>c</var><sub>2</sub>) / (<var>μ</var><sub>a</sub>² + <var>μ</var><sub>b</sub>² + <var>c</var><sub>1</sub>)(<var>σ</var><sub>a</sub>² + <var>σ</var><sub>b</sub>² + <var>c</var><sub>2</sub>)</p>
           <p>
             Per 7×7 window with <var>c</var><sub>1</sub> = 0.01², <var>c</var><sub>2</sub> = 0.03², then averaged.
           </p>
-          <p class="formula-line" style="margin-top:1rem">LPIPS = Σ<sub>l</sub> ‖<var>w</var><sub>l</sub> ⊙ (<var>φ̂</var><sub>l</sub>(<var>a</var>) − <var>φ̂</var><sub>l</sub>(<var>b</var>))‖² / <var>H</var><sub>l</sub><var>W</var><sub>l</sub></p>
+          <p class="formula-line" style="margin-top:1rem">MI = <var>H</var>(<var>a</var>) + <var>H</var>(<var>b</var>) − <var>H</var>(<var>a</var>, <var>b</var>)</p>
           <p>
-            <var>φ̂</var><sub>l</sub> are unit-normalized AlexNet activations at layer <var>l</var>, <var>w</var><sub>l</sub> the learned weights.
+            Entropies of the two 64-level histograms minus the entropy of their joint histogram, over the scored interior.
           </p>
         </aside>
       </div>
