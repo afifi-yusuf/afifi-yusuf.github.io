@@ -134,11 +134,11 @@ best = argmax(grid)</pre>
       <!--SNIPPET:single-table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>SSIM (dy, dx)</th><th>MI (dy, dx)</th><th>s: L2 / NCC / SSIM / MI</th></tr></thead>
+          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>s: L2 / NCC</th></tr></thead>
           <tbody>
-          <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2 / 4.1 / 0.4</td></tr>
-          <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2 / 5.0 / 0.5</td></tr>
-          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">0.1 / 0.2 / 4.3 / 0.5</td></tr>
+          <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2</td></tr>
+          <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2</td></tr>
+          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">0.1 / 0.2</td></tr>
           </tbody>
         </table>
       </div>
@@ -147,7 +147,7 @@ best = argmax(grid)</pre>
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. SSIM and MI are the two extra scores from step 4. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
+            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
           </p>
         </div>
         <aside class="formula" aria-label="Normalized cross-correlation">
@@ -441,7 +441,7 @@ for lvl in range(coarsest, -1, -1):
             Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, and every one of them is visibly wrong. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all four scores agree on every plate.
           </p>
           <p>
-            <b>SSIM.</b> Structural similarity compares two images through local statistics. For every 7×7 window it computes the two means, the two variances and the covariance, and combines them into a score that is high when the windows have the same local brightness, contrast and structure. I get all five maps from one integral image each, so every window sum is four lookups. I expected it to be the most robust score and it was the least. On raw pixels it never picks something crazy, but on nine of the seventeen plates it settles 4 to 9 pixels off, and you can see the fringes on the church's steeple. The reason is its luminance term: it rewards windows whose mean brightness matches, and between two filters that is exactly the thing that does not match. On gradients the brightness term stops mattering and SSIM agrees with NCC everywhere. It is also slow, about 16 s per plate, because every one of the 25 shifts at full resolution recomputes five 12-megapixel box filters.
+            <b>SSIM.</b> Structural similarity compares two images through local statistics. For every 7×7 window it computes the two means, the two variances and the covariance, and combines them into a score that is high when the windows have the same local brightness, contrast and structure. I get all five maps from one integral image each, so every window sum is four lookups. I expected it to be the most robust score and it was the least: on raw pixels it settles 4 to 9 pixels off on nine of the seventeen plates, and you can see the fringes on the church's steeple. The reason is its luminance term, which rewards windows whose mean brightness matches, and between two filters that is exactly the thing that does not match. On gradients that term stops mattering and SSIM agrees with NCC everywhere. It is also slow, about 16 s per plate, because every shift at full resolution recomputes five 12-megapixel box filters.
           </p>
 <pre class="code">mu_a, mu_b = box(a), box(b)                      # 7x7 means via integral image
 var_a, var_b = box(a*a) - mu_a**2, box(b*b) - mu_b**2
@@ -581,7 +581,7 @@ for i in range(limit):            # from the edge inward, outer quarter
             <b>Two passes.</b> The strict pass above leaves thin colored fringes where a plate fades toward its edge, because that band is off by 0.3 rather than 0.5. So I run a second, gentler pass on the result (half the row off by 0.3), but only within the outer 6%, where real content cannot form a sustained run. My first version of all this used a threshold relative to how much the interior varied, and it cut half of every image with a calm sky, because a sky varies so little that everything else looked like an outlier. Describing what paper, glass and misregistration physically look like was far more robust.
           </p>
           <p>
-            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in two places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. Both are honest results of the criteria, not tuning, and I left them as they are.
+            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in three places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. On the lilacs the second pass takes a strip of real flowers off the left side, because that plate is soft and purple all the way to its edge, so the gentler miscolor test cannot tell the fringe from the picture there. All three are honest results of the criteria, not tuning, and I left them as they are.
           </p>
         </div>
       </div>
