@@ -414,3 +414,39 @@
     margin: 0 0 0.75rem;
   }
 }
+
+/* Prose + formula aside: float the aside right so the text wraps around it
+   and uses the full width below, instead of staying in the left column. */
+.part-body-wide {
+  display: block;
+}
+
+.part-body-wide::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.part-body-wide:has(> .formula) > .formula {
+  float: right;
+  width: min(20rem, 38%);
+  margin: 0.2rem 0 1rem clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.part-body-wide > .prose {
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .part-body-wide:has(> .formula) > .formula {
+    float: none;
+    width: 100%;
+    margin: 1rem 0 0;
+  }
+}
+
+@media print {
+  .part-body-wide:has(> .formula) > .formula {
+    width: 16rem;
+  }
+}

@@ -145,17 +145,17 @@ best = argmax(grid)</pre>
       <!--/SNIPPET:single-table-->
 
       <div class="part-body part-body-wide">
-        <div class="prose">
-          <p>
-            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
-          </p>
-        </div>
         <aside class="formula" aria-label="Normalized cross-correlation">
           <p class="formula-line">NCC = ⟨<var>â</var>, <var>b̂</var>⟩</p>
           <p>
             where <var>â</var> = (<var>a</var> − mean <var>a</var>) / ‖<var>a</var> − mean <var>a</var>‖ and likewise for <var>b</var>. It is the cosine of the angle between the two plates as vectors.
           </p>
         </aside>
+        <div class="prose">
+          <p>
+            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
+          </p>
+        </div>
       </div>
     </section>
 
@@ -436,6 +436,16 @@ for lvl in range(coarsest, -1, -1):
       <!--/SNIPPET:table-->
 
       <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="SSIM and mutual information">
+          <p class="formula-line">SSIM = (2<var>μ</var><sub>a</sub><var>μ</var><sub>b</sub> + <var>c</var><sub>1</sub>)(2<var>σ</var><sub>ab</sub> + <var>c</var><sub>2</sub>) / (<var>μ</var><sub>a</sub>² + <var>μ</var><sub>b</sub>² + <var>c</var><sub>1</sub>)(<var>σ</var><sub>a</sub>² + <var>σ</var><sub>b</sub>² + <var>c</var><sub>2</sub>)</p>
+          <p>
+            Per 7×7 window with <var>c</var><sub>1</sub> = 0.01², <var>c</var><sub>2</sub> = 0.03², then averaged.
+          </p>
+          <p class="formula-line" style="margin-top:1rem">MI = <var>H</var>(<var>a</var>) + <var>H</var>(<var>b</var>) − <var>H</var>(<var>a</var>, <var>b</var>)</p>
+          <p>
+            Entropies of the two 64-level histograms minus the entropy of their joint histogram, over the scored interior.
+          </p>
+        </aside>
         <div class="prose">
           <p>
             Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, and every one of them is visibly wrong. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all four scores agree on every plate.
@@ -459,16 +469,6 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
             The extra metrics confirmed the diagnosis; they did not replace the fix, so the pipeline after step 4 is the same as after step 3.
           </p>
         </div>
-        <aside class="formula" aria-label="SSIM and mutual information">
-          <p class="formula-line">SSIM = (2<var>μ</var><sub>a</sub><var>μ</var><sub>b</sub> + <var>c</var><sub>1</sub>)(2<var>σ</var><sub>ab</sub> + <var>c</var><sub>2</sub>) / (<var>μ</var><sub>a</sub>² + <var>μ</var><sub>b</sub>² + <var>c</var><sub>1</sub>)(<var>σ</var><sub>a</sub>² + <var>σ</var><sub>b</sub>² + <var>c</var><sub>2</sub>)</p>
-          <p>
-            Per 7×7 window with <var>c</var><sub>1</sub> = 0.01², <var>c</var><sub>2</sub> = 0.03², then averaged.
-          </p>
-          <p class="formula-line" style="margin-top:1rem">MI = <var>H</var>(<var>a</var>) + <var>H</var>(<var>b</var>) − <var>H</var>(<var>a</var>, <var>b</var>)</p>
-          <p>
-            Entropies of the two 64-level histograms minus the entropy of their joint histogram, over the scored interior.
-          </p>
-        </aside>
       </div>
     </section>
 
@@ -495,6 +495,12 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
       </div>
 
       <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="Where the plates came from">
+          <p class="formula-line">LoC</p>
+          <p>
+            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFs. The Library's own color versions (<code>prokc</code>) of these scenes are what the color matrix in step 6 is fitted against.
+          </p>
+        </aside>
         <div class="prose">
           <p>
             Man on a camel, Lugano and Kivach falls are three plates I downloaded from the Library of Congress collection myself: a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
@@ -503,12 +509,6 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
             All three aligned on the first try with the same parameters, with the basic metrics as well as the extras. The rider did move between exposures: the hut and the tree behind him are pin-sharp at full resolution, but his face and hat have a faint red-green fringe, which no translation can remove. The water at Kivach smears in three colors for the same reason, while the rocks and the man are sharp. The camel plate is also fogged around the edges, so the crop takes a lot off it, and its sepia cast is where the white balance makes the biggest difference.
           </p>
         </div>
-        <aside class="formula" aria-label="Where the plates came from">
-          <p class="formula-line">LoC</p>
-          <p>
-            Library of Congress items <a href="https://www.loc.gov/item/2018681301/">2018681301</a>, <a href="https://www.loc.gov/item/2018679129/">2018679129</a> and <a href="https://www.loc.gov/item/2018679177/">2018679177</a>, the 16-bit <code>prok</code> master TIFs. The Library's own color versions (<code>prokc</code>) of these scenes are what the color matrix in step 6 is fitted against.
-          </p>
-        </aside>
       </div>
     </section>
 
@@ -678,19 +678,6 @@ for i in range(limit):            # from the edge inward, outer quarter
       </div>
 
       <div class="part-body part-body-wide">
-        <div class="prose">
-          <p>
-            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
-          </p>
-          <p>
-            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
-          </p>
-<pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
-rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
-          <p>
-            <b>What it says.</b> The red row is nearly identity. The green row takes about 11% from each of the red and blue plates, which is the broad green filter. The blue row is scaled down to 0.85 and borrows 11% from green, which desaturates the cyan cast. It does part of what the white balance does for the overall cast, but it also fixes hues no per-channel gain can, like the pink shadows on skin and white cloth. The difference that remains against the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. What is left on the church after this step is a blue cast that every plate shares, which is the next step.
-          </p>
-        </div>
         <aside class="formula" aria-label="The fitted matrix">
           <p class="formula-line">[R G B]ᵀ = <var>M</var> · [r g b]ᵀ</p>
           <div class="matrix" aria-label="M">
@@ -710,6 +697,19 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
             Least squares over registered pixels of four scenes against the Library's <code>prokc</code> versions; mean of the four fits. Rows are output R, G, B; columns are the red, green and blue plates.
           </p>
         </aside>
+        <div class="prose">
+          <p>
+            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
+          </p>
+          <p>
+            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
+          </p>
+<pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
+rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
+          <p>
+            <b>What it says.</b> The red row is nearly identity. The green row takes about 11% from each of the red and blue plates, which is the broad green filter. The blue row is scaled down to 0.85 and borrows 11% from green, which desaturates the cyan cast. It does part of what the white balance does for the overall cast, but it also fixes hues no per-channel gain can, like the pink shadows on skin and white cloth. The difference that remains against the Library's versions is mostly tone and contrast, which their conservators set by hand per image and which no fixed matrix can copy. What is left on the church after this step is a blue cast that every plate shares, which is the next step.
+          </p>
+        </div>
       </div>
     </section>
     <!-- =========================================================== balance -->
@@ -769,6 +769,12 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
       </div>
 
       <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="Shades of gray">
+          <p class="formula-line"><var>ℓ</var><sub>c</sub> = ( mean <var>I</var><sub>c</sub><sup><var>p</var></sup> )<sup>1/<var>p</var></sup></p>
+          <p>
+            per channel <var>c</var>; then <var>I</var><sub>c</sub> ← <var>I</var><sub>c</sub> · <var>ℓ</var><sub>G</sub> / <var>ℓ</var><sub>c</sub>. With <var>p</var> = 1 this is gray world; as <var>p</var> → ∞ the norm tends to the maximum and it becomes white patch.
+          </p>
+        </aside>
         <div class="prose">
           <p>
             White balance is two problems: guess the color of the light (the illuminant), then divide it out. The second half is easy. The illuminant function returns one RGB triple; the white balance function divides each channel by it, normalized so green stays put, which keeps the overall brightness about the same. The hard half is the guess, and I implemented the three classic guesses. <b>Gray world</b> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <b>White patch</b> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <b>Shades of gray</b> takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits in between, weighting bright pixels more than the mean does without betting everything on the single brightest patch.
@@ -783,12 +789,6 @@ def white_balance(rgb):
             <b>What I saw.</b> Gray world overcorrects scenes that really are mostly one color: it turns the church's lake and sky beige because it insists the whole picture average out to gray. White patch depends on whichever pixels happen to be brightest, and on the camel plate that is the fogged edge, not a white object. Shades of gray with p = 6 is what I kept. It removes the blue cast the plates share, which I think comes from the blue exposure being the reference, without flattening a scene that really is blue. On the camel it takes out most of the sepia; the rest is real, it was shot at midday in the desert.
           </p>
         </div>
-        <aside class="formula" aria-label="Shades of gray">
-          <p class="formula-line"><var>ℓ</var><sub>c</sub> = ( mean <var>I</var><sub>c</sub><sup><var>p</var></sup> )<sup>1/<var>p</var></sup></p>
-          <p>
-            per channel <var>c</var>; then <var>I</var><sub>c</sub> ← <var>I</var><sub>c</sub> · <var>ℓ</var><sub>G</sub> / <var>ℓ</var><sub>c</sub>. With <var>p</var> = 1 this is gray world; as <var>p</var> → ∞ the norm tends to the maximum and it becomes white patch.
-          </p>
-        </aside>
       </div>
     </section>
     <!-- ========================================================== contrast -->
@@ -840,6 +840,12 @@ def white_balance(rgb):
       </div>
 
       <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="The stretch">
+          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
+          <p>
+            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance, and each channel multiplied by <var>L</var>′/<var>L</var>.
+          </p>
+        </aside>
         <div class="prose">
           <p>
             <b>The stretch.</b> The scans do not use the full range. The icon, for example, has its 0.5th and 99.5th percentiles at 0.08 and 0.93 once the borders are gone, and the wharf at 0.05 and 0.91. I find those two percentiles over all three channels together and map them linearly to 0 and 1, clipping the few pixels outside. Percentiles instead of the true min and max means one speck of dust or one blown highlight cannot pin the range. Using the same two numbers for all three channels changes brightness and contrast but not hue, so this step cannot add a color cast, which matters because it runs after the white balance.
@@ -855,12 +861,6 @@ y_eq = np.interp(y, edges[:-1], cdf)
 y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
 rgb = rgb * (y_new / y)[..., None]</pre>
         </div>
-        <aside class="formula" aria-label="The stretch">
-          <p class="formula-line"><var>y</var> = clip((<var>x</var> − <var>p</var><sub>0.5</sub>) / (<var>p</var><sub>99.5</sub> − <var>p</var><sub>0.5</sub>))</p>
-          <p>
-            Applied identically to R, G and B. Then <var>L</var>′ = (1 − <var>s</var>)<var>L</var> + <var>s</var>·cdf(<var>L</var>) on luminance, and each channel multiplied by <var>L</var>′/<var>L</var>.
-          </p>
-        </aside>
       </div>
     </section>
 
