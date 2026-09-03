@@ -66,7 +66,7 @@
     <section class="part" id="single">
       <header class="part-head">
         <p class="param" aria-label="minus 15 to plus 15 pixels"><span>−15</span><i aria-hidden="true">→</i><span>15</span><small>px</small></p>
-        <h2>Step 1 · Read, split, and try every shift</h2>
+        <h2>Step 1 · Single-scale alignment</h2>
       </header>
 
       <div class="pair pair-3">
@@ -165,7 +165,7 @@ best = argmax(grid)</pre>
     <section class="part" id="pyramid">
       <header class="part-head">
         <p class="param" aria-label="from one thirty-second scale to full scale"><span>1/32</span><i aria-hidden="true">→</i><span>1</span><small>scale</small></p>
-        <h2>Step 2 · A pyramid, coarse to fine</h2>
+        <h2>Step 2 · Image pyramid</h2>
       </header>
 
       <!--SNIPPET:pyramid-->
@@ -223,7 +223,7 @@ for lvl in range(coarsest, -1, -1):
         </div>
       </div>
 
-      <h3 class="sub">What the pyramid alone gives: NCC on raw pixels, nothing else</h3>
+      <h3 class="sub">Pyramid + NCC on raw pixels, all 17 plates</h3>
       <!--SNIPPET:gallery-raw-->
       <div class="gallery">
         <figure>
@@ -307,14 +307,14 @@ for lvl in range(coarsest, -1, -1):
           <figcaption><b class="nounit">After step 2</b><span>Church · pyramid + NCC · G (25, 4) · R (58, −4)</span></figcaption>
         </figure>
       </div>
-      <p class="note">The church is my running example. It is aligned now (one steeple, not three), but it still has its borders, a blue cast and a flat tone. Each later step fixes one of those.</p>
+      <p class="note">I use the church as the running example. After step 2 it is aligned but still has its borders, a blue cast and flat contrast. The later steps fix those.</p>
     </section>
 
     <!-- ========================================================== failures -->
     <section class="part" id="failures">
       <header class="part-head">
         <p class="param" aria-label="542 pixels off"><span>542</span><small>px off</small></p>
-        <h2>What broke · the Emir's robe</h2>
+        <h2>Where it fails: the Emir</h2>
       </header>
 
       <div class="pair">
@@ -331,7 +331,7 @@ for lvl in range(coarsest, -1, -1):
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), which is not a near miss, it is a completely different place. The reason is in the numbers. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
+            Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), a completely different place. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
           </p>
           <p>
             The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
@@ -344,7 +344,7 @@ for lvl in range(coarsest, -1, -1):
     <section class="part" id="features">
       <header class="part-head">
         <p class="param" aria-label="from pixels to edges"><span>pixels</span><i aria-hidden="true">→</i><span>edges</span></p>
-        <h2>Step 3 · Gradient magnitude instead of brightness <small>bells &amp; whistles 5</small></h2>
+        <h2>Step 3 · Better features: gradients <small>bells &amp; whistles 5</small></h2>
       </header>
 
       <div class="pair pair-4">
@@ -396,7 +396,7 @@ for lvl in range(coarsest, -1, -1):
             The point is that the robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude.
           </p>
           <p>
-            From here on, "aligned" means step 3: pyramid, NCC, gradients. The change costs nothing on the easy plates and rescues the hard one.
+            From here on, "aligned" means step 3: pyramid, NCC, gradients.
           </p>
         </div>
       </div>
@@ -460,7 +460,7 @@ var_a, var_b = box(a*a) - mu_a**2, box(b*b) - mu_b**2
 cov = box(a*b) - mu_a*mu_b
 ssim = ((2*mu_a*mu_b + c1) * (2*cov + c2)) / ((mu_a**2 + mu_b**2 + c1) * (var_a + var_b + c2))</pre>
           <p>
-            <b>Mutual information.</b> This one is built for exactly the Emir's problem. Instead of asking whether the two plates are bright in the same places, it asks whether knowing a pixel's value in one plate tells you its value in the other, whichever way that relation goes. I quantize both plates to 64 levels, build their 64×64 joint histogram with one <code>np.bincount</code>, and compute H(a) + H(b) − H(a, b) from it. A robe that is bright in blue and black in red still gives a sharp joint histogram at the right shift, because "bright here" reliably means "dark there". Where it is better: on raw pixels it gets the Emir right, R (106, 40), which NCC and SSIM do not. Where it is weaker: with only 64 bins the score surface is a little flatter than NCC's, so it wanders by 1 to 4 pixels on the softer plates, and it is the one score that does not get sharper on gradients, since a gradient image is mostly near-zero and the histogram is dominated by that. It costs about 1.4 s per plate, twice NCC.
+            <b>Mutual information.</b> This metric fits the Emir problem exactly. Instead of asking whether the two plates are bright in the same places, it asks whether knowing a pixel's value in one plate tells you its value in the other, whichever way that relation goes. I quantize both plates to 64 levels, build their 64×64 joint histogram with one <code>np.bincount</code>, and compute H(a) + H(b) − H(a, b) from it. A robe that is bright in blue and black in red still gives a sharp joint histogram at the right shift, because "bright here" reliably means "dark there". Where it is better: on raw pixels it gets the Emir right, R (106, 40), which NCC and SSIM do not. Where it is weaker: with only 64 bins the score surface is a little flatter than NCC's, so it wanders by 1 to 4 pixels on the softer plates, and it is the one score that does not get sharper on gradients, since a gradient image is mostly near-zero and the histogram is dominated by that. It costs about 1.4 s per plate, twice NCC.
           </p>
 <pre class="code">ia, ib = (a * 64).astype(int), (b * 64).astype(int)          # quantize both plates
 joint = np.bincount((ia * 64 + ib).ravel(), minlength=4096)   # 64x64 joint histogram
@@ -468,7 +468,7 @@ joint = joint / joint.sum()
 pa, pb = joint.reshape(64, 64).sum(1), joint.reshape(64, 64).sum(0)
 mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p log p</pre>
           <p>
-            The extra metrics confirmed the diagnosis; they did not replace the fix, so the pipeline after step 4 is the same as after step 3.
+            The extra metrics confirmed the diagnosis but did not replace the fix; the pipeline after step 4 is the same as after step 3.
           </p>
         </div>
       </div>
@@ -478,7 +478,7 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
     <section class="part" id="chosen">
       <header class="part-head">
         <p class="param" aria-label="1905 to 1915"><span>1905</span><i aria-hidden="true">→</i><span>1915</span></p>
-        <h2>Three plates I picked from the collection</h2>
+        <h2>My three plates from the collection</h2>
       </header>
 
       <div class="pair pair-3">
@@ -583,7 +583,7 @@ for i in range(limit):            # from the edge inward, outer quarter
             <b>Two passes.</b> The strict pass above leaves thin colored fringes where a plate fades toward its edge, because that band is off by 0.3 rather than 0.5. So I run a second, gentler pass on the result (half the row off by 0.3), but only within the outer 6%, where real content cannot form a sustained run. My first version of all this used a threshold relative to how much the interior varied, and it cut half of every image with a calm sky, because a sky varies so little that everything else looked like an outlier. Describing what paper, glass and misregistration physically look like was far more robust.
           </p>
           <p>
-            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in three places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. On the lilacs the second pass takes a strip of real flowers off the left side, because that plate is soft and purple all the way to its edge, so the gentler miscolor test cannot tell the fringe from the picture there. All three are honest results of the criteria, not tuning, and I left them as they are.
+            <b>When it works and when it does not.</b> It works cleanly on the church, the three generations and the harvesters above: the frame and the rebate go, the picture stays, including the harvesters' overexposed sky. It is wrong in three places. On Ilemselga the red exposure fades toward the top edge, so the top of the sky comes out purple, and the detector treats that band as border and removes 35% of the plate. On the camel plate the edges really are fogged, and it takes 26%. On the lilacs the second pass takes a strip of real flowers off the left side, because that plate is soft and purple all the way to its edge, so the gentler miscolor test cannot tell the fringe from the picture there. All three come from the same criteria, not from tuning, and I left them as they are.
           </p>
         </div>
       </div>
@@ -620,7 +620,7 @@ for i in range(limit):            # from the edge inward, outer quarter
     <section class="part" id="color">
       <header class="part-head">
         <p class="param" aria-label="a three by three matrix"><span>3</span><i aria-hidden="true">×</i><span>3</span></p>
-        <h2>Step 6 · A better color mapping: one 3×3 matrix <small>bells &amp; whistles 4</small></h2>
+        <h2>Step 6 · Better color mapping <small>bells &amp; whistles 4</small></h2>
       </header>
 
       <div class="pair">
@@ -701,10 +701,10 @@ for i in range(limit):            # from the edge inward, outer quarter
         </aside>
         <div class="prose">
           <p>
-            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I wanted that matrix for these plates, and I wanted to fit it rather than guess it.
+            <b>Why.</b> There is no reason the three filters Prokudin-Gorskii used in 1910 match the R, G and B primaries of a modern screen. His green glass let through a broad band, his red was a deep orange-red, and the emulsion was not equally sensitive to everything. Mapping the plates straight onto R, G and B is the zeroth-order guess, and it is why every image so far has the same cyan-magenta look. A camera fixes the same problem with a color correction matrix, a fixed 3×3 that mixes its sensor channels into the display's primaries. I fit this matrix instead of guessing it.
           </p>
           <p>
-            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the fiddly part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
+            <b>How.</b> The Library of Congress publishes its own color version of every plate, made by hand by its conservators from the same scan. For four scenes (the Emir and my three picks) I registered my image to theirs and solved, by least squares over about half a million matching pixels, for the 3×3 matrix M that best predicts their colors from my plate values. Registration was the hard part: their versions are framed and cropped differently from a split into equal thirds, so I searched a small grid of per-axis scales and then ran my own pyramid alignment on gradient features to find the residual shift. The four matrices agree in structure, so I average them, and that single matrix is applied to all seventeen plates, including the thirteen that had no say in the fit (three generations and melons above are two of those).
           </p>
 <pre class="code">M, *_ = np.linalg.lstsq(mine, loc)     # loc ≈ mine @ M, over registered pixels
 rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
@@ -870,7 +870,7 @@ rgb = rgb * (y_new / y)[..., None]</pre>
     <section class="part" id="local">
       <header class="part-head">
         <p class="param" aria-label="a tenth of a degree"><span>0.1</span><small>°</small></p>
-        <h2>Step 9 · Beyond translation: a field of local shifts <small>optional · better transformations</small></h2>
+        <h2>Step 9 · Local alignment: rotation, scale and motion <small>optional · better transformations</small></h2>
       </header>
 
       <div class="pair">
@@ -891,7 +891,7 @@ rgb = rgb * (y_new / y)[..., None]</pre>
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the rider aligned with one global shift and with the local field">
           </div>
           <img class="print-only" loading="lazy" src="images/bw/local-camel-after.jpg" alt="The rider after the local field" width="400" height="400">
-          <figcaption>The rider, full resolution. Left: one global shift, his face and hat carry a red-green fringe because he moved. Right: the local field, which follows him.</figcaption>
+          <figcaption>The rider at full resolution. Left: global shift only, with a red-green fringe because he moved. Right: local field.</figcaption>
         </figure>
       </div>
 
@@ -915,7 +915,7 @@ rgb = rgb * (y_new / y)[..., None]</pre>
         </aside>
         <div class="prose">
           <p>
-            <b>Why.</b> Two things on this page could not be fixed by sliding a whole plate: the camel rider moved between the three exposures, and the assignment's own suggestion that the plates may differ by a small rotation or scale, not just a shift. A brute-force search over rotation and scale would add two dimensions to every level of the pyramid. Instead I measure them. After the global alignment I cut the moving plate into 320-pixel tiles and re-align each tile on its own, with the same gradient NCC search, over ±10 pixels. That gives one arrow per tile: how far that part of the plate still wants to move.
+            <b>Why.</b> Two things cannot be fixed by sliding a whole plate: the camel rider moved between the three exposures, and the plates may differ by a small rotation or scale, not just a shift. A brute-force search over rotation and scale would add two dimensions to every level of the pyramid, so instead I measure them. After the global alignment I cut the moving plate into 320-pixel tiles and re-align each tile on its own, with the same gradient NCC search, over ±10 pixels. That gives one arrow per tile: how far that part of the plate still wants to move.
           </p>
 <pre class="code">for each 320x320 tile (ty, tx), skipping the outer 8%:
     r = grad_ref[ty:ty+320, tx:tx+320]
@@ -968,7 +968,7 @@ theta = atan2(b, a); scale = hypot(a, b)</pre>
     <section class="part" id="stereo">
       <header class="part-head">
         <p class="param" aria-label="plus or minus twenty pixels of disparity"><span>±20</span><small>px</small></p>
-        <h2>Step 10 · The same alignment on stereographs: shift becomes depth <small>extra · external data</small></h2>
+        <h2>Step 10 · Stereographs: depth from the same alignment <small>extra · external data</small></h2>
       </header>
 
       <div class="pair">
@@ -978,7 +978,7 @@ theta = atan2(b, a); scale = hypot(a, b)</pre>
         </figure>
         <figure class="shot natural">
           <img src="images/stereo/nevsky1901-wiggle.gif" loading="lazy" decoding="async" alt="The two frames of the stereograph alternating, which makes the depth visible as parallax" width="700" height="700">
-          <figcaption><b class="nounit">Wiggle</b><span>Left and right frame alternating after registration · near things jump, far things hold still</span></figcaption>
+          <figcaption><b class="nounit">Wiggle</b><span>Left and right frames alternating after registration · near objects move more</span></figcaption>
         </figure>
       </div>
 
@@ -1021,7 +1021,7 @@ theta = atan2(b, a); scale = hypot(a, b)</pre>
         </aside>
         <div class="prose">
           <p>
-            <b>Why.</b> A Prokudin-Gorskii plate is three exposures of one scene that differ by a filter. A stereograph card is two exposures of one scene that differ by a few centimetres of viewpoint. The registration problem is identical, and the Library of Congress has thousands of these cards from the same years and places, so I pulled three: Nevsky Prospect in St. Petersburg in 1901 and 1906, and the Kremlin from across the river in 1905. The interesting part is what the leftover shift means. On a plate, any shift that survives the global alignment is an error, or a subject that moved. On a stereograph it is depth.
+            <b>Why.</b> A Prokudin-Gorskii plate is three exposures of one scene that differ by a filter. A stereograph card is two exposures of one scene that differ by a few centimetres of viewpoint. The registration problem is identical, and the Library of Congress has thousands of these cards from the same years and places, so I pulled three: Nevsky Prospect in St. Petersburg in 1901 and 1906, and the Kremlin from across the river in 1905. The difference is what the leftover shift means. On a plate, any shift that survives the global alignment is an error or a subject that moved. On a stereograph it is depth.
           </p>
           <p>
             <b>Finding the frames.</b> The scan is a whole card, black background and all. The card is the bright box; the two photographs sit symmetrically about its centre, so on each half I take the longest run of columns, then rows, whose intensity spread is high. The printed margins have spread too, but they are short runs. A blank sky can end a run early, so the two boxes are equalized to the larger one, each anchored at its outer edge.
@@ -1036,7 +1036,7 @@ field = dense_field(centres, shifts, keep)                          # smooth, fi
 depth = colormap(field[1])                                          # horizontal shift = disparity ∝ 1/Z
 anaglyph = stack(left, right, right)                                # red = left, cyan = right</pre>
           <p>
-            <b>What it finds.</b> On the 1901 card the bridge statue, the lamp post and the people on the pavement come out amber and the far end of the Prospect indigo, and the disparity runs over about 22 pixels between the nearest and farthest trusted tiles. The 1906 card does the same with the carriages. The anaglyph puts the left frame in red and the registered right frame in cyan, which is the stereo pair's own 3D if you have the glasses; the wiggle above is the version that needs none. The Kremlin card is the honest failure: the whole scene is across a river, over a hundred metres away, so its disparity is ±3 pixels, below what 100-pixel tiles can measure, and the map is noise. Depth from a stereo pair needs something near.
+            <b>What it finds.</b> On the 1901 card the bridge statue, the lamp post and the people on the pavement come out amber and the far end of the Prospect indigo, and the disparity runs over about 22 pixels between the nearest and farthest trusted tiles. The 1906 card does the same with the carriages. The anaglyph puts the left frame in red and the registered right frame in cyan, which is the stereo pair's own 3D if you have the glasses; the wiggle above is the version that needs none. The Kremlin card is the failure case: the whole scene is across a river, over a hundred metres away, so its disparity is ±3 pixels, below what 100-pixel tiles can measure, and the map is noise. Depth from a stereo pair needs something near the camera.
           </p>
         </div>
       </div>
@@ -1059,7 +1059,7 @@ anaglyph = stack(left, right, right)                                # red = left
     <section class="part" id="final">
       <header class="part-head">
         <p class="param" aria-label="seventeen plates"><span>17</span><small>plates</small></p>
-        <h2>Everything on · the two running examples, then all seventeen</h2>
+        <h2>Final results</h2>
       </header>
 
       <div class="strip strip-7" aria-label="The church through every step">
@@ -1081,7 +1081,7 @@ anaglyph = stack(left, right, right)                                # red = left
         <figure><img src="images/bw/steps-emir-6-contrast.jpg" srcset="images/bw/steps-emir-6-contrast-750.jpg 750w" sizes="13vw" loading="lazy" decoding="async" alt="Emir, step 8" width="1500" height="1404"><figcaption>8 · contrast</figcaption></figure>
       </div>
 
-      <h3 class="sub">All seventeen through the full pipeline</h3>
+      <h3 class="sub">All 17 plates, full pipeline</h3>
       <!--SNIPPET:gallery-->
       <div class="gallery">
         <figure>
