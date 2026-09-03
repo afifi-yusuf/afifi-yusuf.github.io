@@ -895,14 +895,22 @@ rgb = rgb * (y_new / y)[..., None]</pre>
         </figure>
       </div>
 
-      <div class="pair">
+      <div class="pair pair-4">
         <figure class="shot">
-          <img src="images/bw/local-emir-before.jpg" loading="lazy" decoding="async" alt="The Emir's face with one global shift" width="400" height="400">
-          <figcaption><b class="nounit">Before</b><span>Emir · one global shift · a faint fringe at the eyes</span></figcaption>
+          <img src="images/bw/local-icon-before.jpg" loading="lazy" decoding="async" alt="Top-left corner of the icon plate with one global shift: colour fringes on the chandelier" width="450" height="450">
+          <figcaption><b class="nounit">Before</b><span>Icon · top-left corner · one shift</span></figcaption>
         </figure>
         <figure class="shot">
-          <img src="images/bw/local-emir-after.jpg" loading="lazy" decoding="async" alt="The Emir's face after the local field" width="400" height="400">
-          <figcaption><b class="nounit">After</b><span>Emir · local field · the eyes and turban edge line up</span></figcaption>
+          <img src="images/bw/local-icon-after.jpg" loading="lazy" decoding="async" alt="The same corner after the local field: the chandelier is sharp" width="450" height="450">
+          <figcaption><b class="nounit">After</b><span>Icon · local field</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/local-self_portrait-before.jpg" loading="lazy" decoding="async" alt="Bottom-right corner of the self-portrait plate with one global shift: fringed flowers" width="450" height="450">
+          <figcaption><b class="nounit">Before</b><span>Self-portrait · bottom-right corner · one shift</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/bw/local-self_portrait-after.jpg" loading="lazy" decoding="async" alt="The same corner after the local field: the flowers are sharp" width="450" height="450">
+          <figcaption><b class="nounit">After</b><span>Self-portrait · local field</span></figcaption>
         </figure>
       </div>
 
@@ -934,7 +942,7 @@ theta = atan2(b, a); scale = hypot(a, b)</pre>
             <b>The local warp.</b> For the rider I need more than a rigid transform, so I turn the arrows into a dense field: untrusted tiles borrow the nearest trusted arrow, the coarse grid is smoothed with a small Gaussian, and it is upsampled to every pixel. Each plate is then resampled so pixel (y, x) takes its value from (y − dy, x − dx). That is a bilinear lookup through <code>scipy.ndimage.map_coordinates</code>, a library call the assignment allows for bells and whistles. The field follows the rider because his tiles disagree with the tiles around him, and the smoothing keeps the seams between tiles from showing.
           </p>
           <p>
-            <b>What it does and does not fix.</b> Gradient NCC between the plates goes up on every plate, most on the icon (0.35 → 0.57) and the wharf (0.58 → 0.79), where the tenth-of-a-degree rotation was leaving fringes along the edges. The rider's face and hat come back into register, and the Emir's eyes and turban edge sharpen. Kivach's water does not improve, and cannot: the water is a different picture in each exposure, not a shifted one, so there is no arrow that describes it. I keep this as a separate step rather than part of the final gallery, because a warp can invent detail where the arrows are wrong, and I would rather the seventeen finished plates be the plain, honest translation.
+            <b>What it does and does not fix.</b> Gradient NCC between the plates goes up on every plate, most on the icon (0.35 → 0.57) and the wharf (0.58 → 0.79), where the tenth-of-a-degree rotation was leaving fringes along the edges. The rider's face and hat come back into register, and at the corners of the icon and the self-portrait, where a tenth of a degree is five pixels, the chandelier and the flowers lose their fringes. Kivach's water does not improve, and cannot: the water is a different picture in each exposure, not a shifted one, so there is no arrow that describes it. I keep this as a separate step rather than part of the final gallery, because a warp can invent detail where the arrows are wrong, and I would rather the seventeen finished plates be the plain, honest translation.
           </p>
         </div>
       </div>
