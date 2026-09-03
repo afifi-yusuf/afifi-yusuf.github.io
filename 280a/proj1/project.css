@@ -358,3 +358,59 @@
   text-transform: uppercase;
   color: var(--amber-ink);
 }
+
+/* This page is text-heavy: let the prose use the width. */
+.prose,
+.prose pre.code,
+.note,
+.delta {
+  max-width: none;
+}
+
+/* Comparator + prose: float the comparator so the text wraps around it and
+   then spans the full width below, instead of staying in a narrow right column. */
+.part-body:has(> .wipe) {
+  display: block;
+}
+
+.part-body:has(> .wipe)::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.part-body:has(> .wipe) > .wipe {
+  float: left;
+  width: min(24rem, 42%);
+  margin: 0.35rem clamp(1.5rem, 3vw, 2.5rem) 1rem 0;
+}
+
+.part-body:has(> .wipe) > .prose {
+  max-width: none;
+}
+
+.part-body:has(> .wipe) > .prose p,
+.part-body:has(> .wipe) > .prose pre.code {
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .part-body:has(> .wipe) > .wipe {
+    float: none;
+    width: 100%;
+    margin: 0 0 1.25rem;
+  }
+}
+
+/* Prose + formula aside: give the prose the room, keep the aside narrow. */
+.part-body-wide {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+}
+
+@media print {
+  .part-body:has(> .wipe) > .wipe {
+    float: none;
+    width: 16rem;
+    margin: 0 0 0.75rem;
+  }
+}

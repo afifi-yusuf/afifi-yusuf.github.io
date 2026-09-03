@@ -204,7 +204,8 @@ best = argmax(grid)</pre>
             <b>Downsampling.</b> I downsample with a 2×2 kernel and a stride of 2: every 2×2 block is averaged into one pixel, which halves the image. The averaging is the anti-aliasing filter. I do this repeatedly until the short side would drop under 64 pixels, which gives six levels for these scans: full size, 1/2, 1/4, 1/8, 1/16 and 1/32. No library resize or pyramid function is used.
           </p>
 <pre class="code">def downsample(im):
-    return 0.25 * (im[0::2, 0::2] + im[1::2, 0::2] + im[0::2, 1::2] + im[1::2, 1::2])</pre>
+    return 0.25 * (im[0::2, 0::2] + im[1::2, 0::2]
+                   + im[0::2, 1::2] + im[1::2, 1::2])</pre>
           <p>
             <b>Coarse to fine.</b> I start at the 1/32 level, about 100 × 115 pixels, and run the same ±15 exhaustive search as step 1. At that scale ±15 covers ±480 pixels of the full image, more than any real offset. Then I move one level finer, double the offset (one pixel there is two pixels here), and search only ±2 around it, because the coarse answer is right up to rounding. I repeat until full resolution. The strip above is the real walk for the Emir's blue plate: (2, 1) at 1/32 becomes (49, 24) at full size. That is 961 shifts on a tiny image plus 25 on each of five larger ones, under a second for both plates.
           </p>
