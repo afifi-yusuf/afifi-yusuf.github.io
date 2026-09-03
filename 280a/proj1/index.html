@@ -27,8 +27,9 @@
       <a href="#features"><b>∇</b> Gradients</a>
       <a href="#metrics"><b>L2→MI</b> Metrics</a>
       <a href="#chosen"><b>1905→1915</b> Picks</a>
-      <a href="#crop"><b>5</b> Bells &amp; whistles</a>
-      <a href="#local"><b>0.1°</b> Beyond translation</a>
+      <a href="#crop"><b>5</b> B &amp; W</a>
+      <a href="#local"><b>0.1°</b> Local shifts</a>
+      <a href="#stereo"><b>1901</b> Stereo</a>
       <a href="#final"><b>17</b> Final</a>
     </nav>
   </header>
@@ -961,6 +962,97 @@ theta = atan2(b, a); scale = hypot(a, b)</pre>
         </table>
       </div>
       <!--/SNIPPET:local-table-->
+    </section>
+
+    <!-- ============================================================ stereo -->
+    <section class="part" id="stereo">
+      <header class="part-head">
+        <p class="param" aria-label="plus or minus twenty pixels of disparity"><span>±20</span><small>px</small></p>
+        <h2>Step 10 · The same alignment on stereographs: shift becomes depth <small>extra · external data</small></h2>
+      </header>
+
+      <div class="pair">
+        <figure class="shot natural">
+          <img src="images/stereo/nevsky1901-card.jpg" loading="lazy" decoding="async" alt="A 1901 stereograph card of Nevsky Prospect with the two detected photograph frames outlined" width="1477" height="767">
+          <figcaption><b class="nounit">Card</b><span>Nevsky Prospect, St. Petersburg, 1901 · the two frames found on the card</span></figcaption>
+        </figure>
+        <figure class="shot natural">
+          <img src="images/stereo/nevsky1901-wiggle.gif" loading="lazy" decoding="async" alt="The two frames of the stereograph alternating, which makes the depth visible as parallax" width="700" height="700">
+          <figcaption><b class="nounit">Wiggle</b><span>Left and right frame alternating after registration · near things jump, far things hold still</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/stereo/nevsky1901-left.jpg" srcset="images/stereo/nevsky1901-left-750.jpg 750w, images/stereo/nevsky1901-left.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Left frame of the 1901 Nevsky Prospect stereograph" width="1500" height="1500">
+          <figcaption><b class="nounit">Left</b><span>1901 · the reference frame</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/stereo/nevsky1901-overlay.jpg" srcset="images/stereo/nevsky1901-overlay-750.jpg 750w, images/stereo/nevsky1901-overlay.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The same frame tinted by depth: amber near, indigo far" width="1500" height="1500">
+          <figcaption><b class="nounit">Depth</b><span>Disparity from the tile field · amber near, indigo far</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/stereo/nevsky1901-anaglyph.jpg" srcset="images/stereo/nevsky1901-anaglyph-750.jpg 750w, images/stereo/nevsky1901-anaglyph.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Red/cyan anaglyph of the 1901 Nevsky Prospect stereograph" width="1500" height="1500">
+          <figcaption><b class="nounit">Anaglyph</b><span>Left in red, right in cyan · for red/cyan glasses</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="pair pair-3">
+        <figure class="shot">
+          <img src="images/stereo/nevsky1906-left.jpg" srcset="images/stereo/nevsky1906-left-750.jpg 750w, images/stereo/nevsky1906-left.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Left frame of the 1906 Nevsky Prospect stereograph" width="1500" height="1406">
+          <figcaption><b class="nounit">Left</b><span>1906 · a different publisher, same street</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/stereo/nevsky1906-overlay.jpg" srcset="images/stereo/nevsky1906-overlay-750.jpg 750w, images/stereo/nevsky1906-overlay.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="The 1906 frame tinted by depth" width="1500" height="1406">
+          <figcaption><b class="nounit">Depth</b><span>The carriages and the bridge railing come forward</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/stereo/nevsky1906-anaglyph.jpg" srcset="images/stereo/nevsky1906-anaglyph-750.jpg 750w, images/stereo/nevsky1906-anaglyph.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="Red/cyan anaglyph of the 1906 Nevsky Prospect stereograph" width="1500" height="1406">
+          <figcaption><b class="nounit">Anaglyph</b><span>1906</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="Disparity and depth">
+          <p class="formula-line"><var>Z</var> ∝ 1 / <var>d</var></p>
+          <p>
+            Depth is inversely proportional to disparity <var>d</var>, the horizontal shift of a point between the two frames. The map shows <var>d</var> itself, stretched between its 2nd and 98th percentiles, so it is ordinal depth, not metres.
+          </p>
+        </aside>
+        <div class="prose">
+          <p>
+            <b>Why.</b> A Prokudin-Gorskii plate is three exposures of one scene that differ by a filter. A stereograph card is two exposures of one scene that differ by a few centimetres of viewpoint. The registration problem is identical, and the Library of Congress has thousands of these cards from the same years and places, so I pulled three: Nevsky Prospect in St. Petersburg in 1901 and 1906, and the Kremlin from across the river in 1905. The interesting part is what the leftover shift means. On a plate, any shift that survives the global alignment is an error, or a subject that moved. On a stereograph it is depth.
+          </p>
+          <p>
+            <b>Finding the frames.</b> The scan is a whole card, black background and all. The card is the bright box; the two photographs sit symmetrically about its centre, so on each half I take the longest run of columns, then rows, whose intensity spread is high. The printed margins have spread too, but they are short runs. A blank sky can end a run early, so the two boxes are equalized to the larger one, each anchored at its outer edge.
+          </p>
+          <p>
+            <b>Registration.</b> Step 2's pyramid, with step 3's gradient features, aligns the right frame to the left one; the offsets are real (213, −48) on the 1901 card, since the two prints were mounted by hand. Then step 9's tile search runs again, but only along the horizontal axis (±30 px, with ±2 px vertical slack), because that is the direction the two lenses were separated in. Each trusted tile's horizontal shift is its disparity. Untrusted tiles, mostly sky, borrow their nearest trusted neighbour, and the coarse grid is smoothed and upsampled as in step 9. The bounding box of the trusted tiles is also what crops away the card, since the margin text differs between the two halves and never gets trusted.
+          </p>
+<pre class="code">d = align_pyramid(right, left, metric="ncc", feature="grad")      # global: (213, -48) on the 1901 card
+right = shift(right, *d)
+for each 100x100 tile: best dx in [-30, 30], dy in [-2, 2] by gradient NCC   # disparity
+field = dense_field(centres, shifts, keep)                          # smooth, fill from nearest trusted tile
+depth = colormap(field[1])                                          # horizontal shift = disparity ∝ 1/Z
+anaglyph = stack(left, right, right)                                # red = left, cyan = right</pre>
+          <p>
+            <b>What it finds.</b> On the 1901 card the bridge statue, the lamp post and the people on the pavement come out amber and the far end of the Prospect indigo, and the disparity runs over about 22 pixels between the nearest and farthest trusted tiles. The 1906 card does the same with the carriages. The anaglyph puts the left frame in red and the registered right frame in cyan, which is the stereo pair's own 3D if you have the glasses; the wiggle above is the version that needs none. The Kremlin card is the honest failure: the whole scene is across a river, over a hundred metres away, so its disparity is ±3 pixels, below what 100-pixel tiles can measure, and the map is noise. Depth from a stereo pair needs something near.
+          </p>
+        </div>
+      </div>
+
+      <!--SNIPPET:stereo-table-->
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Card</th><th>Right → left offset (dy, dx)</th><th>Trusted tiles</th><th>Disparity, 2nd to 98th percentile</th><th>Time</th></tr></thead>
+          <tbody>
+          <tr><td>Nevsky Prospect, 1901</td><td class="num">(213, -48)</td><td class="num">132 / 323</td><td class="num">-12 → +11 px</td><td class="num">2 s</td></tr>
+          <tr><td>Nevsky Prospect, 1906</td><td class="num">(38, 240)</td><td class="num">118 / 289</td><td class="num">-13 → +20 px</td><td class="num">2 s</td></tr>
+          <tr><td>The Kremlin from the river, 1905</td><td class="num">(31, -46)</td><td class="num">49 / 306</td><td class="num">-3 → +3 px</td><td class="num">2 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!--/SNIPPET:stereo-table-->
     </section>
 
     <!-- ============================================================= final -->
