@@ -75,11 +75,11 @@
         </figure>
         <figure class="shot">
           <img src="images/aligned/cathedral.jpg" alt="Cathedral aligned by exhaustive search" width="387" height="329" decoding="async">
-          <figcaption><b>12</b><span>After · Cathedral · G (5, 2) · R (12, 3)</span></figcaption>
+          <figcaption><b>12</b><span>After · Cathedral · G (2, 5) · R (3, 12)</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/aligned/monastery.jpg" alt="Monastery aligned by exhaustive search" width="389" height="335" decoding="async">
-          <figcaption><b>3</b><span>After · Monastery · G (−3, 2) · R (3, 2)</span></figcaption>
+          <figcaption><b>3</b><span>After · Monastery · G (2, −3) · R (2, 3)</span></figcaption>
         </figure>
       </div>
 
@@ -97,7 +97,7 @@
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the stacked and the aligned Tobolsk plate">
           </div>
           <img class="print-only" loading="lazy" src="images/aligned/tobolsk.jpg" alt="Tobolsk aligned" width="393" height="335">
-          <figcaption>Tobolsk. Drag the line: stacked on the left, aligned on the right. G (3, 3), R (6, 3).</figcaption>
+          <figcaption>Tobolsk. Drag the line: stacked on the left, aligned on the right. G (3, 3), R (3, 6).</figcaption>
         </figure>
 
         <div class="prose">
@@ -119,10 +119,10 @@ def ncc(a, b):
     den = np.sqrt(np.sum(a * a) * np.sum(b * b))
     return np.sum(a * b) / den</pre>
           <p>
-            <b>The search.</b> The align function takes the metric and the feature as parameters and does an exhaustive search: two for loops over every (dy, dx) from −15 to +15, 961 shifts, scoring each one and keeping the best. One detail matters a lot. The plates have black and white borders that are not part of the picture, and a shifted plate has an empty strip along two edges. So I only score the interior: I trim 10% from every side of the blue plate, and I take the matching pixels of the moving plate by slicing rather than with <code>np.roll</code>, so the strip that wraps around is never compared. Without this the search aligns the borders instead of the picture.
+            <b>The search.</b> The align function takes the metric and the feature as parameters and does an exhaustive search: two for loops over every (x, y) shift from −15 to +15, 961 shifts, scoring each one and keeping the best. One detail matters a lot. The plates have black and white borders that are not part of the picture, and a shifted plate has an empty strip along two edges. So I only score the interior: I trim 10% from every side of the blue plate, and I take the matching pixels of the moving plate by slicing rather than with <code>np.roll</code>, so the strip that wraps around is never compared. Without this the search aligns the borders instead of the picture.
           </p>
-<pre class="code">for dy in range(-15, 16):
-    for dx in range(-15, 16):
+<pre class="code">for dy in range(16, -15):
+    for dx in range(16, -15):
         m, r = crops(mov, ref, dy, dx, margin=0.1)   # interior slices
         grid[dy, dx] = metric(m, r)
 best = argmax(grid)</pre>
@@ -135,11 +135,11 @@ best = argmax(grid)</pre>
       <!--SNIPPET:single-table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Plate</th><th>L2 (dy, dx)</th><th>NCC (dy, dx)</th><th>s: L2 / NCC</th></tr></thead>
+          <thead><tr><th>Plate</th><th>L2 (x, y)</th><th>NCC (x, y)</th><th>s: L2 / NCC</th></tr></thead>
           <tbody>
-          <tr><td>Cathedral</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">G (5, 2) · R (12, 3)</td><td class="num">0.1 / 0.2</td></tr>
-          <tr><td>Monastery</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">G (-3, 2) · R (3, 2)</td><td class="num">0.1 / 0.2</td></tr>
-          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">G (3, 3) · R (6, 3)</td><td class="num">0.1 / 0.2</td></tr>
+          <tr><td>Cathedral</td><td class="num">G (2, 5) · R (3, 12)</td><td class="num">G (2, 5) · R (3, 12)</td><td class="num">0.1 / 0.2</td></tr>
+          <tr><td>Monastery</td><td class="num">G (2, -3) · R (2, 3)</td><td class="num">G (2, -3) · R (2, 3)</td><td class="num">0.1 / 0.2</td></tr>
+          <tr><td>Tobolsk</td><td class="num">G (3, 3) · R (3, 6)</td><td class="num">G (3, 3) · R (3, 6)</td><td class="num">0.1 / 0.2</td></tr>
           </tbody>
         </table>
       </div>
@@ -154,7 +154,7 @@ best = argmax(grid)</pre>
         </aside>
         <div class="prose">
           <p>
-            Offsets are (dy, dx) of the green and red plates relative to blue, and the last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
+            Offsets are (x, y): how many pixels the green and red plates move right and down to land on the blue plate. The last column is the time for the whole 961-shift search. L2 and NCC agree on all three plates and take a tenth of a second. What this search cannot do is a 3700-pixel TIF whose offsets go up to 180 pixels. That is step 2.
           </p>
         </div>
       </div>
@@ -171,27 +171,27 @@ best = argmax(grid)</pre>
       <div class="pyramid" aria-label="The pyramid levels for the Emir plate">
         <figure style="--w:3.60rem">
           <img src="images/pyramid/emir-b-5.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/32 scale" width="115" height="100">
-          <figcaption><b>1/32</b>115×100<br>±15<br>(2, 1)</figcaption>
+          <figcaption><b>1/32</b>115×100<br>±15<br>(1, 2)</figcaption>
         </figure>
         <figure style="--w:3.75rem">
           <img src="images/pyramid/emir-b-4.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/16 scale" width="231" height="200">
-          <figcaption><b>1/16</b>231×200<br>±2<br>(3, 1)</figcaption>
+          <figcaption><b>1/16</b>231×200<br>±2<br>(1, 3)</figcaption>
         </figure>
         <figure style="--w:5.30rem">
           <img src="images/pyramid/emir-b-3.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/8 scale" width="462" height="401">
-          <figcaption><b>1/8</b>462×401<br>±2<br>(6, 3)</figcaption>
+          <figcaption><b>1/8</b>462×401<br>±2<br>(3, 6)</figcaption>
         </figure>
         <figure style="--w:7.50rem">
           <img src="images/pyramid/emir-b-2.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/4 scale" width="925" height="802">
-          <figcaption><b>1/4</b>925×802<br>±2<br>(12, 6)</figcaption>
+          <figcaption><b>1/4</b>925×802<br>±2<br>(6, 12)</figcaption>
         </figure>
         <figure style="--w:10.61rem">
           <img src="images/pyramid/emir-b-1.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/2 scale" width="1200" height="1040">
-          <figcaption><b>1/2</b>1851×1604<br>±2<br>(25, 12)</figcaption>
+          <figcaption><b>1/2</b>1851×1604<br>±2<br>(12, 25)</figcaption>
         </figure>
         <figure style="--w:15.00rem">
           <img src="images/pyramid/emir-b-0.jpg" loading="lazy" decoding="async" alt="Blue plate of the Emir at 1/1 scale" width="1200" height="1040">
-          <figcaption><b>1/1</b>3702×3209<br>±2<br>(49, 24)</figcaption>
+          <figcaption><b>1/1</b>3702×3209<br>±2<br>(24, 49)</figcaption>
         </figure>
       </div>
       <!--/SNIPPET:pyramid-->
@@ -208,7 +208,7 @@ best = argmax(grid)</pre>
     return 0.25 * (im[0::2, 0::2] + im[1::2, 0::2]
                    + im[0::2, 1::2] + im[1::2, 1::2])</pre>
           <p>
-            <b>Coarse to fine.</b> I start at the 1/32 level, about 100 × 115 pixels, and run the same ±15 exhaustive search as step 1. At that scale ±15 covers ±480 pixels of the full image, more than any real offset. Then I move one level finer, double the offset (one pixel there is two pixels here), and search only ±2 around it, because the coarse answer is right up to rounding. I repeat until full resolution. The strip above is the real walk for the Emir's blue plate: (2, 1) at 1/32 becomes (49, 24) at full size. That is 961 shifts on a tiny image plus 25 on each of five larger ones, under a second for both plates.
+            <b>Coarse to fine.</b> I start at the 1/32 level, about 100 × 115 pixels, and run the same ±15 exhaustive search as step 1. At that scale ±15 covers ±480 pixels of the full image, more than any real offset. Then I move one level finer, double the offset (one pixel there is two pixels here), and search only ±2 around it, because the coarse answer is right up to rounding. I repeat until full resolution. The strip above is the real walk for the Emir's blue plate: (1, 2) at 1/32 becomes (24, 49) at full size. That is 961 shifts on a tiny image plus 25 on each of five larger ones, under a second for both plates.
           </p>
 <pre class="code">d = (0, 0)
 for lvl in range(coarsest, -1, -1):
@@ -227,71 +227,71 @@ for lvl in range(coarsest, -1, -1):
       <div class="gallery">
         <figure>
           <img src="images/aligned/cathedral-ncc-raw.jpg" loading="lazy" decoding="async" alt="Cathedral, pyramid alignment with NCC on raw pixels" width="387" height="329">
-          <figcaption><b>Cathedral</b>G (5, 2) · R (12, 3)</figcaption>
+          <figcaption><b>Cathedral</b>G (2, 5) · R (3, 12)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/monastery-ncc-raw.jpg" loading="lazy" decoding="async" alt="Monastery, pyramid alignment with NCC on raw pixels" width="389" height="335">
-          <figcaption><b>Monastery</b>G (-3, 2) · R (3, 2)</figcaption>
+          <figcaption><b>Monastery</b>G (2, -3) · R (2, 3)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/tobolsk-ncc-raw.jpg" loading="lazy" decoding="async" alt="Tobolsk, pyramid alignment with NCC on raw pixels" width="393" height="335">
-          <figcaption><b>Tobolsk</b>G (3, 3) · R (6, 3)</figcaption>
+          <figcaption><b>Tobolsk</b>G (3, 3) · R (3, 6)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/church-ncc-raw.jpg" srcset="images/aligned/church-ncc-raw-750.jpg 750w, images/aligned/church-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Church, pyramid alignment with NCC on raw pixels" width="1500" height="1301">
-          <figcaption><b>Church</b>G (25, 4) · R (58, -4)</figcaption>
+          <figcaption><b>Church</b>G (4, 25) · R (-4, 58)</figcaption>
         </figure>
         <figure class="bad">
           <img src="images/aligned/emir-ncc-raw.jpg" srcset="images/aligned/emir-ncc-raw-750.jpg 750w, images/aligned/emir-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Emir of Bukhara, pyramid alignment with NCC on raw pixels · misaligned" width="1500" height="1391">
-          <figcaption><b>Emir of Bukhara · misaligned</b>G (49, 24) · R (300, -542)</figcaption>
+          <figcaption><b>Emir of Bukhara · misaligned</b>G (24, 49) · R (-542, 300)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/harvesters-ncc-raw.jpg" srcset="images/aligned/harvesters-ncc-raw-750.jpg 750w, images/aligned/harvesters-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Harvesters, pyramid alignment with NCC on raw pixels" width="1500" height="1266">
-          <figcaption><b>Harvesters</b>G (60, 17) · R (124, 13)</figcaption>
+          <figcaption><b>Harvesters</b>G (17, 60) · R (13, 124)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/icon-ncc-raw.jpg" srcset="images/aligned/icon-ncc-raw-750.jpg 750w, images/aligned/icon-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Icon, pyramid alignment with NCC on raw pixels" width="1500" height="1273">
-          <figcaption><b>Icon</b>G (41, 17) · R (89, 23)</figcaption>
+          <figcaption><b>Icon</b>G (17, 41) · R (23, 89)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/ilemselga-ncc-raw.jpg" srcset="images/aligned/ilemselga-ncc-raw-750.jpg 750w, images/aligned/ilemselga-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Ilemselga, pyramid alignment with NCC on raw pixels" width="1500" height="1243">
-          <figcaption><b>Ilemselga</b>G (40, 7) · R (130, 11)</figcaption>
+          <figcaption><b>Ilemselga</b>G (7, 40) · R (11, 130)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/melons-ncc-raw.jpg" srcset="images/aligned/melons-ncc-raw-750.jpg 750w, images/aligned/melons-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Melons, pyramid alignment with NCC on raw pixels" width="1500" height="1223">
-          <figcaption><b>Melons</b>G (82, 11) · R (178, 13)</figcaption>
+          <figcaption><b>Melons</b>G (11, 82) · R (13, 178)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/religous_painting-ncc-raw.jpg" srcset="images/aligned/religous_painting-ncc-raw-750.jpg 750w, images/aligned/religous_painting-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Religious painting, pyramid alignment with NCC on raw pixels" width="1500" height="1255">
-          <figcaption><b>Religious painting</b>G (28, 3) · R (68, 7)</figcaption>
+          <figcaption><b>Religious painting</b>G (3, 28) · R (7, 68)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/self_portrait-ncc-raw.jpg" srcset="images/aligned/self_portrait-ncc-raw-750.jpg 750w, images/aligned/self_portrait-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Self-portrait, pyramid alignment with NCC on raw pixels" width="1500" height="1223">
-          <figcaption><b>Self-portrait</b>G (79, 29) · R (176, 37)</figcaption>
+          <figcaption><b>Self-portrait</b>G (29, 79) · R (37, 176)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/siren-ncc-raw.jpg" srcset="images/aligned/siren-ncc-raw-750.jpg 750w, images/aligned/siren-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lilacs (Siren), pyramid alignment with NCC on raw pixels" width="1500" height="1248">
-          <figcaption><b>Lilacs (Siren)</b>G (49, -6) · R (96, -25)</figcaption>
+          <figcaption><b>Lilacs (Siren)</b>G (-6, 49) · R (-25, 96)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/three_generations-ncc-raw.jpg" srcset="images/aligned/three_generations-ncc-raw-750.jpg 750w, images/aligned/three_generations-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Three generations, pyramid alignment with NCC on raw pixels" width="1500" height="1256">
-          <figcaption><b>Three generations</b>G (53, 14) · R (112, 11)</figcaption>
+          <figcaption><b>Three generations</b>G (14, 53) · R (11, 112)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/wharf-ncc-raw.jpg" srcset="images/aligned/wharf-ncc-raw-750.jpg 750w, images/aligned/wharf-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Wharf, pyramid alignment with NCC on raw pixels" width="1500" height="1266">
-          <figcaption><b>Wharf</b>G (15, -7) · R (83, -16)</figcaption>
+          <figcaption><b>Wharf</b>G (-7, 15) · R (-16, 83)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/camel-ncc-raw.jpg" srcset="images/aligned/camel-ncc-raw-750.jpg 750w, images/aligned/camel-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Man on a camel, pyramid alignment with NCC on raw pixels" width="1500" height="1256">
-          <figcaption><b>Man on a camel</b>G (45, 30) · R (104, 41)</figcaption>
+          <figcaption><b>Man on a camel</b>G (30, 45) · R (41, 104)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/lugano-ncc-raw.jpg" srcset="images/aligned/lugano-ncc-raw-750.jpg 750w, images/aligned/lugano-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lugano, pyramid alignment with NCC on raw pixels" width="1500" height="1267">
-          <figcaption><b>Lugano</b>G (37, 13) · R (86, 38)</figcaption>
+          <figcaption><b>Lugano</b>G (13, 37) · R (38, 86)</figcaption>
         </figure>
         <figure>
           <img src="images/aligned/kivach-ncc-raw.jpg" srcset="images/aligned/kivach-ncc-raw-750.jpg 750w, images/aligned/kivach-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Kivach falls, pyramid alignment with NCC on raw pixels" width="1500" height="1267">
-          <figcaption><b>Kivach falls</b>G (18, 17) · R (89, 30)</figcaption>
+          <figcaption><b>Kivach falls</b>G (17, 18) · R (30, 89)</figcaption>
         </figure>
       </div>
       <!--/SNIPPET:gallery-raw-->
@@ -303,7 +303,7 @@ for lvl in range(coarsest, -1, -1):
         </figure>
         <figure class="shot">
           <img src="images/bw/steps-church-1-ncc-raw.jpg" srcset="images/bw/steps-church-1-ncc-raw-750.jpg 750w, images/bw/steps-church-1-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The church after pyramid alignment with NCC on pixels" width="1500" height="1301">
-          <figcaption><b class="nounit">After step 2</b><span>Church · pyramid + NCC · G (25, 4) · R (58, −4)</span></figcaption>
+          <figcaption><b class="nounit">After step 2</b><span>Church · pyramid + NCC · G (4, 25) · R (−4, 58)</span></figcaption>
         </figure>
       </div>
       <p class="note">I use the church as the running example. After step 2 it is aligned but still has its borders, a blue cast and flat contrast. The later steps fix those.</p>
@@ -319,7 +319,7 @@ for lvl in range(coarsest, -1, -1):
       <div class="pair">
         <figure class="shot">
           <img src="images/aligned/emir-ncc-raw.jpg" srcset="images/aligned/emir-ncc-raw-750.jpg 750w, images/aligned/emir-ncc-raw.jpg 1500w" sizes="(min-width: 76rem) 37rem, 48vw" loading="lazy" decoding="async" alt="The Emir with the red plate placed 542 pixels to the left: a red ghost of the whole figure" width="1500" height="1391">
-          <figcaption><b>542</b><span>Emir · step 2 · NCC on raw pixels · R (300, −542)</span></figcaption>
+          <figcaption><b>542</b><span>Emir · step 2 · NCC on raw pixels · R (−542, 300)</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/bw/feat-emir-r-plate.jpg" loading="lazy" decoding="async" alt="The Emir's red plate: the robe is dark" width="900" height="780">
@@ -330,10 +330,10 @@ for lvl in range(coarsest, -1, -1):
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            <b>What happens.</b> Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), a completely different place. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
+            <b>What happens.</b> Comparing raw pixels fails on the Emir. The green plate lands correctly at (24, 49), but the red plate is put at (−542, 300), a completely different place. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
           </p>
           <p>
-            <b>The church too.</b> The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
+            <b>The church too.</b> The church breaks the same way with L2 on raw pixels: red lands at (267, 64) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
           </p>
         </div>
       </div>
@@ -379,7 +379,7 @@ for lvl in range(coarsest, -1, -1):
             <input type="range" min="0" max="100" value="50" aria-label="Wipe between the Emir aligned on raw pixels and on gradients">
           </div>
           <img class="print-only" loading="lazy" src="images/aligned/emir.jpg" alt="The Emir aligned on gradients" width="1500" height="1271">
-          <figcaption>Before and after on the Emir: NCC on pixels (left, red plate 542 px off) against NCC on gradient magnitudes (right, R (107, 40)). Same pyramid, same parameters, only the feature changed.</figcaption>
+          <figcaption>Before and after on the Emir: NCC on pixels (left, red plate 542 px off) against NCC on gradient magnitudes (right, R (40, 107)). Same pyramid, same parameters, only the feature changed.</figcaption>
         </figure>
 
         <div class="prose">
@@ -392,7 +392,7 @@ for lvl in range(coarsest, -1, -1):
     gx[:, 1:-1] = (im[:, 2:] - im[:, :-2]) * 0.5   # horizontal change
     return np.sqrt(gx * gx + gy * gy)</pre>
           <p>
-            <b>Why it works.</b> The robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude. From here on, "aligned" means step 3: pyramid, NCC, gradients.
+            <b>Why it works.</b> The robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (40, 107). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude. From here on, "aligned" means step 3: pyramid, NCC, gradients.
           </p>
         </div>
       </div>
@@ -409,25 +409,25 @@ for lvl in range(coarsest, -1, -1):
       <div class="table-wrap">
         <table class="results">
           <thead><tr><th>Plate</th><th>L2<br>pixels</th><th>NCC<br>pixels</th><th>SSIM<br>pixels</th><th>MI<br>pixels</th><th>L2<br>gradients</th><th>NCC<br>gradients</th><th>SSIM<br>gradients</th><th>MI<br>gradients</th><th>s: NCC / SSIM / MI</th></tr></thead>
-          <caption class="sr">Offsets are (dy, dx) in pixels of the green and red plates relative to blue.</caption>
+          <caption class="sr">Offsets are (x, y): pixels the green and red plates move right and down to land on blue.</caption>
           <tbody>
-          <tr><td>Cathedral</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">G (5, 2)<br>R (12, 3)</td><td class="num">0.2 / 4 / 0.5</td></tr>
-          <tr><td>Monastery</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">G (-3, 2)<br>R (3, 2)</td><td class="num">0.2 / 5 / 0.5</td></tr>
-          <tr><td>Tobolsk</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 2)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">G (3, 3)<br>R (6, 3)</td><td class="num">0.2 / 4 / 0.5</td></tr>
-          <tr><td>Church</td><td class="num bad">G (25, 4)<br>R (64, 267)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num bad">G (34, 7)<br>R (56, -8)</td><td class="num">G (25, 4)<br>R (59, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">G (25, 4)<br>R (58, -4)</td><td class="num">0.7 / 15 / 2.0</td></tr>
-          <tr><td>Emir of Bukhara</td><td class="num bad">G (49, 24)<br>R (103, 57)</td><td class="num bad">G (49, 24)<br>R (300, -542)</td><td class="num bad">G (46, 23)<br>R (100, 36)</td><td class="num">G (49, 23)<br>R (106, 40)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 24)<br>R (107, 40)</td><td class="num">G (49, 23)<br>R (107, 40)</td><td class="num">G (49, 23)<br>R (107, 40)</td><td class="num">0.7 / 15 / 1.9</td></tr>
-          <tr><td>Harvesters</td><td class="num">G (59, 16)<br>R (124, 13)</td><td class="num">G (60, 17)<br>R (124, 13)</td><td class="num bad">G (55, 12)<br>R (121, 10)</td><td class="num">G (59, 17)<br>R (123, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">G (60, 18)<br>R (123, 14)</td><td class="num">G (60, 17)<br>R (124, 14)</td><td class="num">0.7 / 15 / 1.7</td></tr>
-          <tr><td>Icon</td><td class="num">G (41, 17)<br>R (90, 23)</td><td class="num">G (41, 17)<br>R (89, 23)</td><td class="num">G (40, 20)<br>R (88, 26)</td><td class="num">G (41, 17)<br>R (89, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">G (41, 16)<br>R (90, 23)</td><td class="num">G (42, 17)<br>R (90, 23)</td><td class="num">0.7 / 16 / 1.7</td></tr>
-          <tr><td>Ilemselga</td><td class="num">G (39, 7)<br>R (130, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num bad">G (32, 8)<br>R (125, 4)</td><td class="num">G (40, 6)<br>R (131, 9)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (131, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num">G (40, 7)<br>R (130, 11)</td><td class="num">0.7 / 16 / 1.9</td></tr>
-          <tr><td>Melons</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (82, 11)<br>R (178, 13)</td><td class="num">G (81, 12)<br>R (176, 10)</td><td class="num">G (81, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">G (80, 10)<br>R (177, 13)</td><td class="num">0.7 / 16 / 1.8</td></tr>
-          <tr><td>Religious painting</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 3)<br>R (68, 7)</td><td class="num">G (28, 5)<br>R (73, 6)</td><td class="num">G (29, 3)<br>R (69, 6)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (30, 6)<br>R (70, 6)</td><td class="num">G (29, 4)<br>R (69, 6)</td><td class="num">G (29, 4)<br>R (69, 7)</td><td class="num">0.7 / 15 / 1.6</td></tr>
-          <tr><td>Self-portrait</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num">G (79, 29)<br>R (176, 37)</td><td class="num bad">G (77, 31)<br>R (177, 32)</td><td class="num">G (78, 29)<br>R (176, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">G (78, 29)<br>R (175, 37)</td><td class="num">0.8 / 16 / 1.6</td></tr>
-          <tr><td>Lilacs (Siren)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num">G (49, -6)<br>R (96, -25)</td><td class="num bad">G (45, -10)<br>R (92, -23)</td><td class="num">G (48, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">G (49, -6)<br>R (96, -24)</td><td class="num">0.7 / 16 / 1.7</td></tr>
-          <tr><td>Three generations</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num">G (53, 14)<br>R (112, 11)</td><td class="num bad">G (53, 14)<br>R (106, 11)</td><td class="num">G (53, 15)<br>R (112, 12)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (54, 12)<br>R (111, 9)</td><td class="num">G (55, 13)<br>R (111, 9)</td><td class="num bad">G (55, 16)<br>R (114, 11)</td><td class="num">0.7 / 16 / 1.8</td></tr>
-          <tr><td>Wharf</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num bad">G (15, -13)<br>R (81, -13)</td><td class="num">G (15, -7)<br>R (82, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -16)</td><td class="num">G (15, -7)<br>R (83, -17)</td><td class="num">G (15, -7)<br>R (83, -17)</td><td class="num">0.7 / 16 / 1.7</td></tr>
-          <tr><td>Man on a camel</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (45, 30)<br>R (104, 41)</td><td class="num">G (48, 30)<br>R (101, 39)</td><td class="num">G (47, 28)<br>R (105, 39)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (104, 41)</td><td class="num">G (45, 31)<br>R (103, 41)</td><td class="num">G (45, 30)<br>R (104, 40)</td><td class="num">0.8 / 16 / 1.6</td></tr>
-          <tr><td>Lugano</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (36, 14)<br>R (85, 37)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">G (37, 13)<br>R (86, 38)</td><td class="num">0.7 / 16 / 1.7</td></tr>
-          <tr><td>Kivach falls</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num bad">G (17, 19)<br>R (94, 25)</td><td class="num">G (18, 17)<br>R (89, 30)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">G (17, 17)<br>R (88, 31)</td><td class="num">0.7 / 16 / 1.8</td></tr>
+          <tr><td>Cathedral</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">G (2, 5)<br>R (3, 12)</td><td class="num">0.2 / 4 / 0.5</td></tr>
+          <tr><td>Monastery</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">G (2, -3)<br>R (2, 3)</td><td class="num">0.2 / 5 / 0.5</td></tr>
+          <tr><td>Tobolsk</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">G (2, 3)<br>R (3, 6)</td><td class="num">G (2, 3)<br>R (3, 6)</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">G (3, 3)<br>R (3, 6)</td><td class="num">0.2 / 4 / 0.5</td></tr>
+          <tr><td>Church</td><td class="num bad">G (4, 25)<br>R (267, 64)</td><td class="num">G (4, 25)<br>R (-4, 58)</td><td class="num bad">G (7, 34)<br>R (-8, 56)</td><td class="num">G (4, 25)<br>R (-4, 59)</td><td class="num">G (4, 25)<br>R (-4, 58)</td><td class="num">G (4, 25)<br>R (-4, 58)</td><td class="num">G (4, 25)<br>R (-4, 58)</td><td class="num">G (4, 25)<br>R (-4, 58)</td><td class="num">0.7 / 15 / 2.0</td></tr>
+          <tr><td>Emir of Bukhara</td><td class="num bad">G (24, 49)<br>R (57, 103)</td><td class="num bad">G (24, 49)<br>R (-542, 300)</td><td class="num bad">G (23, 46)<br>R (36, 100)</td><td class="num">G (23, 49)<br>R (40, 106)</td><td class="num">G (24, 49)<br>R (40, 107)</td><td class="num">G (24, 49)<br>R (40, 107)</td><td class="num">G (23, 49)<br>R (40, 107)</td><td class="num">G (23, 49)<br>R (40, 107)</td><td class="num">0.7 / 15 / 1.9</td></tr>
+          <tr><td>Harvesters</td><td class="num">G (16, 59)<br>R (13, 124)</td><td class="num">G (17, 60)<br>R (13, 124)</td><td class="num bad">G (12, 55)<br>R (10, 121)</td><td class="num">G (17, 59)<br>R (14, 123)</td><td class="num">G (17, 60)<br>R (14, 124)</td><td class="num">G (17, 60)<br>R (14, 124)</td><td class="num">G (18, 60)<br>R (14, 123)</td><td class="num">G (17, 60)<br>R (14, 124)</td><td class="num">0.7 / 15 / 1.7</td></tr>
+          <tr><td>Icon</td><td class="num">G (17, 41)<br>R (23, 90)</td><td class="num">G (17, 41)<br>R (23, 89)</td><td class="num">G (20, 40)<br>R (26, 88)</td><td class="num">G (17, 41)<br>R (23, 89)</td><td class="num">G (17, 42)<br>R (23, 90)</td><td class="num">G (17, 42)<br>R (23, 90)</td><td class="num">G (16, 41)<br>R (23, 90)</td><td class="num">G (17, 42)<br>R (23, 90)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Ilemselga</td><td class="num">G (7, 39)<br>R (11, 130)</td><td class="num">G (7, 40)<br>R (11, 130)</td><td class="num bad">G (8, 32)<br>R (4, 125)</td><td class="num">G (6, 40)<br>R (9, 131)</td><td class="num">G (7, 40)<br>R (11, 131)</td><td class="num">G (7, 40)<br>R (11, 131)</td><td class="num">G (7, 40)<br>R (11, 130)</td><td class="num">G (7, 40)<br>R (11, 130)</td><td class="num">0.7 / 16 / 1.9</td></tr>
+          <tr><td>Melons</td><td class="num">G (11, 82)<br>R (13, 178)</td><td class="num">G (11, 82)<br>R (13, 178)</td><td class="num">G (12, 81)<br>R (10, 176)</td><td class="num">G (10, 81)<br>R (13, 177)</td><td class="num">G (10, 80)<br>R (13, 177)</td><td class="num">G (10, 80)<br>R (13, 177)</td><td class="num">G (10, 80)<br>R (13, 177)</td><td class="num">G (10, 80)<br>R (13, 177)</td><td class="num">0.7 / 16 / 1.8</td></tr>
+          <tr><td>Religious painting</td><td class="num">G (3, 28)<br>R (7, 68)</td><td class="num">G (3, 28)<br>R (7, 68)</td><td class="num">G (5, 28)<br>R (6, 73)</td><td class="num">G (3, 29)<br>R (6, 69)</td><td class="num">G (6, 30)<br>R (6, 70)</td><td class="num">G (6, 30)<br>R (6, 70)</td><td class="num">G (4, 29)<br>R (6, 69)</td><td class="num">G (4, 29)<br>R (7, 69)</td><td class="num">0.7 / 15 / 1.6</td></tr>
+          <tr><td>Self-portrait</td><td class="num">G (29, 79)<br>R (37, 176)</td><td class="num">G (29, 79)<br>R (37, 176)</td><td class="num bad">G (31, 77)<br>R (32, 177)</td><td class="num">G (29, 78)<br>R (37, 176)</td><td class="num">G (29, 78)<br>R (37, 175)</td><td class="num">G (29, 78)<br>R (37, 175)</td><td class="num">G (29, 78)<br>R (37, 175)</td><td class="num">G (29, 78)<br>R (37, 175)</td><td class="num">0.8 / 16 / 1.6</td></tr>
+          <tr><td>Lilacs (Siren)</td><td class="num">G (-6, 49)<br>R (-25, 96)</td><td class="num">G (-6, 49)<br>R (-25, 96)</td><td class="num bad">G (-10, 45)<br>R (-23, 92)</td><td class="num">G (-6, 48)<br>R (-24, 96)</td><td class="num">G (-6, 49)<br>R (-24, 96)</td><td class="num">G (-6, 49)<br>R (-24, 96)</td><td class="num">G (-6, 49)<br>R (-24, 96)</td><td class="num">G (-6, 49)<br>R (-24, 96)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Three generations</td><td class="num">G (14, 53)<br>R (11, 112)</td><td class="num">G (14, 53)<br>R (11, 112)</td><td class="num bad">G (14, 53)<br>R (11, 106)</td><td class="num">G (15, 53)<br>R (12, 112)</td><td class="num">G (12, 54)<br>R (9, 111)</td><td class="num">G (12, 54)<br>R (9, 111)</td><td class="num">G (13, 55)<br>R (9, 111)</td><td class="num bad">G (16, 55)<br>R (11, 114)</td><td class="num">0.7 / 16 / 1.8</td></tr>
+          <tr><td>Wharf</td><td class="num">G (-7, 15)<br>R (-16, 83)</td><td class="num">G (-7, 15)<br>R (-16, 83)</td><td class="num bad">G (-13, 15)<br>R (-13, 81)</td><td class="num">G (-7, 15)<br>R (-16, 82)</td><td class="num">G (-7, 15)<br>R (-16, 83)</td><td class="num">G (-7, 15)<br>R (-16, 83)</td><td class="num">G (-7, 15)<br>R (-17, 83)</td><td class="num">G (-7, 15)<br>R (-17, 83)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Man on a camel</td><td class="num">G (30, 45)<br>R (41, 104)</td><td class="num">G (30, 45)<br>R (41, 104)</td><td class="num">G (30, 48)<br>R (39, 101)</td><td class="num">G (28, 47)<br>R (39, 105)</td><td class="num">G (31, 45)<br>R (41, 104)</td><td class="num">G (31, 45)<br>R (41, 104)</td><td class="num">G (31, 45)<br>R (41, 103)</td><td class="num">G (30, 45)<br>R (40, 104)</td><td class="num">0.8 / 16 / 1.6</td></tr>
+          <tr><td>Lugano</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (14, 36)<br>R (37, 85)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">G (13, 37)<br>R (38, 86)</td><td class="num">0.7 / 16 / 1.7</td></tr>
+          <tr><td>Kivach falls</td><td class="num">G (17, 18)<br>R (30, 89)</td><td class="num">G (17, 18)<br>R (30, 89)</td><td class="num bad">G (19, 17)<br>R (25, 94)</td><td class="num">G (17, 18)<br>R (30, 89)</td><td class="num">G (17, 17)<br>R (31, 88)</td><td class="num">G (17, 17)<br>R (31, 88)</td><td class="num">G (17, 17)<br>R (31, 88)</td><td class="num">G (17, 17)<br>R (31, 88)</td><td class="num">0.7 / 16 / 1.8</td></tr>
           </tbody>
         </table>
       </div>
@@ -456,7 +456,7 @@ var_a, var_b = box(a*a) - mu_a**2, box(b*b) - mu_b**2
 cov = box(a*b) - mu_a*mu_b
 ssim = ((2*mu_a*mu_b + c1) * (2*cov + c2)) / ((mu_a**2 + mu_b**2 + c1) * (var_a + var_b + c2))</pre>
           <p>
-            <b>Mutual information.</b> This metric fits the Emir problem exactly. Instead of asking whether the two plates are bright in the same places, it asks whether knowing a pixel's value in one plate tells you its value in the other, whichever way that relation goes. I quantize both plates to 64 levels, build their 64×64 joint histogram with one <code>np.bincount</code>, and compute H(a) + H(b) − H(a, b) from it. A robe that is bright in blue and black in red still gives a sharp joint histogram at the right shift, because "bright here" reliably means "dark there". Where it is better: on raw pixels it gets the Emir right, R (106, 40), which NCC and SSIM do not. Where it is weaker: with only 64 bins the score surface is a little flatter than NCC's, so it wanders by 1 to 4 pixels on the softer plates, and it is the one score that does not get sharper on gradients, since a gradient image is mostly near-zero and the histogram is dominated by that. It costs about 1.4 s per plate, twice NCC.
+            <b>Mutual information.</b> This metric fits the Emir problem exactly. Instead of asking whether the two plates are bright in the same places, it asks whether knowing a pixel's value in one plate tells you its value in the other, whichever way that relation goes. I quantize both plates to 64 levels, build their 64×64 joint histogram with one <code>np.bincount</code>, and compute H(a) + H(b) − H(a, b) from it. A robe that is bright in blue and black in red still gives a sharp joint histogram at the right shift, because "bright here" reliably means "dark there". Where it is better: on raw pixels it gets the Emir right, R (40, 106), which NCC and SSIM do not. Where it is weaker: with only 64 bins the score surface is a little flatter than NCC's, so it wanders by 1 to 4 pixels on the softer plates, and it is the one score that does not get sharper on gradients, since a gradient image is mostly near-zero and the histogram is dominated by that. It costs about 1.4 s per plate, twice NCC.
           </p>
 <pre class="code">ia, ib = (a * 64).astype(int), (b * 64).astype(int)          # quantize both plates
 joint = np.bincount((ia * 64 + ib).ravel(), minlength=4096)   # 64x64 joint histogram
@@ -480,15 +480,15 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
       <div class="pair pair-3">
         <figure class="shot">
           <img src="images/final/camel.jpg" srcset="images/final/camel-750.jpg 750w, images/final/camel.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="A man on a camel under a tree, buildings behind, Central Asia, about 1905" width="1500" height="1368">
-          <figcaption><b class="nounit">1905</b><span>Man on a camel · G (45, 31) · R (104, 41)</span></figcaption>
+          <figcaption><b class="nounit">1905</b><span>Man on a camel · G (31, 45) · R (41, 104)</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/final/lugano.jpg" srcset="images/final/lugano-750.jpg 750w, images/final/lugano.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="A tree-lined lakeside promenade in Lugano, Switzerland, about 1905" width="1500" height="1241">
-          <figcaption><b class="nounit">1905</b><span>Lugano · G (37, 13) · R (86, 38)</span></figcaption>
+          <figcaption><b class="nounit">1905</b><span>Lugano · G (13, 37) · R (38, 86)</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/final/kivach.jpg" srcset="images/final/kivach-750.jpg 750w, images/final/kivach.jpg 1500w" sizes="(min-width: 76rem) 24rem, 31vw" loading="lazy" decoding="async" alt="A man seated on rocks beside the Kivach waterfall on the Suna river, 1915" width="1500" height="1318">
-          <figcaption><b class="nounit">1915</b><span>Kivach falls · G (17, 17) · R (88, 31)</span></figcaption>
+          <figcaption><b class="nounit">1915</b><span>Kivach falls · G (17, 17) · R (31, 88)</span></figcaption>
         </figure>
       </div>
 
@@ -778,7 +778,7 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
             <b>Two problems.</b> White balance is two problems: guess the color of the light (the illuminant), then divide it out. The second half is easy. The illuminant function returns one RGB triple; the white balance function divides each channel by it, normalized so green stays put, which keeps the overall brightness about the same. The hard half is the guess, and I implemented the three classic guesses. <b>Gray world</b> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <b>White patch</b> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <b>Shades of gray</b> takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits in between, weighting bright pixels more than the mean does without betting everything on the single brightest patch.
           </p>
 <pre class="code">def illuminant(rgb, p=6):
-    return np.mean(rgb.reshape(-1, 3) ** p, axis=0) ** (1 / p)   # p=1 gray world, p→∞ white patch
+    return np.mean(rgb.reshape(3, -1) ** p, axis=0) ** (1 / p)   # p=1 gray world, p→∞ white patch
 
 def white_balance(rgb):
     ill = illuminant(rgb)
@@ -853,7 +853,7 @@ rgb = np.clip((rgb - lo) / (hi - lo), 0, 1)</pre>
           <p>
             <b>Histogram equalization.</b> For the nonlinear part I equalize the luminance: build its histogram, take the cumulative sum, normalize it, and that CDF is the new tone curve. Then I only blend part of the way from the original curve to the equalized one, and scale all three channels by the same luminance ratio so colors stay put. Full equalization is too much for these photos, it flattens skies into gray and makes everything look like a poster. Half strength, shown above, opens the shadows in the church interiors without wrecking the highlights. The final pipeline uses a quarter strength on every plate. With this the church is finished; compare it with the stacked plates back in step 2.
           </p>
-<pre class="code">hist, edges = np.histogram(y, bins=1024, range=(0, 1))
+<pre class="code">hist, edges = np.histogram(y, bins=1024, range=(1, 0))
 cdf = np.cumsum(hist) / hist.sum()
 y_eq = np.interp(y, edges[:-1], cdf)
 y_new = (1 - s) * y + s * y_eq                 # s = 0.25 in the final pipeline
@@ -928,12 +928,12 @@ rgb = rgb * (y_new / y)[..., None]</pre>
             <b>Finding the two photos on the card.</b> The find_frames function first finds the card, which is the bright region on the black scan background. The two photos sit symmetrically about the card's center, so I split the card in half and in each half take the longest run of columns, then rows, whose pixel values vary a lot. The printed margins vary too, but they are short runs. A blank sky can end a run early, so I make the two boxes the same size, each anchored at the card's outer edge.
           </p>
           <p>
-            <b>Global alignment.</b> I align the right photo to the left one with the step-2 pyramid and step-3 gradient features, the same align function as the plates. The offsets are real, (213, −48) on the 1901 card, because the two prints were glued onto the card by hand.
+            <b>Global alignment.</b> I align the right photo to the left one with the step-2 pyramid and step-3 gradient features, the same align function as the plates. The offsets are real, (−48, 213) on the 1901 card, because the two prints were glued onto the card by hand.
           </p>
           <p>
             <b>Disparity per tile.</b> Then I cut the left photo into 100-pixel tiles and run the same gradient NCC search once more for each tile, but only sideways (±30 px, with ±2 px up and down), because that is the direction the two lenses were apart. I trust a tile if its NCC peak is above 0.2 and it has some texture. Each trusted tile's sideways shift is its disparity. Untrusted tiles, mostly sky, take the value of the nearest trusted tile, and the coarse grid of tile values is smoothed and stretched to every pixel. The bounding box of the trusted tiles is also what crops away the card, since the margin text is different on the two halves and never gets trusted.
           </p>
-<pre class="code">d = align_pyramid(right, left, metric="ncc", feature="grad")      # global: (213, -48) on the 1901 card
+<pre class="code">d = align_pyramid(right, left, metric="ncc", feature="grad")      # global: (-48, 213) on the 1901 card
 right = shift(right, *d)
 for each 100x100 tile: best dx in [-30, 30], dy in [-2, 2] by gradient NCC   # disparity
 field = dense_field(centres, shifts, keep)                          # fill from nearest trusted tile, smooth, upsample
@@ -951,11 +951,11 @@ anaglyph = stack(left, right, right)                                # red = left
       <!--SNIPPET:stereo-table-->
       <div class="table-wrap">
         <table class="results">
-          <thead><tr><th>Card</th><th>Right → left offset (dy, dx)</th><th>Trusted tiles</th><th>Disparity, 2nd to 98th percentile</th><th>Time</th></tr></thead>
+          <thead><tr><th>Card</th><th>Right → left offset (x, y)</th><th>Trusted tiles</th><th>Disparity, 2nd to 98th percentile</th><th>Time</th></tr></thead>
           <tbody>
-          <tr><td>Nevsky Prospect, 1901</td><td class="num">(213, -48)</td><td class="num">132 / 323</td><td class="num">-12 → +11 px</td><td class="num">2 s</td></tr>
-          <tr><td>Nevsky Prospect, 1906</td><td class="num">(38, 240)</td><td class="num">118 / 289</td><td class="num">-13 → +20 px</td><td class="num">2 s</td></tr>
-          <tr><td>The Kremlin from the river, 1905</td><td class="num">(31, -46)</td><td class="num">49 / 306</td><td class="num">-3 → +3 px</td><td class="num">2 s</td></tr>
+          <tr><td>Nevsky Prospect, 1901</td><td class="num">(-48, 213)</td><td class="num">132 / 323</td><td class="num">-12 → +11 px</td><td class="num">2 s</td></tr>
+          <tr><td>Nevsky Prospect, 1906</td><td class="num">(240, 38)</td><td class="num">118 / 289</td><td class="num">-13 → +20 px</td><td class="num">2 s</td></tr>
+          <tr><td>The Kremlin from the river, 1905</td><td class="num">(-46, 31)</td><td class="num">49 / 306</td><td class="num">-3 → +3 px</td><td class="num">2 s</td></tr>
           </tbody>
         </table>
       </div>
@@ -993,71 +993,71 @@ anaglyph = stack(left, right, right)                                # red = left
       <div class="gallery">
         <figure>
           <img src="images/final/cathedral.jpg" loading="lazy" decoding="async" alt="Cathedral, colorized" width="365" height="322">
-          <figcaption><b>Cathedral</b>G (5, 2) · R (12, 3)</figcaption>
+          <figcaption><b>Cathedral</b>G (2, 5) · R (3, 12)</figcaption>
         </figure>
         <figure>
           <img src="images/final/monastery.jpg" loading="lazy" decoding="async" alt="Monastery, colorized" width="364" height="300">
-          <figcaption><b>Monastery</b>G (-3, 2) · R (3, 2)</figcaption>
+          <figcaption><b>Monastery</b>G (2, -3) · R (2, 3)</figcaption>
         </figure>
         <figure>
           <img src="images/final/tobolsk.jpg" loading="lazy" decoding="async" alt="Tobolsk, colorized" width="367" height="326">
-          <figcaption><b>Tobolsk</b>G (3, 2) · R (6, 3)</figcaption>
+          <figcaption><b>Tobolsk</b>G (2, 3) · R (3, 6)</figcaption>
         </figure>
         <figure>
           <img src="images/final/church.jpg" srcset="images/final/church-750.jpg 750w, images/final/church.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Church, colorized" width="1500" height="1311">
-          <figcaption><b>Church</b>G (25, 4) · R (58, -4)</figcaption>
+          <figcaption><b>Church</b>G (4, 25) · R (-4, 58)</figcaption>
         </figure>
         <figure>
           <img src="images/final/emir.jpg" srcset="images/final/emir-750.jpg 750w, images/final/emir.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Emir of Bukhara, colorized" width="1500" height="1404">
-          <figcaption><b>Emir of Bukhara</b>G (49, 24) · R (107, 40)</figcaption>
+          <figcaption><b>Emir of Bukhara</b>G (24, 49) · R (40, 107)</figcaption>
         </figure>
         <figure>
           <img src="images/final/harvesters.jpg" srcset="images/final/harvesters-750.jpg 750w, images/final/harvesters.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Harvesters, colorized" width="1500" height="1347">
-          <figcaption><b>Harvesters</b>G (60, 17) · R (124, 14)</figcaption>
+          <figcaption><b>Harvesters</b>G (17, 60) · R (14, 124)</figcaption>
         </figure>
         <figure>
           <img src="images/final/icon.jpg" srcset="images/final/icon-750.jpg 750w, images/final/icon.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Icon, colorized" width="1500" height="1355">
-          <figcaption><b>Icon</b>G (42, 17) · R (90, 23)</figcaption>
+          <figcaption><b>Icon</b>G (17, 42) · R (23, 90)</figcaption>
         </figure>
         <figure>
           <img src="images/final/ilemselga.jpg" srcset="images/final/ilemselga-750.jpg 750w, images/final/ilemselga.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Ilemselga, colorized" width="1500" height="1135">
-          <figcaption><b>Ilemselga</b>G (40, 7) · R (131, 11)</figcaption>
+          <figcaption><b>Ilemselga</b>G (7, 40) · R (11, 131)</figcaption>
         </figure>
         <figure>
           <img src="images/final/melons.jpg" srcset="images/final/melons-750.jpg 750w, images/final/melons.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Melons, colorized" width="1500" height="1317">
-          <figcaption><b>Melons</b>G (80, 10) · R (177, 13)</figcaption>
+          <figcaption><b>Melons</b>G (10, 80) · R (13, 177)</figcaption>
         </figure>
         <figure>
           <img src="images/final/religous_painting.jpg" srcset="images/final/religous_painting-750.jpg 750w, images/final/religous_painting.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Religious painting, colorized" width="1500" height="1187">
-          <figcaption><b>Religious painting</b>G (30, 6) · R (70, 6)</figcaption>
+          <figcaption><b>Religious painting</b>G (6, 30) · R (6, 70)</figcaption>
         </figure>
         <figure>
           <img src="images/final/self_portrait.jpg" srcset="images/final/self_portrait-750.jpg 750w, images/final/self_portrait.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Self-portrait, colorized" width="1500" height="1350">
-          <figcaption><b>Self-portrait</b>G (78, 29) · R (175, 37)</figcaption>
+          <figcaption><b>Self-portrait</b>G (29, 78) · R (37, 175)</figcaption>
         </figure>
         <figure>
           <img src="images/final/siren.jpg" srcset="images/final/siren-750.jpg 750w, images/final/siren.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lilacs (Siren), colorized" width="1500" height="1458">
-          <figcaption><b>Lilacs (Siren)</b>G (49, -6) · R (96, -24)</figcaption>
+          <figcaption><b>Lilacs (Siren)</b>G (-6, 49) · R (-24, 96)</figcaption>
         </figure>
         <figure>
           <img src="images/final/three_generations.jpg" srcset="images/final/three_generations-750.jpg 750w, images/final/three_generations.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Three generations, colorized" width="1500" height="1317">
-          <figcaption><b>Three generations</b>G (54, 12) · R (111, 9)</figcaption>
+          <figcaption><b>Three generations</b>G (12, 54) · R (9, 111)</figcaption>
         </figure>
         <figure>
           <img src="images/final/wharf.jpg" srcset="images/final/wharf-750.jpg 750w, images/final/wharf.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Wharf, colorized" width="1500" height="1305">
-          <figcaption><b>Wharf</b>G (15, -7) · R (83, -16)</figcaption>
+          <figcaption><b>Wharf</b>G (-7, 15) · R (-16, 83)</figcaption>
         </figure>
         <figure>
           <img src="images/final/camel.jpg" srcset="images/final/camel-750.jpg 750w, images/final/camel.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Man on a camel, colorized" width="1500" height="1368">
-          <figcaption><b>Man on a camel</b>G (45, 31) · R (104, 41)</figcaption>
+          <figcaption><b>Man on a camel</b>G (31, 45) · R (41, 104)</figcaption>
         </figure>
         <figure>
           <img src="images/final/lugano.jpg" srcset="images/final/lugano-750.jpg 750w, images/final/lugano.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Lugano, colorized" width="1500" height="1241">
-          <figcaption><b>Lugano</b>G (37, 13) · R (86, 38)</figcaption>
+          <figcaption><b>Lugano</b>G (13, 37) · R (38, 86)</figcaption>
         </figure>
         <figure>
           <img src="images/final/kivach.jpg" srcset="images/final/kivach-750.jpg 750w, images/final/kivach.jpg 1500w" sizes="(min-width: 76rem) 14rem, 30vw" loading="lazy" decoding="async" alt="Kivach falls, colorized" width="1500" height="1318">
-          <figcaption><b>Kivach falls</b>G (17, 17) · R (88, 31)</figcaption>
+          <figcaption><b>Kivach falls</b>G (17, 17) · R (31, 88)</figcaption>
         </figure>
       </div>
       <!--/SNIPPET:gallery-->
