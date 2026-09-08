@@ -217,7 +217,7 @@ for lvl in range(coarsest, -1, -1):
     if lvl > 0:
         d = (2 * d[0], 2 * d[1])</pre>
           <p>
-            All parameters are the same for every image: 10% scoring margin, ±15 coarse window, ±2 refinement, 64-pixel floor. Nothing is tuned per plate.
+            <b>Parameters.</b> All parameters are the same for every image: 10% scoring margin, ±15 coarse window, ±2 refinement, 64-pixel floor. Nothing is tuned per plate.
           </p>
         </div>
       </div>
@@ -330,10 +330,10 @@ for lvl in range(coarsest, -1, -1):
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), a completely different place. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
+            <b>What happens.</b> Comparing raw pixels fails on the Emir. The green plate lands correctly at (49, 24), but the red plate is put at (300, −542), a completely different place. His robe averages 0.55 in the blue plate and 0.30 in the red plate. The wall behind him goes the other way: 0.49 in blue, 0.76 in red. So in the blue plate the robe is brighter than the wall, and in the red plate it is much darker than the wall. A score that compares brightness cannot line those up. At the true offset the raw NCC between the red and blue plates is only 0.264, and at the wrong offset the search found it is 0.307, so NCC genuinely preferred the wrong answer. It goes wrong at the coarsest level, and the ±2 refinements can never get back.
           </p>
           <p>
-            The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
+            <b>The church too.</b> The church breaks the same way with L2 on raw pixels: red lands at (64, 267) because L2 rewards the shift where the bright sky in the blue plate overlaps something bright in the red plate. The common problem is that brightness depends on the filter, not just the scene. What does not depend on the filter is where the edges are.
           </p>
         </div>
       </div>
@@ -384,7 +384,7 @@ for lvl in range(coarsest, -1, -1):
 
         <div class="prose">
           <p>
-            The gradient magnitude function makes an edge map of the image. It measures how much the brightness changes from one pixel to the next by taking the central difference in the vertical direction and in the horizontal direction, then combining the two with Pythagoras. Where the picture is flat the result is near zero; on an edge it is large. It is two array subtractions and a square root, no library.
+            <b>The gradient function.</b> The gradient magnitude function makes an edge map of the image. It measures how much the brightness changes from one pixel to the next by taking the central difference in the vertical direction and in the horizontal direction, then combining the two with Pythagoras. Where the picture is flat the result is near zero; on an edge it is large. It is two array subtractions and a square root, no library.
           </p>
 <pre class="code">def gradient_magnitude(im):
     gy = np.zeros_like(im); gx = np.zeros_like(im)
@@ -392,10 +392,7 @@ for lvl in range(coarsest, -1, -1):
     gx[:, 1:-1] = (im[:, 2:] - im[:, :-2]) * 0.5   # horizontal change
     return np.sqrt(gx * gx + gy * gy)</pre>
           <p>
-            The point is that the robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude.
-          </p>
-          <p>
-            From here on, "aligned" means step 3: pyramid, NCC, gradients.
+            <b>Why it works.</b> The robe's edge is in the same place in every plate, whichever way the contrast goes across it. So I run the gradient function on each plate first, build the pyramid from the gradient images, and search exactly as before. On the Emir the gradient NCC at the true offset is 0.493 and at the old wrong offset only 0.040, so the search has no reason to go anywhere else. The red plate lands at (107, 40). The church's L2 failure goes away too, and on the plates that were already fine the offsets move by at most one pixel. I also tried a softened edge map, 1 − exp(−g/2ḡ), so a few very strong edges do not dominate; it gave the same answers, so I kept the plain magnitude. From here on, "aligned" means step 3: pyramid, NCC, gradients.
           </p>
         </div>
       </div>
@@ -449,7 +446,7 @@ for lvl in range(coarsest, -1, -1):
         </aside>
         <div class="prose">
           <p>
-            Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, which is a visible fringe. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all four scores agree on every plate.
+            <b>The table.</b> Every plate aligned eight ways: four scores on raw pixels, the same four on gradient magnitudes. Amber cells with a cross disagree with gradient NCC by more than 3 pixels, which is a visible fringe. The last column is the pyramid time for both plates. The first two column pairs are the basic metrics the assignment asks for. On raw pixels L2 loses the church (271 px off) and misses the Emir by 17; NCC loses the Emir (582 px). On gradients all four scores agree on every plate.
           </p>
           <p>
             <b>SSIM.</b> Structural similarity compares two images through local statistics. For every 7×7 window it computes the two means, the two variances and the covariance, and combines them into a score that is high when the windows have the same local brightness, contrast and structure. I get all five maps from one integral image each, so every window sum is four lookups. I expected it to be the most robust score and it was the least: on raw pixels it settles 4 to 9 pixels off on nine of the seventeen plates, and you can see the fringes on the church's steeple. The reason is its luminance term, which rewards windows whose mean brightness matches, and between two filters that is exactly the thing that does not match. On gradients that term stops mattering and SSIM agrees with NCC everywhere. It is also slow, about 16 s per plate, because every shift at full resolution recomputes five 12-megapixel box filters.
@@ -467,7 +464,7 @@ joint = joint / joint.sum()
 pa, pb = joint.reshape(64, 64).sum(1), joint.reshape(64, 64).sum(0)
 mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p log p</pre>
           <p>
-            The extra metrics confirmed the diagnosis but did not replace the fix; the pipeline after step 4 is the same as after step 3.
+            <b>Result.</b> The extra metrics confirmed the diagnosis but did not replace the fix; the pipeline after step 4 is the same as after step 3.
           </p>
         </div>
       </div>
@@ -504,10 +501,10 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
         </aside>
         <div class="prose">
           <p>
-            Man on a camel, Lugano and Kivach falls are three plates I downloaded from the Library of Congress collection myself: a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
+            <b>The plates.</b> Man on a camel, Lugano and Kivach falls are three plates I downloaded from the Library of Congress collection myself: a man on a camel in front of a mud-brick wall (Central Asia, about 1905), the lakefront at Lugano from the same year, and a study at the Kivach waterfall from 1915. I wanted a portrait with a subject that could move, a landscape with fine repeated structure, and a scene with water that changes between exposures.
           </p>
           <p>
-            All three aligned on the first try with the same parameters, with L2 and NCC as well as the extras; the only disagreement in the step-4 table is SSIM on raw pixels at the falls, 6 pixels off, the same weakness it shows on the provided plates. The rider did move between exposures: the hut and the tree behind him are pin-sharp at full resolution, but his face and hat have a faint red-green fringe, which no translation can remove. The water at Kivach smears in three colors for the same reason, while the rocks and the man are sharp. The camel plate is also fogged around the edges, so the crop takes a lot off it, and its sepia cast is where the white balance makes the biggest difference.
+            <b>How they did.</b> All three aligned on the first try with the same parameters, with L2 and NCC as well as the extras; the only disagreement in the step-4 table is SSIM on raw pixels at the falls, 6 pixels off, the same weakness it shows on the provided plates. The rider did move between exposures: the hut and the tree behind him are pin-sharp at full resolution, but his face and hat have a faint red-green fringe, which no translation can remove. The water at Kivach smears in three colors for the same reason, while the rocks and the man are sharp. The camel plate is also fogged around the edges, so the crop takes a lot off it, and its sepia cast is where the white balance makes the biggest difference.
           </p>
         </div>
       </div>
@@ -561,7 +558,7 @@ mi = H(pa) + H(pb) - H(joint)                                  # H(p) = -sum p l
 
         <div class="prose">
           <p>
-            After alignment each image is wrapped in junk: the scanner's paper-white margin, the black edge of the glass, the film rebate, and, on two sides of each moved plate, a strip where only one or two channels have any picture. The assignment says to detect these edges rather than cut a fixed margin, so I do it with a one-dimensional profile per side.
+            <b>Why.</b> After alignment each image is wrapped in junk: the scanner's paper-white margin, the black edge of the glass, the film rebate, and, on two sides of each moved plate, a strip where only one or two channels have any picture. The assignment says to detect these edges rather than cut a fixed margin, so I do it with a one-dimensional profile per side.
           </p>
           <p>
             <b>The border profile.</b> For each row, the border profile function asks three yes/no questions. Is nearly the whole row paper white (over 95% of pixels above 0.9 in all three channels)? Is more than a third of the row black in all three channels (below 0.08)? Is more than a third of the row strongly miscolored, meaning two channels differ by more than 0.5? The white catches the paper, the black catches the glass edge, and the miscolor catches the rebate and the strips where the plates do not overlap. Real picture content, even a bright sky or a saturated robe, rarely fills a whole row like that. Columns get the same three questions.
@@ -778,7 +775,7 @@ rgb_out = np.clip(rgb @ M.T, 0, 1)      # one matrix multiply per pixel</pre>
         </aside>
         <div class="prose">
           <p>
-            White balance is two problems: guess the color of the light (the illuminant), then divide it out. The second half is easy. The illuminant function returns one RGB triple; the white balance function divides each channel by it, normalized so green stays put, which keeps the overall brightness about the same. The hard half is the guess, and I implemented the three classic guesses. <b>Gray world</b> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <b>White patch</b> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <b>Shades of gray</b> takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits in between, weighting bright pixels more than the mean does without betting everything on the single brightest patch.
+            <b>Two problems.</b> White balance is two problems: guess the color of the light (the illuminant), then divide it out. The second half is easy. The illuminant function returns one RGB triple; the white balance function divides each channel by it, normalized so green stays put, which keeps the overall brightness about the same. The hard half is the guess, and I implemented the three classic guesses. <b>Gray world</b> assumes the average color of the scene is gray, so the illuminant is the mean of each channel. <b>White patch</b> assumes the brightest thing in the scene is white, so the illuminant is the mean of the brightest 1% of pixels. <b>Shades of gray</b> takes the Minkowski p-norm of each channel: p = 1 is gray world, p → ∞ is white patch, and p = 6 sits in between, weighting bright pixels more than the mean does without betting everything on the single brightest patch.
           </p>
 <pre class="code">def illuminant(rgb, p=6):
     return np.mean(rgb.reshape(-1, 3) ** p, axis=0) ** (1 / p)   # p=1 gray world, p→∞ white patch
