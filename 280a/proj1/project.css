@@ -468,3 +468,13 @@
   object-fit: contain;
   background: none;
 }
+
+@media print {
+  .print-note {
+    grid-column: 1 / -1;
+    margin: 0.5rem 0 0;
+    font-family: var(--display);
+    font-size: 8.5pt;
+    color: var(--ink-2);
+  }
+}
