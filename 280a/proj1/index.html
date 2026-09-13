@@ -68,18 +68,18 @@
         <h2>Step 1 · Single-scale alignment</h2>
       </header>
 
-      <div class="pair pair-3">
+      <div class="pair pair-3 pair-plate">
+        <figure class="shot natural">
+          <img src="images/aligned/cathedral-plate.jpg" alt="The cathedral scan as it comes: three grayscale exposures stacked top to bottom, blue, green, red" width="390" height="1024" decoding="async">
+          <figcaption><b class="nounit">Scan</b><span>Cathedral · the input: B, G, R stacked top to bottom</span></figcaption>
+        </figure>
         <figure class="shot">
           <img src="images/aligned/cathedral-unaligned.jpg" alt="Cathedral with the three channels simply stacked: colored fringes everywhere" width="390" height="341" decoding="async">
-          <figcaption><b class="nounit">Before</b><span>Cathedral · the three plates stacked as they come</span></figcaption>
+          <figcaption><b class="nounit">Stacked</b><span>The three plates on top of each other, no alignment</span></figcaption>
         </figure>
         <figure class="shot">
           <img src="images/aligned/cathedral.jpg" alt="Cathedral aligned by exhaustive search" width="387" height="329" decoding="async">
-          <figcaption><b>12</b><span>After · Cathedral · G (2, 5) · R (3, 12)</span></figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="images/aligned/monastery.jpg" alt="Monastery aligned by exhaustive search" width="389" height="335" decoding="async">
-          <figcaption><b>3</b><span>After · Monastery · G (2, −3) · R (2, 3)</span></figcaption>
+          <figcaption><b>12</b><span>Aligned · G (2, 5) · R (3, 12)</span></figcaption>
         </figure>
       </div>
 
@@ -199,7 +199,7 @@ best = argmax(grid)</pre>
       <div class="part-body part-body-wide">
         <div class="prose">
           <p>
-            <b>Why.</b> The TIF plates are about 3700 × 3200 pixels and the offsets go up to 180 pixels. The step-1 search would need a window a few hundred pixels wide, tens of thousands of shifts, each one a pass over 12 million pixels. That is far too slow. So I search at a small scale first, where the offset is small, and refine.
+            <b>Why.</b> The TIF plates are about 3700 × 3200 pixels and the offsets go up to 180 pixels. The step-1 search would need a window of ±180 pixels: 361 × 361 = 130,321 shifts, each one a pass over 12 million pixels, about 1.6 trillion pixel comparisons per plate. The pyramid does 961 shifts on a 100-pixel image plus 25 on each of the five larger levels, 1,086 shifts in total, and only the last 25 touch the full-resolution plate. So I search at a small scale first, where the offset is small, and refine.
           </p>
           <p>
             <b>Downsampling.</b> I downsample with a 2×2 kernel and a stride of 2: every 2×2 block is averaged into one pixel, which halves the image. The averaging matters. If I just threw away every other row and column, fine detail would alias: high frequencies the small image cannot hold would show up disguised as false coarse patterns, the same effect that makes a wagon wheel spin backwards on film. So each level is filtered, then subsampled. This is a Gaussian pyramid with a 2×2 box in place of the Gaussian; the box is a cruder low-pass, but the coarse levels only have to locate the offset to within a pixel or two, and the finer levels fix the rest. I do this repeatedly until the short side would drop under 64 pixels, which gives six levels for these scans: full size, 1/2, 1/4, 1/8, 1/16 and 1/32. No library resize or pyramid function is used.
@@ -953,7 +953,7 @@ anaglyph = stack(left, right, right)                                # red = left
         <table class="results">
           <thead><tr><th>Card</th><th>Right → left offset (x, y)</th><th>Trusted tiles</th><th>Disparity, 2nd to 98th percentile</th><th>Time</th></tr></thead>
           <tbody>
-          <tr><td>Nevsky Prospect, 1901</td><td class="num">(-48, 213)</td><td class="num">132 / 323</td><td class="num">-12 → +11 px</td><td class="num">2 s</td></tr>
+          <tr><td>Nevsky Prospect, 1901</td><td class="num">(-48, 213)</td><td class="num">132 / 323</td><td class="num">-12 → +11 px</td><td class="num">3 s</td></tr>
           <tr><td>Nevsky Prospect, 1906</td><td class="num">(240, 38)</td><td class="num">118 / 289</td><td class="num">-13 → +20 px</td><td class="num">2 s</td></tr>
           <tr><td>The Kremlin from the river, 1905</td><td class="num">(-46, 31)</td><td class="num">49 / 306</td><td class="num">-3 → +3 px</td><td class="num">2 s</td></tr>
           </tbody>
@@ -1061,6 +1061,34 @@ anaglyph = stack(left, right, right)                                # red = left
         </figure>
       </div>
       <!--/SNIPPET:gallery-->
+      <h3 class="sub">Offsets and run time, all 17 plates</h3>
+      <!--SNIPPET:final-table-->
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Plate</th><th>Plate size (px)</th><th>G (x, y)</th><th>R (x, y)</th><th>Search</th><th>Seconds</th></tr></thead>
+          <tbody>
+          <tr><td>Cathedral</td><td class="num">390×341</td><td class="num">(2, 5)</td><td class="num">(3, 12)</td><td>single scale</td><td class="num">0.2</td></tr>
+          <tr><td>Monastery</td><td class="num">391×341</td><td class="num">(2, -3)</td><td class="num">(2, 3)</td><td>single scale</td><td class="num">0.2</td></tr>
+          <tr><td>Tobolsk</td><td class="num">396×341</td><td class="num">(2, 3)</td><td class="num">(3, 6)</td><td>single scale</td><td class="num">0.2</td></tr>
+          <tr><td>Church</td><td class="num">3634×3202</td><td class="num">(4, 25)</td><td class="num">(-4, 58)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Emir of Bukhara</td><td class="num">3702×3209</td><td class="num">(24, 49)</td><td class="num">(40, 107)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Harvesters</td><td class="num">3683×3218</td><td class="num">(17, 60)</td><td class="num">(14, 124)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Icon</td><td class="num">3741×3244</td><td class="num">(17, 42)</td><td class="num">(23, 90)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Ilemselga</td><td class="num">3800×3270</td><td class="num">(7, 40)</td><td class="num">(11, 131)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Melons</td><td class="num">3770×3241</td><td class="num">(10, 80)</td><td class="num">(13, 177)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Religious painting</td><td class="num">3742×3193</td><td class="num">(6, 30)</td><td class="num">(6, 70)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Self-portrait</td><td class="num">3810×3251</td><td class="num">(29, 78)</td><td class="num">(37, 175)</td><td>pyramid</td><td class="num">0.8</td></tr>
+          <tr><td>Lilacs (Siren)</td><td class="num">3817×3250</td><td class="num">(-6, 49)</td><td class="num">(-24, 96)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Three generations</td><td class="num">3714×3209</td><td class="num">(12, 54)</td><td class="num">(9, 111)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Wharf</td><td class="num">3761×3244</td><td class="num">(-7, 15)</td><td class="num">(-16, 83)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Man on a camel</td><td class="num">3752×3212</td><td class="num">(31, 45)</td><td class="num">(41, 104)</td><td>pyramid</td><td class="num">0.8</td></tr>
+          <tr><td>Lugano</td><td class="num">3778×3244</td><td class="num">(13, 37)</td><td class="num">(38, 86)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          <tr><td>Kivach falls</td><td class="num">3770×3249</td><td class="num">(17, 17)</td><td class="num">(31, 88)</td><td>pyramid</td><td class="num">0.7</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!--/SNIPPET:final-table-->
+
     </section>
   </main>
 

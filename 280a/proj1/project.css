@@ -456,3 +456,15 @@
   aspect-ratio: auto;
   object-fit: contain;
 }
+
+/* Step 1 opener: the tall scan next to two square results. */
+.pair.pair-plate {
+  grid-template-columns: minmax(0, 0.45fr) 1fr 1fr;
+  align-items: end;
+}
+
+.pair.pair-plate .shot.natural img {
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: none;
+}
