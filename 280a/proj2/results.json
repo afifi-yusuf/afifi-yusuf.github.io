@@ -220,6 +220,30 @@
    "cutoff_high_cycles_per_px": 0.01171191407057985,
    "chroma_energy_kept_by_low_pass": 0.9514497155734024,
    "chroma_energy_kept_by_high_pass": 0.051463691398843416
+  },
+  "tiger-cat": {
+   "shape": [
+    986,
+    960
+   ],
+   "sigma_low": 7.0,
+   "sigma_high": 9.0,
+   "cutoff_low_cycles_per_px": 0.026770089304182513,
+   "cutoff_high_cycles_per_px": 0.02082118056991973,
+   "chroma_energy_kept_by_low_pass": 0.9198099871933146,
+   "chroma_energy_kept_by_high_pass": 0.0383787455050561
+  },
+  "tiger-bicycle": {
+   "shape": [
+    986,
+    960
+   ],
+   "sigma_low": 7.0,
+   "sigma_high": 9.0,
+   "cutoff_low_cycles_per_px": 0.026770089304182513,
+   "cutoff_high_cycles_per_px": 0.02082118056991973,
+   "chroma_energy_kept_by_low_pass": 0.9198099871933146,
+   "chroma_energy_kept_by_high_pass": 0.08725347799973665
   }
  },
  "blend": {
@@ -238,5 +262,23 @@
   "apple_stack_sums_to_image": 1.1102230246251565e-16,
   "orange_stack_sums_to_image": 2.7755575615628914e-17,
   "rgb_blend_luma_vs_gray_blend": 9.029665903881323e-12
+ },
+ "custom": {
+  "earth-mars": {
+   "shape": [
+    800,
+    800
+   ],
+   "levels": 6,
+   "sigma0": 2.0
+  },
+  "tiger-face": {
+   "shape": [
+    1000,
+    1200
+   ],
+   "levels": 6,
+   "sigma0": 2.0
+  }
  }
 }

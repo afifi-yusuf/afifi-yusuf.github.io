@@ -28,8 +28,10 @@
       <a href="#orientation"><b>360°</b> Orientation</a>
       <a href="#sharpen"><b>α</b> Sharpen</a>
       <a href="#hybrid"><b>9→14</b> Hybrid</a>
+      <a href="#hybrid-own"><b>1→⅛</b> More</a>
       <a href="#stacks"><b>1→16</b> Stacks</a>
       <a href="#blend"><b>0→5</b> Blend</a>
+      <a href="#blend-own"><b>4→8</b> Mine</a>
     </nav>
   </header>
 
@@ -367,8 +369,8 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
         <figure><img src="images/hybrid/derek-nutmeg-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid at full size: a cat" width="732" height="1024"><figcaption><b>1/1</b>Up close: the cat</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/derek-nutmeg-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="183" height="256"><figcaption><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/derek-nutmeg-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size: Derek" width="91" height="128"><figcaption><b>1/8</b>Derek</figcaption></figure>
+        <figure style="width:25%"><img src="images/hybrid/derek-nutmeg-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="183" height="256"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
+        <figure style="width:12.5%"><img src="images/hybrid/derek-nutmeg-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size: Derek" width="91" height="128"><figcaption style="white-space:nowrap"><b>1/8</b>Derek</figcaption></figure>
       </div>
     </section>
 
@@ -386,16 +388,48 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure><img src="images/hybrid/derek-nutmeg-hybrid-color-high.jpg" loading="lazy" decoding="async" alt="Colour in the high. Cat in colour, Derek in gray" width="732" height="1024"><figcaption><b>Colour in the high</b>Cat in colour, Derek in gray</figcaption></figure>
         <figure><img src="images/hybrid/derek-nutmeg-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Colour in both" width="732" height="1024"><figcaption><b>Colour in both</b></figcaption></figure>
       </div>
+    </section>
+
+    <section class="part" id="hybrid-own">
+      <header class="part-head">
+        <p class="param"><span>1</span><i aria-hidden="true">→</i><span>1/8</span><small>viewing size</small></p>
+        <h2>Part 2.2 · More hybrids</h2>
+      </header>
       <div class="prose">
-        <p><b>My own: one face from two distances.</b> These are the two selfies from Project 0, one taken at arm's length with the wide lens and one from a few metres away, zoomed in. They are the same face at the same size, but the perspective differs: close up the nose is large, the face narrow and the ears hidden; from far away the face is broader and the ears show. Aligned on the eyes, the hybrid shows the close face up close and the far face from far away, so moving away from the screen does what moving the camera did.</p>
-        <p>It works on the face and fails around it. Only the eyes are aligned, so anything far from them disagrees: the collar of the jersey appears twice, and the two backgrounds are different places, so the far one shows through as coloured fog. A change of expression from a fixed camera would not have this problem.</p>
+        <p><b>Tiger and cat.</b> A tiger and a house cat have the same face plan: two forward eyes, a triangle of nose and mouth, round cheeks, ears on top. That makes them a good pair, because once the eyes are aligned everything else nearly is. The tiger goes in the low frequencies and the cat in the high ones. I tried it the other way round first and it does not work: a tiger's stripes are broad, so they are low-frequency content themselves, and a high-pass filter that keeps them also keeps enough of the tiger to be seen from any distance. With the tiger low (σ = 7) and the cat high (σ = 9), up close it is a hissing tabby with oddly orange fur, and at one eighth size it is a tiger. The cat's ears are the one thing that survives at a distance: they stick out past the tiger's outline, and an outline against a dark background is a strong edge at every scale.</p>
       </div>
-      <div class="row" style="--n:3">
+      <div class="row" style="--n:4">
+        <figure><img src="images/hybrid/tiger-cat-low-input.jpg" loading="lazy" decoding="async" alt="Tiger. Low-frequency picture" width="960" height="986"><figcaption><b>Tiger</b>Low-frequency picture</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-cat-high-input.jpg" loading="lazy" decoding="async" alt="Cat. High-frequency picture" width="1920" height="1280"><figcaption><b>Cat</b>High-frequency picture</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-cat-high-aligned.jpg" loading="lazy" decoding="async" alt="Cat, aligned. Eyes carried onto the tiger&#x27;s" width="960" height="986"><figcaption><b>Cat, aligned</b>Eyes carried onto the tiger's</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-cat-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid. σ = 7 and 9" width="960" height="986"><figcaption><b>Hybrid</b>σ = 7 and 9</figcaption></figure>
+      </div>
+      <div class="row narrow" style="--n:3; align-items:end">
+        <figure><img src="images/hybrid/tiger-cat-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid at full size" width="960" height="986"><figcaption><b>1/1</b>Up close: a cat</figcaption></figure>
+        <figure style="width:25%"><img src="images/hybrid/tiger-cat-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="240" height="246"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
+        <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A tiger</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>One face from two distances.</b> These are my two selfies from Project 0, one taken at arm's length with the wide lens and one from a few metres away, zoomed in. They are the same face at the same size, but the perspective differs: close up the nose is large, the face narrow and the ears hidden; from far away the face is broader and the ears show. Aligned on the eyes, the hybrid shows the close face up close and the far face from far away, so stepping back from the screen does what stepping back with the camera did. The face works. Around it the two photos disagree, because only the eyes are aligned: the collar of the jersey shows twice, and the far photo's background comes through as coloured fog.</p>
+      </div>
+      <div class="row narrow" style="--n:3">
         <figure><img src="images/hybrid/selfie-perspective-low-input.jpg" loading="lazy" decoding="async" alt="Far, zoomed. Low-frequency picture" width="1200" height="1600"><figcaption><b>Far, zoomed</b>Low-frequency picture</figcaption></figure>
         <figure><img src="images/hybrid/selfie-perspective-high-input.jpg" loading="lazy" decoding="async" alt="Close, wide. High-frequency picture" width="1200" height="1600"><figcaption><b>Close, wide</b>High-frequency picture</figcaption></figure>
         <figure><img src="images/hybrid/selfie-perspective-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid. σ = 12 and 16" width="1200" height="1600"><figcaption><b>Hybrid</b>σ = 12 and 16</figcaption></figure>
       </div>
-      <p class="note">Still to come: two more hybrids of my own, one of them chosen to fail.</p>
+      <div class="prose">
+        <p><b>A failure: tiger and bicycle.</b> I chose this pair to fail, to see what alignment and shape are doing in the ones that work. There is nothing to align, so I placed the bicycle to fill the frame, and used the same filters as for the cat. It fails in both directions. Up close the tiger does not hide: the bicycle is thin lines with nothing between them, so most of the picture has no high-frequency content to cover the blurred tiger, and the stripes read straight through the frame. From far away the bicycle does not go: its wheels are large, dark, high-contrast rings, and a high-pass filter keeps the edges of a large shape as well as it keeps fine texture, so at quarter size the wheels are still there, across the tiger's face. In the hybrids that work, the two pictures put their edges in the same places, so each one's edges are explained by the other. Here the eye sees two pictures at every distance. The vertical streaks at the top and bottom are the bicycle photo's border pixels repeated, since the photo is wider than it is tall and does not cover the square frame.</p>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/hybrid/tiger-bicycle-high-input.jpg" loading="lazy" decoding="async" alt="Bicycle. High-frequency picture" width="1920" height="1280"><figcaption><b>Bicycle</b>High-frequency picture</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-bicycle-overlay.jpg" loading="lazy" decoding="async" alt="Overlay. No shared structure to align" width="960" height="986"><figcaption><b>Overlay</b>No shared structure to align</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-bicycle-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid. Both visible up close" width="960" height="986"><figcaption><b>Hybrid</b>Both visible up close</figcaption></figure>
+      </div>
+      <div class="row narrow" style="--n:3; align-items:end">
+        <figure><img src="images/hybrid/tiger-bicycle-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid at full size" width="960" height="986"><figcaption><b>1/1</b>Up close: both</figcaption></figure>
+        <figure style="width:25%"><img src="images/hybrid/tiger-bicycle-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="240" height="246"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
+        <figure style="width:12.5%"><img src="images/hybrid/tiger-bicycle-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>Still both</figcaption></figure>
+      </div>
     </section>
 
     <section class="part" id="stacks">
@@ -496,6 +530,61 @@ def laplacian_stack(im, levels, sigma0=1.0):
       </div>
     </section>
 
+    <section class="part" id="blend-own">
+      <header class="part-head">
+        <p class="param"><span>4</span><i aria-hidden="true">→</i><span>8</span><small>levels</small></p>
+        <h2>Part 2.4 · My own blends</h2>
+      </header>
+      <div class="prose">
+        <p><b>Irregular mask: a cat with a tiger's face.</b> The same two pictures as the hybrid, used differently. The tiger is aligned to the cat by the eyes, and the mask is an ellipse over the cat's face, wide enough to take in the tiger's white cheeks, because pale fur next to the cat's pale fur is an easier join than orange next to gray. With the mask used as it is, the result is a sticker. With the blend, the fine bands change over within a few pixels, so whiskers and hairs stay sharp and nothing is doubled, while the coarse bands change over across the whole cheek, so the orange drains into the tabby's beige with no edge to find. The images are 1200 × 1000, so the stack starts at σ = 2 (σ = 2, 4, 8, 16, 32) to cover the same fraction of the picture as the oraple's.</p>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/blend/tiger-face-a.jpg" loading="lazy" decoding="async" alt="Tiger, aligned. Eyes carried onto the cat&#x27;s" width="1200" height="1000"><figcaption><b>Tiger, aligned</b>Eyes carried onto the cat's</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-b.jpg" loading="lazy" decoding="async" alt="Cat" width="1200" height="1000"><figcaption><b>Cat</b></figcaption></figure>
+        <figure><img src="images/blend/tiger-face-mask.png" loading="lazy" decoding="async" alt="Mask. An ellipse over the face" width="1200" height="1000"><figcaption><b>Mask</b>An ellipse over the face</figcaption></figure>
+      </div>
+      <div class="row narrow" style="--n:2">
+        <figure><img src="images/blend/tiger-face-cut.jpg" loading="lazy" decoding="async" alt="Cut. The mask used as it is" width="1200" height="1000"><figcaption><b>Cut</b>The mask used as it is</figcaption></figure>
+        <figure><img src="images/blend/tiger-face.jpg" loading="lazy" decoding="async" alt="Multiresolution. Six bands, each with its own mask width" width="1200" height="1000"><figcaption><b>Multiresolution</b>Six bands, each with its own mask width</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all six bands added up. In band 0 the ellipse has a hard edge and both animals contribute only hair. By band 4 the tiger's contribution is a soft orange glow with no outline at all, which is why the join cannot be found in the result.</p>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/tiger-face-fig-0-a.jpg" loading="lazy" decoding="async" alt="Band 0 · finest. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 0 · finest</b>Tiger × mask</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-0-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-0-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/tiger-face-fig-1-a.jpg" loading="lazy" decoding="async" alt="Band 2. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 2</b>Tiger × mask</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-1-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-1-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/tiger-face-fig-2-a.jpg" loading="lazy" decoding="async" alt="Band 4 · coarse. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 4 · coarse</b>Tiger × mask</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-2-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-2-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/tiger-face-fig-3-a.jpg" loading="lazy" decoding="async" alt="Sum of all bands. Tiger × mask" width="1200" height="1000"><figcaption><b>Sum of all bands</b>Tiger × mask</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-3-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/tiger-face-fig-3-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>Straight seam: Earth and Mars.</b> Two planets on black, cropped and scaled so the discs coincide (I find each disc by thresholding, and match the centroids and the equal-area radii). This pair is harder than the apple and the orange, and I include it because of how it fails. The fruits differ mostly in colour. The planets differ in everything: Earth is high-contrast cloud, Mars is nearly smooth, and their colours are opposite. The number of levels now matters. With four, the widest mask is narrow and the colour changes over a short distance, which reads as a soft-edged cut. With eight, the coarsest band is blended across most of the disc, and the colours mix over that whole width: Mars turns pink and Earth's oceans go mauve. Six is the compromise I kept. The general point is that the blend hides a seam between pictures that are already similar at coarse scales. Where they are not, the coarse bands have to change somewhere, and the only choice is over what distance.</p>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/blend/earth-mars-a.jpg" loading="lazy" decoding="async" alt="Earth. Apollo 17" width="800" height="800"><figcaption><b>Earth</b>Apollo 17</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-b.jpg" loading="lazy" decoding="async" alt="Mars. Rosetta / OSIRIS" width="800" height="800"><figcaption><b>Mars</b>Rosetta / OSIRIS</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-cut.jpg" loading="lazy" decoding="async" alt="Cut" width="800" height="800"><figcaption><b>Cut</b></figcaption></figure>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/blend/earth-mars-4-levels.jpg" loading="lazy" decoding="async" alt="4 levels. Widest σ = 8" width="800" height="800"><figcaption><b>4 levels</b>Widest σ = 8</figcaption></figure>
+        <figure class="pick"><img src="images/blend/earth-mars.jpg" loading="lazy" decoding="async" alt="6 levels. Widest σ = 32" width="800" height="800"><figcaption><b>6 levels</b>Widest σ = 32</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-8-levels.jpg" loading="lazy" decoding="async" alt="8 levels. Widest σ = 128" width="800" height="800"><figcaption><b>8 levels</b>Widest σ = 128</figcaption></figure>
+      </div>
+    </section>
+
     <section class="part" id="blend-color">
       <header class="part-head">
         <p class="param"><span>1</span><i aria-hidden="true">→</i><span>4</span><small>× mask width</small></p>
@@ -513,7 +602,18 @@ def laplacian_stack(im, levels, sigma0=1.0):
       <div class="prose">
         <p>In gray the oraple is already convincing, which says that most of what sells the blend is brightness and texture. Colour is what gives the two fruits away, so it is what needs the gentlest transition. With the chroma mask four times wider, red runs into orange a little more gradually across the middle. With it narrower, the colour changes a little faster than the shading does. Side by side the three are hard to tell apart, because most of the colour difference is in the coarsest band and that band is blended widely in every version. I keep the same width for both as the default, and would widen the chroma for pairs whose colours differ more than their brightness.</p>
       </div>
-      <p class="note">Still to come: two blends of my own, one with an irregular mask, and its Laplacian stacks laid out like figure 10 of the paper.</p>
+      <div class="prose">
+        <p><b>On a pair whose colours really differ.</b> The oraple is a weak test of this, since an apple and an orange are close in colour to begin with. Earth and Mars are not, so I ran the same experiment on them, with one addition.</p>
+      </div>
+      <div class="row" style="--n:4">
+        <figure><img src="images/blend/earth-mars-gray.jpg" loading="lazy" decoding="async" alt="Gray. No colour at all" width="800" height="800"><figcaption><b>Gray</b>No colour at all</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-chroma-wide.jpg" loading="lazy" decoding="async" alt="Chroma wider. Colour changes over 4× the distance" width="800" height="800"><figcaption><b>Chroma wider</b>Colour changes over 4× the distance</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-chroma-narrow.jpg" loading="lazy" decoding="async" alt="Chroma narrower. Brightness changes over 4× the distance" width="800" height="800"><figcaption><b>Chroma narrower</b>Brightness changes over 4× the distance</figcaption></figure>
+        <figure><img src="images/blend/earth-mars-earth-chroma.jpg" loading="lazy" decoding="async" alt="Earth&#x27;s colour throughout. Brightness blended, colour from Earth only" width="800" height="800"><figcaption><b>Earth's colour throughout</b>Brightness blended, colour from Earth only</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p>In gray the join is still easy to find, which I did not expect: it is cloud texture against smooth ground, so here colour is not the only thing giving the seam away. Widening the chroma mask spreads a pink haze onto Earth's limb and pales Mars near the middle; narrowing it keeps both planets' colours clean up to a crisper colour boundary. For this pair I prefer the narrower chroma, the opposite of what I would have guessed from the oraple: when the two colours are this far apart, every mixture of them is a colour that belongs to neither planet, so a short transition with less of that mixture looks better than a long one. The last picture answers the question from the other side. It keeps the blended brightness and takes all of its colour from Earth, and it reads as a single planet, a pale blue world with Martian terrain on one side. So colour is what says "two objects" here, and the way to use colour to enhance a blend is to make the colours agree (as they nearly do for the apple and the orange), not to find a cleverer way to mix colours that disagree.</p>
+      </div>
     </section>
 
     <section class="part" id="libraries">
@@ -529,7 +629,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images; the rest are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Bicycle: 齐健, CC BY 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All five from Wikimedia Commons. The rest are mine.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj2</p>
   </footer>
 
