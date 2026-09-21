@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.14,
-     "two": 0.5,
-     "scipy": 0.02666
+     "four": 4.055,
+     "two": 0.509,
+     "scipy": 0.02677
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -18,9 +18,9 @@
    },
    "dx": {
     "seconds": {
-     "four": 0.137,
-     "two": 0.461,
-     "scipy": 0.00236
+     "four": 0.136,
+     "two": 0.457,
+     "scipy": 0.00221
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.149,
-     "two": 0.469,
-     "scipy": 0.00311
+     "four": 0.148,
+     "two": 0.453,
+     "scipy": 0.00304
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -298,6 +298,22 @@
   "rgb_blend_luma_vs_gray_blend": 9.029665903881323e-12
  },
  "custom": {
+  "half-smile": {
+   "shape": [
+    900,
+    681
+   ],
+   "levels": 6,
+   "sigma0": 2.0
+  },
+  "half-glasses": {
+   "shape": [
+    900,
+    681
+   ],
+   "levels": 6,
+   "sigma0": 2.0
+  },
   "earth-mars": {
    "shape": [
     800,
