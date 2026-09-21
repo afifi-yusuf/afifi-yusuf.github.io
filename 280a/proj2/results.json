@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.38,
-     "two": 0.508,
-     "scipy": 0.02795
+     "four": 4.14,
+     "two": 0.5,
+     "scipy": 0.02666
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -18,8 +18,8 @@
    },
    "dx": {
     "seconds": {
-     "four": 0.145,
-     "two": 0.477,
+     "four": 0.137,
+     "two": 0.461,
      "scipy": 0.00236
     },
     "max_abs_diff": {
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.158,
-     "two": 0.468,
-     "scipy": 0.00316
+     "four": 0.149,
+     "two": 0.469,
+     "scipy": 0.00311
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -230,6 +230,18 @@
    "cutoff_high_cycles_per_px": 0.013385044652091256,
    "chroma_energy_kept_by_low_pass": 0.9280561600206975,
    "chroma_energy_kept_by_high_pass": 0.04346331041041898
+  },
+  "shades": {
+   "shape": [
+    900,
+    681
+   ],
+   "sigma_low": 6.0,
+   "sigma_high": 8.0,
+   "cutoff_low_cycles_per_px": 0.031231770854879597,
+   "cutoff_high_cycles_per_px": 0.0234238281411597,
+   "chroma_energy_kept_by_low_pass": 0.9610529989166993,
+   "chroma_energy_kept_by_high_pass": 0.007288530657909444
   },
   "tiger-cat": {
    "shape": [
