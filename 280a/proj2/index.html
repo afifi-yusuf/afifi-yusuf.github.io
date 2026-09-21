@@ -32,7 +32,7 @@
       <a href="#stacks"><b>1→16</b> Stacks</a>
       <a href="#blend"><b>0→5</b> Blend</a>
       <a href="#blend-own"><b>4→8</b> Mine</a>
-      <a href="#learned"><b>∗→×</b> Learned</a>
+      <a href="#learned"><b>FFT</b> Learned</a>
     </nav>
   </header>
 
@@ -427,20 +427,12 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure><img src="images/hybrid/shades-overlay.jpg" loading="lazy" decoding="async" alt="Overlay, registered. Hair, nose, mouth and jaw coincide" width="681" height="900"><figcaption><b>Overlay, registered</b>Hair, nose, mouth and jaw coincide</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Glasses low, face high</b> (σ = 6 and 8). From across the room I am wearing the glasses; up close my eyes show through them. It only half works. Low frequencies never go away up close, they are only covered: blurred Derek passes for the cat's shading, but a gold band passes for nothing on a bare face, so up close I see tinted glasses, not a face without glasses.</p>
+        <p><b>Glasses low, face high</b> (σ = 6 and 8). From close up we can see my eyes, and the glasses appear distorted, a tinted smear across the face. From far away it looks like I am actually wearing the glasses. The gold shield is one large, nearly uniform region, so it is low-frequency, and so is its colour, while eyes, brows and lashes are fine detail. The same two photos are blended in part 2.4.</p>
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
         <figure><img src="images/hybrid/shades-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="1/1. Up close: eyes, through a tint" width="681" height="900"><figcaption><b>1/1</b>Up close: eyes, through a tint</figcaption></figure>
         <figure style="width:25%"><img src="images/hybrid/shades-far-4.jpg" loading="lazy" decoding="async" alt="1/4. " width="170" height="225"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
         <figure style="width:12.5%"><img src="images/hybrid/shades-far-8.jpg" loading="lazy" decoding="async" alt="1/8. Shades" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Shades</figcaption></figure>
-      </div>
-      <div class="prose">
-        <p><b>Face low, glasses high.</b> My favourite picture, and a failed hybrid. The gold disappears, because colour is low-frequency, and the shield becomes clear glass with the room reflected in it. But the rim is a long hard edge, present at every scale, so it is the same picture at every distance. The same photos make a much better blend, in part 2.4.</p>
-      </div>
-      <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/shades-reversed.jpg" loading="lazy" decoding="async" alt="1/1. Clear glass, reflections kept" width="681" height="900"><figcaption><b>1/1</b>Clear glass, reflections kept</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/shades-reversed-far-4.jpg" loading="lazy" decoding="async" alt="1/4. " width="170" height="225"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/shades-reversed-far-8.jpg" loading="lazy" decoding="async" alt="1/8. Still glasses" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Still glasses</figcaption></figure>
       </div>
     </section>
 
@@ -645,7 +637,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
 
     <section class="part" id="learned">
       <header class="part-head">
-        <p class="param" aria-label="convolution in space is multiplication in frequency"><span>∗</span><i aria-hidden="true">→</i><span>×</span><small>space to frequency</small></p>
+        <p class="param" aria-label="convolution in space is multiplication in frequency"><span>conv</span><i aria-hidden="true">→</i><span>mult</span><small>space to frequency</small></p>
         <h2>The most important thing I learned</h2>
       </header>
       <div class="prose">

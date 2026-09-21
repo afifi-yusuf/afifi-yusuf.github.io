@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.19,
-     "two": 0.529,
-     "scipy": 0.02638
+     "four": 4.012,
+     "two": 0.492,
+     "scipy": 0.02612
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -18,9 +18,9 @@
    },
    "dx": {
     "seconds": {
-     "four": 0.139,
-     "two": 0.478,
-     "scipy": 0.00222
+     "four": 0.135,
+     "two": 0.45,
+     "scipy": 0.00207
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.152,
-     "two": 0.468,
-     "scipy": 0.00281
+     "four": 0.147,
+     "two": 0.451,
+     "scipy": 0.00276
     },
     "max_abs_diff": {
      "four": 0.0,
