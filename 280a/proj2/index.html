@@ -32,7 +32,7 @@
       <a href="#stacks"><b>1→16</b> Stacks</a>
       <a href="#blend"><b>0→5</b> Blend</a>
       <a href="#blend-own"><b>4→8</b> Mine</a>
-      <a href="#learned"><b>1→6</b> Learned</a>
+      <a href="#learned"><b>∗→×</b> Learned</a>
     </nav>
   </header>
 
@@ -70,8 +70,7 @@
         <h2>Part 1.1 · Convolution from scratch</h2>
       </header>
       <div class="prose">
-        <p><b>What a convolution is.</b> Every output pixel is a weighted sum of the input pixels around it, and the weights are the filter, flipped in both directions. The flip is what separates convolution from cross-correlation. It makes no difference for a symmetric filter like the box, and it changes the sign of the result for D<sub>x</sub> and D<sub>y</sub>.</p>
-        <p><b>Padding.</b> I pad with zeros before sliding the filter. For <code>full</code> I add <var>k</var>−1 rows and columns on every side, so every partial overlap of the filter and the picture gives an output. For <code>same</code> I add <var>k</var>//2 before and (<var>k</var>−1)//2 after, which is the centre crop of <code>full</code> and gives an output the size of the input. For an odd filter the two amounts are equal. D<sub>x</sub> is 1×2, so its one extra column goes on the left; that is the convention scipy uses, and it is why my results can be compared with scipy's value for value.</p>
+        <p><b>Convolution.</b> A convolution is a sliding weighted sum. A kernel smaller than the image slides over it, and each output pixel is the dot product of the flipped kernel with the window under it. With weights that sum to 1, like the box filter, it is a moving average. Without padding, an <var>n</var>×<var>n</var> image and a <var>k</var>×<var>k</var> filter give an (<var>n</var>−<var>k</var>+1)×(<var>n</var>−<var>k</var>+1) output, so I pad the image with zeros to keep the resolution: <var>k</var>//2 before and (<var>k</var>−1)//2 after for <code>same</code>, <var>k</var>−1 on every side for <code>full</code>.</p>
 <pre class="code">def pad_zero(im, kh, kw, mode):
     if mode == &quot;full&quot;:
         top, bottom, left, right = kh - 1, kh - 1, kw - 1, kw - 1
@@ -81,7 +80,7 @@
     out = np.zeros((H + top + bottom, W + left + right))
     out[top:top + H, left:left + W] = im
     return out</pre>
-        <p><b>Four loops.</b> Two loops over the output pixels, two over the filter taps. This is the definition written out.</p>
+        <p><b>Four loops.</b> Two over the output pixels, two over the kernel taps.</p>
 <pre class="code">def conv2d_four(im, kernel, mode=&quot;same&quot;):
     kh, kw = kernel.shape
     k = kernel[::-1, ::-1]                      # convolution flips the filter
@@ -96,7 +95,7 @@
                     acc += k[u, v] * p[i + u, j + v]
             out[i, j] = acc
     return out</pre>
-        <p><b>Two loops.</b> The two inner loops become one array operation: multiply the filter by the window under it and sum.</p>
+        <p><b>Two loops.</b> The inner two loops become one NumPy operation: kernel times window, summed.</p>
 <pre class="code">    for i in range(H):
         for j in range(W):
             out[i, j] = np.sum(k * p[i:i + kh, j:j + kw])</pre>
@@ -112,9 +111,9 @@
         </table>
       </div>
       <div class="prose">
-        <p><b>Against scipy.</b> All three give the same numbers as <code>scipy.signal.convolve2d</code> with zero fill, to rounding error. The box filter cannot show whether I flip the filter, because it is symmetric, so I also ran a 3×4 filter holding the numbers 0 to 11 on a small crop, in both modes. The shapes match scipy's (40×50 for <code>same</code>, 42×53 for <code>full</code>) and the largest difference is 1e-14. Leaving the flip out on purpose gives a difference of 17.5.</p>
-        <p><b>Runtime.</b> For the 81-tap box the two-loop version is about 8 times faster than four loops, because 81 multiplications happen inside one NumPy call. For the two-tap derivative filters it is slower than four loops: a NumPy call has a fixed cost, and that cost is larger than two multiplications. scipy is 20 to 200 times faster than either, since none of its loops run in Python.</p>
-        <p><b>Boundaries.</b> Zero padding means the filter averages in black near the border. After the box filter the top row of my picture has a mean of 0.19, against 0.34 five rows further in: a dark frame four pixels wide, visible on the blurred picture below. scipy with <code>boundary="fill"</code> does the same. For the derivative filters the frame of the picture becomes an edge of its own, which is why I switch to a mirrored border in the next section.</p>
+        <p><b>Against scipy.</b> Same numbers as <code>scipy.signal.convolve2d</code> to rounding error, in both modes. The box is symmetric and cannot show a missing flip, so I also tested a 3×4 kernel holding 0 to 11: the difference is 1e-14 with the flip and 17.5 without.</p>
+        <p><b>Runtime.</b> Two loops is 8 times faster than four for the 81-tap box, and slower for the 2-tap derivative filters, where the fixed cost of a NumPy call is more than two multiplications. scipy is 20 to 200 times faster than both.</p>
+        <p><b>Boundaries.</b> Zero padding darkens the border. After the box filter the top row averages 0.19 against 0.34 five rows in: a dark frame 4 pixels wide. scipy with zero fill does the same. For derivatives the frame becomes an edge of its own, so from part 1.2 on I mirror the border.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/conv/selfie-gray.jpg" decoding="async" alt="Input. Me, read as grayscale" width="600" height="800"><figcaption><b>Input</b>Me, read as grayscale</figcaption></figure>
@@ -122,7 +121,7 @@
         <figure><img src="images/conv/dx.jpg" loading="lazy" decoding="async" alt="D&lt;sub&gt;x&lt;/sub&gt; = [1 −1]. Responds to vertical edges" width="600" height="800"><figcaption><b>D<sub>x</sub> = [1 −1]</b>Responds to vertical edges</figcaption></figure>
         <figure><img src="images/conv/dy.jpg" loading="lazy" decoding="async" alt="D&lt;sub&gt;y&lt;/sub&gt; = [1 −1]ᵀ. Responds to horizontal edges" width="600" height="800"><figcaption><b>D<sub>y</sub> = [1 −1]ᵀ</b>Responds to horizontal edges</figcaption></figure>
       </div>
-      <p class="note">The derivative pictures are drawn as 0.5 + 2 × value, so gray is zero, white is brightness increasing to the right (or downward), black is decreasing. D<sub>x</sub> finds the pole, the sides of the glasses and the edges of the collar. D<sub>y</sub> finds the top of the glasses, the brow and the moustache.</p>
+      <p class="note">Derivatives are drawn as 0.5 + 2 × value, so gray is zero. D<sub>x</sub> responds to vertical edges (the pole, the sides of the glasses), D<sub>y</sub> to horizontal ones (the brow, the moustache).</p>
     </section>
 
     <section class="part" id="fd">
@@ -131,12 +130,11 @@
         <h2>Part 1.2 · Finite difference operator</h2>
       </header>
       <div class="prose">
-        <p><b>Partial derivatives.</b> I convolve the cameraman with D<sub>x</sub> = [1 −1] and D<sub>y</sub> = [1 −1]ᵀ using <code>scipy.signal.convolve2d</code>. Each output pixel is the difference between a pixel and its neighbour: how fast the brightness changes across, and down.</p>
-        <p><b>Gradient magnitude.</b> The two derivatives are the two components of the gradient vector at each pixel. Its length, √(g<sub>x</sub>² + g<sub>y</sub>²), says how strong the change is whatever its direction. An edge is where that length is large.</p>
+        <p><b>Partial derivatives.</b> Partial derivatives come from the high-pass kernels D<sub>x</sub> = [1 −1] and its transpose D<sub>y</sub>: each output is the difference between a pixel and its neighbour. The gradient magnitude is √(g<sub>x</sub>² + g<sub>y</sub>²), the strength of the change in any direction, and an edge is where it is large.</p>
 <pre class="code">gx, gy = conv(im, DX), conv(im, DY)
 mag = np.sqrt(gx * gx + gy * gy)
 edges = mag &gt; threshold</pre>
-        <p><b>Two things about the input.</b> The course PNG has a white margin around the photograph (7 rows on top, 1 below, 1 column on the left, 5 on the right). With it, the strongest edge in every result was a rectangle around the picture, so I crop it off. For the same reason I mirror the image at the border here (<code>boundary="symm"</code>) instead of filling with zeros: the sky is bright, and a jump from sky to zero is a large gradient that has nothing to do with the scene.</p>
+        <p><b>Input.</b> The course PNG has a white margin (7 rows on top, 1 below, 1 column left, 5 right). It came out as the strongest edge in the picture, so I crop it, and I mirror the border instead of zero filling for the same reason.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/edges/cameraman.png" loading="lazy" decoding="async" alt="Input. Cameraman, margin cropped" width="534" height="534"><figcaption><b>Input</b>Cameraman, margin cropped</figcaption></figure>
@@ -152,7 +150,7 @@ edges = mag &gt; threshold</pre>
         <figure><img src="images/edges/fd-edge-30.png" loading="lazy" decoding="async" alt="&amp;gt; 0.30. 1.8% of pixels" width="534" height="534"><figcaption><b>&gt; 0.30</b>1.8% of pixels</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Choosing the threshold.</b> Pixel values run from 0 to 1 and the largest gradient magnitude in the picture is 0.87. At 0.10 and 0.15 the grass is covered in speckle: the grass texture has real pixel-to-pixel differences of that size, and a two-pixel difference cannot tell texture from an edge. At 0.25 and 0.30 the grass is clean, but the buildings on the horizon break up and the far tripod leg starts to go. I chose 0.20. It keeps the man, the camera, the tripod and the skyline, and accepts a little speckle in the grass as the price of keeping the buildings.</p>
+        <p><b>Threshold.</b> I chose 0.20. At 0.10 and 0.15 the grass is speckle: a two-pixel difference cannot tell texture from an edge. At 0.25 and 0.30 the buildings and the far tripod leg break up. 0.20 keeps the man, the camera, the tripod and the skyline, at the cost of a little speckle.</p>
       </div>
     </section>
 
@@ -162,7 +160,7 @@ edges = mag &gt; threshold</pre>
         <h2>Part 1.3 · Derivative of Gaussian filter</h2>
       </header>
       <div class="prose">
-        <p><b>Blur first.</b> The speckle in the last section is noise and fine texture, which live at high frequencies, and a difference of neighbouring pixels amplifies exactly those. So I smooth first. The Gaussian comes from <code>cv2.getGaussianKernel</code>, a 1D kernel, and the outer product with its transpose makes it 2D. I use σ = 2 and a width of 6σ + 1 = 13, three σ on each side.</p>
+        <p><b>Blur first.</b> A Gaussian is a low-pass filter: it averages neighbouring pixels, which blurs. The speckle is high-frequency and a difference of neighbours amplifies it, so I blur before differentiating. The 1D kernel is from <code>cv2.getGaussianKernel</code>, the outer product makes it 2D, σ = 2, width 6σ + 1 = 13.</p>
 <pre class="code">g = cv2.getGaussianKernel(13, 2.0)     # 13 x 1
 G = g @ g.T                            # 13 x 13
 blurred = conv(im, G)
@@ -182,8 +180,8 @@ gx, gy = conv(blurred, DX), conv(blurred, DY)</pre>
         <figure><img src="images/edges/g-edge-12.png" loading="lazy" decoding="async" alt="&amp;gt; 0.12. 0.2% of pixels" width="534" height="534"><figcaption><b>&gt; 0.12</b>0.2% of pixels</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>What is different.</b> The grass speckle is gone at every threshold: the blur averaged it away before the derivative could amplify it. The edges are thick, continuous curves instead of broken one-pixel lines, because a blurred edge is a ramp several pixels wide and the whole ramp has a gradient. The cost is detail. The small parts of the camera merge, and the fine lines on the tripod head are gone. The numbers are smaller too: the largest magnitude drops from 0.87 to 0.16, since the same brightness step is now spread over many pixels, so the threshold has to come down with it. I chose 0.05, which keeps the buildings; at 0.07 they disappear.</p>
-        <p><b>One convolution instead of two.</b> Convolution is associative: (image ∗ G) ∗ D<sub>x</sub> = image ∗ (G ∗ D<sub>x</sub>). So I can convolve the Gaussian with D<sub>x</sub> and D<sub>y</sub> once, and get two derivative of Gaussian filters that blur and differentiate in a single pass.</p>
+        <p><b>What is different.</b> No grass speckle at any threshold. Edges are thick and continuous, because a blurred edge is a ramp several pixels wide. The cost is detail: the small parts of the camera merge. Magnitudes drop from 0.87 to 0.16, since each step is spread over more pixels, so the threshold drops too. 0.05 keeps the buildings; 0.07 loses them.</p>
+        <p><b>One convolution.</b> Convolution is associative, (image ∗ G) ∗ D<sub>x</sub> = image ∗ (G ∗ D<sub>x</sub>), so I convolve G with D<sub>x</sub> and D<sub>y</sub> once and get derivative of Gaussian filters that blur and differentiate in one pass.</p>
 <pre class="code">dog_x = convolve2d(G, DX, mode=&quot;full&quot;)     # 13 x 14
 dog_y = convolve2d(G, DY, mode=&quot;full&quot;)     # 14 x 13
 gx, gy = conv(im, dog_x), conv(im, dog_y)</pre>
@@ -200,7 +198,7 @@ gx, gy = conv(im, dog_x), conv(im, dog_y)</pre>
         <figure><img src="images/edges/dog-edge-05.png" loading="lazy" decoding="async" alt="&amp;gt; 0.05. Same edges as above" width="534" height="534"><figcaption><b>&gt; 0.05</b>Same edges as above</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Same result.</b> Each filter is a smooth bump next to a smooth dip: it takes a weighted average on one side and subtracts a weighted average on the other. The largest difference between the one-pass and the two-pass derivatives, anywhere in the picture, is 1e-15, and at every one of the five thresholds the two edge maps agree on every pixel.</p>
+        <p><b>Same result.</b> Each DoG filter is a bump next to a dip. One pass and two passes differ by at most 1e-15, and the edge maps agree on every pixel at all five thresholds.</p>
       </div>
     </section>
 
@@ -210,8 +208,8 @@ gx, gy = conv(im, dog_x), conv(im, dog_y)</pre>
         <h2>Gradient orientation<small>Bells &amp; whistles · part 1</small></h2>
       </header>
       <div class="prose">
-        <p><b>What is shown.</b> The gradient at a pixel is a vector, and so far I have only used its length. Its direction says which way the brightness increases, and that is perpendicular to the edge. I put the direction in the hue, which is a circle just as angles are, and the length in the value, so flat regions stay dark. Saturation is 1 everywhere.</p>
-        <p><b>The angle, without an angle function.</b> I do not use <code>arctan2</code>, <code>np.angle</code> or any inverse trigonometric function on the image. I compute the angle with CORDIC, the method pocket calculators use: rotate the vector onto the x axis in steps of known size, and add up the steps. First I fold the vector into the right half plane (if g<sub>x</sub> is negative I negate both components and remember to add 180°). Then I rotate the vector towards the x axis in 24 steps. Step <var>i</var> rotates by the angle whose tangent is 2<sup>−i</sup>, clockwise if the vector is above the axis and anticlockwise if it is below. Rotating by such an angle needs only additions and a multiplication by 2<sup>−i</sup>. The steps get smaller each time, so the vector closes in on the axis, and the signed sum of the rotations is the angle I started with. The 24 step angles themselves come from the power series of the arctangent, <var>x</var> − <var>x</var>³/3 + <var>x</var>⁵/5 − …, so nothing in the chain is a library angle function.</p>
+        <p><b>HSV.</b> The gradient direction goes in the hue, which is a cyclic colormap just as angles are cyclic, and the magnitude goes in the value, so flat regions stay dark. Saturation is 1.</p>
+        <p><b>The angle without an angle function.</b> No <code>arctan2</code> or <code>np.angle</code>. I use CORDIC: fold the vector into the right half plane, then rotate it onto the x axis in 24 steps of atan(2<sup>−i</sup>), each one clockwise or anticlockwise, whichever shrinks y. The signed sum of the steps is the angle. The step angles come from the arctangent power series, so no library angle function is used anywhere.</p>
 <pre class="code">CORDIC_ANGLES = [pi / 4] + [atan_series(2.0 ** -i) for i in range(1, 24)]
 
 def orientation(gx, gy):
@@ -225,7 +223,7 @@ def orientation(gx, gy):
         theta += d * a
     theta[left] += pi
     return np.mod(theta, 2 * pi)</pre>
-        <p>As a check only, in the same way part 1.1 uses scipy, I compared the result with <code>np.arctan2</code>: the largest difference over the whole picture is 1.2e-07 radians. The conversion from HSV to RGB is also written by hand (six sectors of the hue circle) and matches Python's <code>colorsys</code> to 1e-16.</p>
+        <p>Checked against <code>np.arctan2</code>: the largest difference is 1.2e-07 radians. HSV to RGB is also written by hand and matches <code>colorsys</code> to 1e-16.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/edges/orient.jpg" loading="lazy" decoding="async" alt="DoG gradient. Hue is direction, brightness is strength" width="534" height="534"><figcaption><b>DoG gradient</b>Hue is direction, brightness is strength</figcaption></figure>
@@ -233,7 +231,7 @@ def orientation(gx, gy):
         <figure><img src="images/edges/orient-wheel.png" loading="lazy" decoding="async" alt="Key. Colour of a gradient pointing from the centre outwards" width="241" height="241"><figcaption><b>Key</b>Colour of a gradient pointing from the centre outwards</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Reading it.</b> I flip y so that angles read the usual way round: red is a gradient pointing right (dark on the left, bright on the right), yellow-green points up, cyan points left, purple points down. The left edge of the coat is cyan, because the bright sky is to its left. The top of the head is green. Each tripod leg is a dark bar on a lighter ground, so it has two edges with opposite gradients and shows as two lines in opposite colours. The second picture explains why strength has to go into the brightness: a direction is defined even where the gradient is nearly zero, and there it is the direction of noise.</p>
+        <p><b>Reading it.</b> Red points right (dark to bright), yellow-green up, cyan left, purple down. The coat's left edge is cyan because the bright sky is to its left. Each tripod leg shows as two lines in opposite colours, one per side. At full brightness (second picture) flat regions show the direction of noise, which is why the magnitude goes in the value.</p>
       </div>
     </section>
 
@@ -243,8 +241,8 @@ def orientation(gx, gy):
         <h2>Part 2.1 · Image sharpening</h2>
       </header>
       <div class="prose">
-        <p><b>How it works.</b> A Gaussian blur is a low-pass filter: it keeps the slow changes in a picture and removes the fast ones. So the picture minus its blur is what the blur removed, the high frequencies: edges and fine texture. A picture looks sharper when those are stronger, so I add them back, scaled by α.</p>
-        <p><b>As one filter.</b> sharpened = image + α (image − image ∗ G). The image itself is image ∗ δ, where δ is the unit impulse (a filter that is 1 in the centre and 0 elsewhere), so everything is a convolution of the image and the three terms combine into one filter: (1 + α) δ − α G. Its weights sum to 1, so flat regions keep their brightness. Its centre is positive and everything around it is slightly negative, which is what pushes a pixel away from the average of its neighbours.</p>
+        <p><b>Unsharp mask.</b> To sharpen an image I blur it and subtract the blur from the original, which leaves the high frequencies: edges and fine texture. Adding them back scaled by α amplifies them, and the image looks sharper.</p>
+        <p><b>One filter.</b> sharpened = image + α (image − image ∗ G) = image ∗ ((1 + α) δ − α G), where δ is the unit impulse. The weights sum to 1, so flat regions keep their brightness.</p>
 <pre class="code">def unsharp_kernel(sigma, alpha):
     g = cv2.getGaussianKernel(2 * ceil(3 * sigma) + 1, sigma)
     k = -alpha * (g @ g.T)
@@ -252,7 +250,7 @@ def orientation(gx, gy):
     return k
 
 sharpened = convolve2d(channel, unsharp_kernel(sigma, alpha), mode=&quot;same&quot;, boundary=&quot;symm&quot;)</pre>
-        <p>The single filter and the three-step recipe give the same picture to 1e-15. Colour pictures are filtered one channel at a time.</p>
+        <p>One filter and three steps agree to 1e-15. Colour images are filtered per channel.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/sharpen/taj.jpg" loading="lazy" decoding="async" alt="Taj Mahal. Input" width="300" height="300"><figcaption><b>Taj Mahal</b>Input</figcaption></figure>
@@ -266,8 +264,8 @@ sharpened = convolve2d(channel, unsharp_kernel(sigma, alpha), mode=&quot;same&qu
         <figure><img src="images/sharpen/taj-sharp-40.jpg" loading="lazy" decoding="async" alt="α = 4. 20% of values clipped" width="300" height="300"><figcaption><b>α = 4</b>20% of values clipped</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Varying the amount.</b> At α = 0.5 and 1 the Taj Mahal's inlay and the brickwork of the path come forward and the picture just looks better focused. At 2 the dome has a dark outline against the sky, and at 4 the outline is a halo and the JPEG blocks in the sky become visible. The halo is the negative ring of the filter showing up on the far side of every strong edge. The caption counts the values pushed outside [0, 1] and clipped, which is detail destroyed, not added.</p>
-        <p><b>My own picture.</b> A department store wall I photographed for Project 0. It has three kinds of detail: the brushed concrete, the lettering, and the palm fronds. It is 1000 pixels tall, so I use σ = 2.</p>
+        <p><b>Varying α.</b> At 0.5 and 1 the Taj Mahal just looks better focused. At 2 the dome gets a dark outline, and at 4 a halo, with the JPEG blocks in the sky showing. The halo is the negative ring of the filter. The captions count the values clipped outside [0, 1]: detail destroyed, not added.</p>
+        <p><b>My own picture.</b> A wall I photographed for Project 0: brushed concrete, lettering, palm fronds. It is 1000 pixels tall, so σ = 2.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/sharpen/facade.jpg" loading="lazy" decoding="async" alt="Wall. Input" width="750" height="1000"><figcaption><b>Wall</b>Input</figcaption></figure>
@@ -282,7 +280,7 @@ sharpened = convolve2d(channel, unsharp_kernel(sigma, alpha), mode=&quot;same&qu
       </div>
 
       <div class="prose">
-        <p><b>A blurry picture.</b> The wall was sharp to begin with. This one is not: it is my zoomed selfie from Project 0, taken at the long end of the phone's digital zoom, so it is soft everywhere. At α = 2 the curls separate, the glasses get their edges back and the stubble shows, and nothing looks overdone, because a soft picture has little high-frequency content to overshoot with. This is the case the filter is for.</p>
+        <p><b>A blurry picture.</b> My zoomed selfie from Project 0, soft from digital zoom. At α = 2 the curls separate and the glasses get their edges back, with no halos, because a soft picture has little high-frequency content to overshoot with.</p>
       </div>
       <div class="row narrow" style="--n:2">
         <figure><img src="images/sharpen/soft.jpg" loading="lazy" decoding="async" alt="Soft. Digital zoom, as shot" width="750" height="1000"><figcaption><b>Soft</b>Digital zoom, as shot</figcaption></figure>
@@ -305,9 +303,8 @@ sharpened = convolve2d(channel, unsharp_kernel(sigma, alpha), mode=&quot;same&qu
           <figcaption>Drag the line: blurred with σ = 2 on the left, the same picture sharpened with α = 4 on the right.</figcaption>
         </figure>
         <div class="prose">
-          <p><b>Evaluation: blur, then sharpen.</b> I took the sharp wall, blurred it with σ = 2, and tried to get it back with the unsharp mask at the same σ. The lettering recovers well: its edges are steep again and from a distance it reads as sharp. The concrete does not recover. In the original every brush stroke in the wall is visible; after the round trip the wall is smooth with a few exaggerated streaks.</p>
-          <p>The numbers agree. I measure high-frequency energy as the RMS of (picture − its blur at σ = 2). The original has 0.047, the blurred one 0.010. Sharpening brings it back to 0.020 at α = 2, 0.029 at α = 4 and 0.045 at α = 8, about the original amount. But the RMS error against the original only goes from 0.047 to 0.040 at best (α = 2), and at α = 8 it is 0.061, worse than doing nothing. The energy is back; it is not the same detail.</p>
-          <p>That is the point of the quotation marks around "sharpening". The blur multiplied the finest frequencies by nearly zero. The unsharp mask multiplies each frequency by at most 1 + α, and that times nearly zero is still nearly zero. It can make surviving edges steeper. It cannot bring back what was removed; it has no information about it.</p>
+          <p><b>Evaluation: blur, then sharpen.</b> I blurred the sharp wall with σ = 2 and sharpened it back at the same σ. The lettering recovers: its edges are steep again. The concrete does not: the brush strokes are gone and stay gone.</p>
+          <p>High-frequency energy (RMS of picture − its blur) is 0.047 in the original, 0.010 blurred, and back to 0.045 at α = 8. But the RMS error against the original only improves from 0.047 to 0.040 (at α = 2), and at α = 8 it is 0.061, worse than doing nothing. The blur multiplied the finest frequencies by nearly zero. The unsharp mask multiplies by at most 1 + α, and that times nearly zero is still nearly zero. It steepens surviving edges. It cannot bring back what was removed.</p>
         </div>
       </div>
       <div class="row" style="--n:3">
@@ -323,11 +320,11 @@ sharpened = convolve2d(channel, unsharp_kernel(sigma, alpha), mode=&quot;same&qu
         <h2>Part 2.2 · Hybrid images</h2>
       </header>
       <div class="prose">
-        <p><b>The idea.</b> Up close the eye resolves fine detail, and fine detail dominates what we see. From far away the fine detail falls below what the eye can resolve and only the coarse structure is left. A hybrid image puts the fine detail of one picture on top of the coarse structure of another, so the picture changes with viewing distance.</p>
-        <p><b>Alignment.</b> The two pictures have to agree where it matters, or the eye groups them as two overlapping things instead of one. The starter code asks for two clicked points per picture. I store the points in a file instead (the eyes, in pixel coordinates), so a run is repeatable, and compute the similarity transform (rotation, scale and shift) that carries the cat's eyes onto Derek's. The cat is resampled onto Derek's canvas, with the border pixels repeated where the cat's photo runs out.</p>
+        <p><b>The idea.</b> A hybrid image adds the high-pass of one image to the low-pass of another. Up close the fine detail dominates. From far away it cannot be resolved and only the low frequencies are left, so the picture changes with distance.</p>
+        <p><b>Alignment.</b> The two pictures must agree where it matters, or the eye sees two overlapping things. Instead of clicking two points per picture I store them in a file (the eyes) and compute the similarity transform that carries the cat's eyes onto Derek's.</p>
 <pre class="code">t = SimilarityTransform.from_estimate(cat_eyes, derek_eyes)
 cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge&quot;, order=3)</pre>
-        <p><b>The filters.</b> Low-pass is a Gaussian. High-pass is the impulse minus a Gaussian, which is the picture minus its blur. The hybrid is the sum.</p>
+        <p><b>The filters.</b> Low-pass is a Gaussian. High-pass is the impulse minus a Gaussian: the picture minus its blur.</p>
 <pre class="code">def hybrid(low_im, high_im, s_low, s_high):
     low = blur(low_im, s_low)
     high = high_im - blur(high_im, s_high)      # impulse minus Gaussian
@@ -345,7 +342,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure><img src="images/hybrid/derek-nutmeg-hybrid-gray.jpg" loading="lazy" decoding="async" alt="Hybrid. The sum" width="732" height="1024"><figcaption><b>Hybrid</b>The sum</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Choosing the cutoffs.</b> A Gaussian of width σ passes half the amplitude at <var>f</var> = √(ln 2 / 2) / (πσ) cycles per pixel. I tried three widths for each filter; the grid below has the low-pass σ going down and the high-pass σ going across. With a narrow low-pass (σ = 4, top row) Derek keeps his eyes and teeth, and up close they compete with the cat's: the picture is a man in cat make-up at every distance. With a wide one (σ = 16, bottom row) he is a blob with no face to find from far away. With a narrow high-pass (σ = 6, left column) the cat is only whiskers and outlines, too faint to win up close. With a wide one (σ = 24, right column) the cat keeps its light and dark patches and is still visible from far away. I chose the middle: σ = 9 for Derek, a cutoff of 0.021 cycles per pixel or a period of 48 pixels, and σ = 14 for the cat (0.013 cycles per pixel, a period of 75 pixels). The two bands overlap a little, which I prefer to a gap: with a gap there is a middle distance at which neither picture reads.</p>
+        <p><b>Choosing the cutoffs.</b> A Gaussian of width σ passes half the amplitude at <var>f</var> = √(ln 2 / 2) / (πσ) cycles per pixel. In the grid the low-pass σ goes down and the high-pass σ goes across. Low-pass too narrow (σ = 4): Derek keeps his eyes and teeth and competes with the cat up close. Too wide (16): he is a blob from far away. High-pass too narrow (6): the cat is only whiskers. Too wide (24): the cat is still visible from far away. I chose σ = 9 for Derek (0.021 cycles per pixel) and σ = 14 for the cat (0.013). The bands overlap slightly, which is better than a gap where neither picture reads.</p>
       </div>
       <div class="row keep narrow" style="--n:3">
         <figure><img src="images/hybrid/derek-nutmeg-sweep-4-6.jpg" loading="lazy" decoding="async" alt="σ 4 / 6" width="366" height="512"><figcaption><b>σ 4 / 6</b></figcaption></figure>
@@ -363,7 +360,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure><img src="images/hybrid/derek-nutmeg-sweep-16-24.jpg" loading="lazy" decoding="async" alt="σ 16 / 24" width="366" height="512"><figcaption><b>σ 16 / 24</b></figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>In the frequency domain.</b> Each picture below is log |FFT| of the gray image with zero frequency in the centre. Derek's spectrum is concentrated in the centre and falls off quickly: a smooth face on a plain background. The cat's is broader, from the fur, and its bright diagonal streaks are the tilted edges of the shelf and the wall. The low-pass keeps a small bright disc in the centre, and the high-pass is the opposite: the centre is dimmed and the rest is untouched. The hybrid's spectrum is Derek's disc set into the cat's surround. The thin cross along the axes in every picture, most obvious after the low-pass, is not in the scene. The FFT treats the picture as repeating, the left side does not match the right side nor the top the bottom, and that jump is a sharp edge that no blur inside the picture can remove.</p>
+        <p><b>In the frequency domain.</b> log |FFT|, zero frequency in the centre. Derek's spectrum falls off quickly: a smooth face on a plain background. The cat's is broader, from the fur, with diagonal streaks from the shelf and the wall. The low-pass keeps a small disc in the centre, the high-pass everything but the centre, and the hybrid is one inside the other. The thin cross along the axes is the border of the picture: the FFT treats the picture as repeating, and the jump from one side to the other is an edge that no blur inside the picture removes.</p>
       </div>
       <div class="row keep" style="--n:5">
         <figure><img src="images/hybrid/derek-nutmeg-fft-low-input.jpg" loading="lazy" decoding="async" alt="Derek" width="732" height="1024"><figcaption><b>Derek</b></figcaption></figure>
@@ -385,7 +382,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <h2>Colour in hybrid images<small>Bells &amp; whistles · part 2.2</small></h2>
       </header>
       <div class="prose">
-        <p><b>Where colour helps.</b> Colour belongs in the low frequencies. I split each picture into gray and the rest (the chroma) and measured how much chroma energy each filter lets through: the low-pass keeps 93% of Derek's, the high-pass keeps 4% of the cat's. Colour in a photograph changes slowly, over regions, and a high-pass filter removes regions. The pictures show it: "colour in the high" is almost the gray hybrid, with a faint tint along the cat's edges. "Colour in the low" gives Derek his skin tone, which makes him much easier to find from far away, and up close the skin tone reads as the cat's fur colour, so it does not hurt the near view. Colour in both looks the same as colour in the low alone. I use colour in both: it costs nothing and it is the simpler thing to say.</p>
+        <p><b>Where colour helps.</b> In the low frequencies. Splitting each picture into gray and chroma, the low-pass keeps 93% of Derek's chroma energy and the high-pass keeps 4% of the cat's: colour changes slowly, over regions, and a high-pass removes regions. Colour in the high is almost the gray hybrid. Colour in the low gives Derek his skin tone, which makes him easier to find from far away. Colour in both looks the same as colour in the low, so I use both.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/hybrid/derek-nutmeg-hybrid-gray.jpg" loading="lazy" decoding="async" alt="Gray. Both in gray" width="732" height="1024"><figcaption><b>Gray</b>Both in gray</figcaption></figure>
@@ -401,7 +398,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <h2>Part 2.2 · More hybrids</h2>
       </header>
       <div class="prose">
-        <p><b>Tiger and cat.</b> A tiger and a house cat have the same face plan: two forward eyes, a triangle of nose and mouth, round cheeks, ears on top. That makes them a good pair, because once the eyes are aligned everything else nearly is. The tiger goes in the low frequencies and the cat in the high ones. I tried it the other way round first and it does not work: a tiger's stripes are broad, so they are low-frequency content themselves, and a high-pass filter that keeps them also keeps enough of the tiger to be seen from any distance. With the tiger low (σ = 7) and the cat high (σ = 9), up close it is a hissing tabby with oddly orange fur, and at one eighth size it is a tiger. The cat's ears are the one thing that survives at a distance: they stick out past the tiger's outline, and an outline against a dark background is a strong edge at every scale. This is my favourite of my own hybrids, so its spectra are below. Both animals' spectra are nearly the same in every direction, because fur has no preferred direction; the tiger's has one faint diagonal streak, from the slanted stripes and whiskers. After the low-pass only a small disc in the centre is left. After the high-pass the centre is a dark hole and everything else is kept. The hybrid has the tiger's centre inside the cat's surround.</p>
+        <p><b>Tiger and cat.</b> The same face plan, so once the eyes are aligned everything else nearly is. Tiger low (σ = 7), cat high (σ = 9): a hissing tabby up close, a tiger at one eighth size. The other way round fails, because a tiger's stripes are broad and so are low-frequency themselves. The cat's ears survive at a distance: an outline against a dark background is a strong edge at every scale. This is my favourite, so its spectra are below. Both are nearly the same in every direction, since fur has no preferred direction. The low-pass leaves a small disc, the high-pass a dark hole in the centre.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/hybrid/tiger-cat-low-input.jpg" loading="lazy" decoding="async" alt="Tiger. Low-frequency picture" width="960" height="986"><figcaption><b>Tiger</b>Low-frequency picture</figcaption></figure>
@@ -421,7 +418,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A tiger</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Shades: my own photos.</b> Two photos of me taken a minute apart with the phone propped in one place, one of them in mirrored sports glasses. The starter code aligns on two clicked points, usually the eyes, and here the eyes are behind the lens. So I register the two photos automatically with OpenCV's ECC, which finds the affine warp that maximises the correlation between two gray images. I fit it only on the hair and on the face below the glasses, which are the same in both photos, and leave the band with the glasses out so it cannot pull the fit. It found that I was standing about 8% closer in the second photo, which the first overlay shows and the second has removed.</p>
+        <p><b>Shades: my own photos.</b> Two photos of me from a propped phone, one in mirrored glasses. The eyes are behind the lens, so there are no two points to click. I register the photos with OpenCV's ECC (the affine warp that maximises the correlation of the gray images), fitted only on the hair and the lower face so the glasses cannot pull the fit. It found I was standing 8% closer in the second photo.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/hybrid/shades-low-raw.jpg" loading="lazy" decoding="async" alt="With glasses. As shot" width="900" height="1200"><figcaption><b>With glasses</b>As shot</figcaption></figure>
@@ -430,7 +427,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure><img src="images/hybrid/shades-overlay.jpg" loading="lazy" decoding="async" alt="Overlay, registered. Hair, nose, mouth and jaw coincide" width="681" height="900"><figcaption><b>Overlay, registered</b>Hair, nose, mouth and jaw coincide</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Glasses low, face high</b> (σ = 6 and 8). A gold shield across a face is one large, nearly uniform region, about as low-frequency as anything on a face can be, and its colour is low-frequency too. Eyes, brows and lashes are fine detail. From across the room I am wearing the glasses, and up close my eyes show through them. It only half works, and the reason is worth stating. The low frequencies of a hybrid never go away up close; they are only covered. Derek disappears behind the cat because a blurred face passes for the cat's own shading. A gold band across the eyes passes for nothing on a bare face, so up close I see tinted glasses I can look through, not a face without glasses.</p>
+        <p><b>Glasses low, face high</b> (σ = 6 and 8). From across the room I am wearing the glasses; up close my eyes show through them. It only half works. Low frequencies never go away up close, they are only covered: blurred Derek passes for the cat's shading, but a gold band passes for nothing on a bare face, so up close I see tinted glasses, not a face without glasses.</p>
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
         <figure><img src="images/hybrid/shades-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="1/1. Up close: eyes, through a tint" width="681" height="900"><figcaption><b>1/1</b>Up close: eyes, through a tint</figcaption></figure>
@@ -438,7 +435,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/shades-far-8.jpg" loading="lazy" decoding="async" alt="1/8. Shades" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Shades</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Face low, glasses high.</b> The same filters with the pictures swapped. This is the picture I like best in the whole project, and as a hybrid it fails. The gold disappears completely, because colour is low-frequency and the high-pass removes it, and the mirrored shield becomes clear glass with the room reflected in it in sharp lines, like a head-up display. But it is the same picture at every distance. The rim of the shield is a long, hard edge, and an edge that strong is present at every scale, so from far away I am still wearing glasses. It is the cat's ears and the bicycle's wheels again: a high-pass filter keeps the outline of a large shape as well as it keeps fine texture. The same two photos make a much better blend than a hybrid, in part 2.4 below. I also shot a neutral face and a smile; with a closed-mouth smile the two are too alike for the hybrid to change with distance, and that pair also went to the blend.</p>
+        <p><b>Face low, glasses high.</b> My favourite picture, and a failed hybrid. The gold disappears, because colour is low-frequency, and the shield becomes clear glass with the room reflected in it. But the rim is a long hard edge, present at every scale, so it is the same picture at every distance. The same photos make a much better blend, in part 2.4.</p>
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
         <figure><img src="images/hybrid/shades-reversed.jpg" loading="lazy" decoding="async" alt="1/1. Clear glass, reflections kept" width="681" height="900"><figcaption><b>1/1</b>Clear glass, reflections kept</figcaption></figure>
@@ -446,19 +443,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/shades-reversed-far-8.jpg" loading="lazy" decoding="async" alt="1/8. Still glasses" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Still glasses</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Moon and Earth.</b> Two discs on black, so again there is nothing to click: I find each disc by thresholding and scale both to the same frame. The Moon goes in the low frequencies (σ = 6) and Earth in the high ones (σ = 3). Both are much narrower than for the faces: Earth's clouds are so bright against the ocean that with a wider high-pass they were still the whole picture at one eighth size. The Moon's identity is in its large dark maria, which are low-frequency, and Earth's is in the fine curl of its cloud systems, which is high-frequency, so each picture is recognisable from exactly the band it is given. Up close it is Earth: the Horn of Africa, Madagascar, the weather systems. At one eighth size it is the full Moon. Earth has also lost its blue. That is the colour result from the section above again: the blue of the oceans is spread over large regions, the high-pass removes regions, and what is left of the blue marble is gray.</p>
-      </div>
-      <div class="row narrow" style="--n:2">
-        <figure><img src="images/hybrid/moon-earth-low-input.jpg" loading="lazy" decoding="async" alt="Moon. Low-frequency picture" width="900" height="900"><figcaption><b>Moon</b>Low-frequency picture</figcaption></figure>
-        <figure><img src="images/hybrid/moon-earth-high-aligned.jpg" loading="lazy" decoding="async" alt="Earth. High-frequency picture" width="900" height="900"><figcaption><b>Earth</b>High-frequency picture</figcaption></figure>
-      </div>
-      <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/moon-earth-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid at full size" width="900" height="900"><figcaption><b>1/1</b>Up close: Earth</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/moon-earth-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="225" height="225"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/moon-earth-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="112" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>The Moon</figcaption></figure>
-      </div>
-      <div class="prose">
-        <p><b>A failure: tiger and bicycle.</b> I chose this pair to fail, to see what alignment and shape are doing in the ones that work. There is nothing to align, so I placed the bicycle to fill the frame, and used the same filters as for the cat. It fails in both directions. Up close the tiger does not hide: the bicycle is thin lines with nothing between them, so most of the picture has no high-frequency content to cover the blurred tiger, and the stripes read straight through the frame. From far away the bicycle does not go: its wheels are large, dark, high-contrast rings, and a high-pass filter keeps the edges of a large shape as well as it keeps fine texture, so at quarter size the wheels are still there, across the tiger's face. In the hybrids that work, the two pictures put their edges in the same places, so each one's edges are explained by the other. Here the eye sees two pictures at every distance. (The vertical streaks are the bicycle photo's border pixels repeated; the photo does not cover the square frame.)</p>
+        <p><b>A failure: tiger and bicycle.</b> Chosen to fail, with the same filters as the cat. Up close the tiger does not hide: the bicycle is thin lines with nothing between them to cover it. From far away the bicycle does not go: a high-pass keeps the edges of a large dark shape as well as it keeps fine texture, so the wheels are still there at quarter size. In the hybrids that work, the two pictures put their edges in the same places.</p>
       </div>
       <div class="row" style="--n:2">
         <figure><img src="images/hybrid/tiger-bicycle-high-input.jpg" loading="lazy" decoding="async" alt="Bicycle. High-frequency picture" width="1920" height="1280"><figcaption><b>Bicycle</b>High-frequency picture</figcaption></figure>
@@ -477,8 +462,8 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <h2>Part 2.3 · Gaussian and Laplacian stacks</h2>
       </header>
       <div class="prose">
-        <p><b>Stacks.</b> A pyramid blurs and halves the picture at each level. A stack blurs and keeps the size. Level 0 of my Gaussian stack is the picture, and each level after it is the previous one blurred again, with σ = 1, 2, 4, 8, 16. Doubling σ stands in for the halving a pyramid would do, so each level holds about half the frequency range of the one before. There are 6 levels. No pyramid function is used; the only library call is the Gaussian blur itself.</p>
-        <p><b>Laplacian stack.</b> Each level is the difference between two neighbouring Gaussian levels, which is the band of frequencies the second blur removed. The last entry is the last Gaussian level, the leftover low frequencies. Because the differences telescope, the stack sums back to the picture exactly (to 1e-16 here), and that is what makes blending in this representation possible: I can change each band separately and add them up again.</p>
+        <p><b>Stacks.</b> A pyramid blurs and halves the picture at each level; a stack blurs and keeps the size. Level 0 of the Gaussian stack is the picture, and each level is the previous one blurred again, with σ = 1, 2, 4, 8, 16, for 6 levels. Doubling σ stands in for the halving. No pyramid functions: the only library call is the Gaussian blur.</p>
+        <p><b>Laplacian stack.</b> Each level is the difference of two neighbouring Gaussian levels, the band of frequencies the second blur removed, and the last level is the last Gaussian level. The differences telescope, so the stack sums back to the picture (to 1e-16). That is what makes blending possible: change each band separately, then add them up.</p>
 <pre class="code">def gaussian_stack(im, levels, sigma0=1.0):
     out = [im]
     for k in range(1, levels):
@@ -521,7 +506,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/orange-l4.jpg" loading="lazy" decoding="async" alt="L&lt;sub&gt;4&lt;/sub&gt;. G&lt;sub&gt;4&lt;/sub&gt; − G&lt;sub&gt;5&lt;/sub&gt;" width="300" height="300"><figcaption><b>L<sub>4</sub></b>G<sub>4</sub> − G<sub>5</sub></figcaption></figure>
         <figure><img src="images/blend/orange-l5.jpg" loading="lazy" decoding="async" alt="L&lt;sub&gt;5&lt;/sub&gt;. = G&lt;sub&gt;5&lt;/sub&gt;" width="300" height="300"><figcaption><b>L<sub>5</sub></b>= G<sub>5</sub></figcaption></figure>
       </div>
-      <p class="note">Laplacian levels are drawn with gray as zero and stretched to fill the range, each on its own scale, or the fine levels would look empty. The last level is a Gaussian level and is drawn as it is.</p>
+      <p class="note">Laplacian levels are drawn with gray as zero, each stretched to its own range. The last level is a Gaussian level, drawn as it is.</p>
     </section>
 
     <section class="part" id="blend">
@@ -530,14 +515,23 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <h2>Part 2.4 · Multiresolution blending</h2>
       </header>
       <div class="prose">
-        <p><b>The blend.</b> Joining two pictures along a line gives a visible seam, because the pictures differ at every frequency and the join is abrupt at every frequency. Feathering the join over a fixed width cannot fix that. A narrow feather leaves the slow differences in colour and brightness as a visible step. A wide one makes the fine texture of both pictures show through each other as a ghost. Burt and Adelson's answer is that the right width depends on the frequency, so I blend each band of the Laplacian stack with its own width: fine detail over a few pixels, broad colour over about a quarter of the picture.</p>
-        <p>I follow the algorithm on page 230 of the paper. The mask is a step, 1 on the apple's side and 0 on the orange's. I build a Gaussian stack of the mask with the same σ as the pictures, so level <var>k</var> of the mask is already blurred to the scale of band <var>k</var>. Each band of the result is mask × apple band + (1 − mask) × orange band, and the result is the sum of the bands.</p>
+        <p><b>The blend.</b> A straight cut shows a seam because the join is abrupt at every frequency. A narrow feather leaves the colour as a step; a wide one ghosts the textures. Burt and Adelson's answer is a width per frequency: I blend each band of the Laplacian stack with its own mask width, fine detail over a few pixels and broad colour over about a quarter of the picture.</p>
+        <p>I follow the algorithm on page 230 of the paper. The mask is a step, 1 on the apple's side. Its Gaussian stack uses the same σ as the pictures, so level <var>k</var> of the mask is blurred to the scale of band <var>k</var>. Each band is mask × apple + (1 − mask) × orange, and the result is the sum of the bands.</p>
 <pre class="code">def blend(a, b, mask, levels=6):
     la, lb = laplacian_stack(a, levels), laplacian_stack(b, levels)
     gm = gaussian_stack(mask, levels)
     bands = [gm[k] * la[k] + (1 - gm[k]) * lb[k] for k in range(levels)]
     return np.clip(sum(bands), 0, 1)</pre>
       </div>
+      <div class="row keep" style="--n:6">
+        <figure><img src="images/blend/mask-g0.png" loading="lazy" decoding="async" alt="Mask, stack level 0" width="300" height="300"><figcaption><b>M<sub>0</sub></b>The step</figcaption></figure>
+        <figure><img src="images/blend/mask-g1.png" loading="lazy" decoding="async" alt="Mask, stack level 1" width="300" height="300"><figcaption><b>M<sub>1</sub></b>σ = 1</figcaption></figure>
+        <figure><img src="images/blend/mask-g2.png" loading="lazy" decoding="async" alt="Mask, stack level 2" width="300" height="300"><figcaption><b>M<sub>2</sub></b>σ = 2</figcaption></figure>
+        <figure><img src="images/blend/mask-g3.png" loading="lazy" decoding="async" alt="Mask, stack level 3" width="300" height="300"><figcaption><b>M<sub>3</sub></b>σ = 4</figcaption></figure>
+        <figure><img src="images/blend/mask-g4.png" loading="lazy" decoding="async" alt="Mask, stack level 4" width="300" height="300"><figcaption><b>M<sub>4</sub></b>σ = 8</figcaption></figure>
+        <figure><img src="images/blend/mask-g5.png" loading="lazy" decoding="async" alt="Mask, stack level 5" width="300" height="300"><figcaption><b>M<sub>5</sub></b>σ = 16</figcaption></figure>
+      </div>
+      <p class="note">The Gaussian stack of the mask. M<sub>k</sub> weights band k: the finest band is joined along a hard line and the coarsest over a wide ramp.</p>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/oraple-hard.jpg" loading="lazy" decoding="async" alt="Cut. A step mask, no blending" width="300" height="300"><figcaption><b>Cut</b>A step mask, no blending</figcaption></figure>
         <figure><img src="images/blend/oraple-feather-4.jpg" loading="lazy" decoding="async" alt="Feather, σ = 4. One width: the colour still steps" width="300" height="300"><figcaption><b>Feather, σ = 4</b>One width: the colour still steps</figcaption></figure>
@@ -565,7 +559,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/fig-3-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="300" height="300"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>The figure.</b> This is figure 3.42 of Szeliski for my stacks. In the finest band the mask is nearly a step and the two halves meet along a sharp line, which is right, because at that scale there is only texture and a sharp join between two textures is not visible. In band 2 the join is a soft ramp about ten pixels wide. In band 4 it is about forty. Within a row the three pictures share one scale, so the third really is the sum of the first two.</p>
+        <p><b>The figure.</b> Figure 3.42 of Szeliski for my stacks: bands 0, 2 and 4, then the sum. In band 0 the halves meet along a sharp line, which is right, because a sharp join between two textures is not visible. In band 2 the join is a ramp about ten pixels wide, in band 4 about forty. Each row shares one scale, so the third picture is the sum of the first two.</p>
       </div>
     </section>
 
@@ -575,7 +569,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <h2>Part 2.4 · My own blends</h2>
       </header>
       <div class="prose">
-        <p><b>Straight seam, my own photos: half a smile, half a pair of glasses.</b> The three photos from the hybrid section, registered onto each other, and joined down the bridge of the nose with a step mask. These are the pairs the method is made for: two pictures of the same scene that agree everywhere except in the one thing that differs. In the cut versions the join shows even where nothing should differ. The wall changes brightness at the seam, most clearly in the glasses pair, because the phone chose a slightly different exposure for each shot, and the collar does not quite line up. The blend spreads the exposure difference over a wide band in the coarse levels, where it cannot be seen, and joins the skin and hair over a few pixels in the fine bands. What is left is the difference itself: one corner of the mouth is smiling, and one eye has a lens over it. The glasses still end abruptly at the nose, as they must, since there is nothing on the other side for them to blend into.</p>
+        <p><b>Straight seam, my own photos: half a smile, half a pair of glasses.</b> Three photos of me from the same propped phone (neutral, smiling, in glasses), registered and joined down the bridge of the nose with a step mask. This is what the method is made for: two pictures that agree everywhere except in one thing. In the cuts the join shows anyway: the wall changes brightness, because the phone exposed each shot slightly differently, and the collar does not line up. The blend spreads the exposure difference over a wide band in the coarse levels, where it cannot be seen, and joins skin and hair over a few pixels in the fine ones. The glasses still end abruptly at the nose, as they must: there is nothing on the other side to blend into.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/half-smile-a.jpg" loading="lazy" decoding="async" alt="Neutral. Left of the seam" width="681" height="900"><figcaption><b>Neutral</b>Left of the seam</figcaption></figure>
@@ -590,7 +584,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/half-glasses.jpg" loading="lazy" decoding="async" alt="Multiresolution. Half a pair of glasses" width="681" height="900"><figcaption><b>Multiresolution</b>Half a pair of glasses</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Irregular mask: a cat with a tiger's face.</b> The same two pictures as the hybrid, used differently. The tiger is aligned to the cat by the eyes, and the mask is an ellipse over the cat's face, wide enough to take in the tiger's white cheeks, because pale fur next to the cat's pale fur is an easier join than orange next to gray. With the mask used as it is, the result is a sticker. With the blend, the fine bands change over within a few pixels, so whiskers and hairs stay sharp and nothing is doubled, while the coarse bands change over across the whole cheek, so the orange drains into the tabby's beige with no edge to find. The images are 1200 × 1000, so the stack starts at σ = 2 (σ = 2, 4, 8, 16, 32) to cover the same fraction of the picture as the oraple's.</p>
+        <p><b>Irregular mask: a cat with a tiger's face.</b> The tiger is aligned to the cat by the eyes, and the mask is an ellipse over the face, wide enough to take in the tiger's white cheeks, since pale fur next to pale fur is an easier join than orange next to gray. With the mask alone the result is a sticker. With the blend, whiskers and hairs stay sharp, and the orange drains into the tabby's beige with no edge to find. The images are 1200 × 1000, so the stack starts at σ = 2.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/blend/tiger-face-a.jpg" loading="lazy" decoding="async" alt="Tiger, aligned. Eyes carried onto the cat&#x27;s" width="1200" height="1000"><figcaption><b>Tiger, aligned</b>Eyes carried onto the cat's</figcaption></figure>
@@ -602,7 +596,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/tiger-face.jpg" loading="lazy" decoding="async" alt="Multiresolution. Six bands, each with its own mask width" width="1200" height="1000"><figcaption><b>Multiresolution</b>Six bands, each with its own mask width</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all six bands added up. In band 0 the ellipse has a hard edge and both animals contribute only hair. By band 4 the tiger's contribution is a soft orange glow with no outline at all, which is why the join cannot be found in the result.</p>
+        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all six bands added up. In band 0 the ellipse has a hard edge. By band 4 the tiger is a soft orange glow with no outline, which is why the join cannot be found.</p>
       </div>
       <div class="row keep" style="--n:3">
         <figure><img src="images/blend/tiger-face-fig-0-a.jpg" loading="lazy" decoding="async" alt="Band 0 · finest. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 0 · finest</b>Tiger × mask</figcaption></figure>
@@ -625,7 +619,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/tiger-face-fig-3-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>A harder straight seam: Earth and Mars.</b> Two planets on black, cropped and scaled so the discs coincide (each disc found by thresholding, as for the Moon above). My photos agree everywhere but in one place. These two agree nowhere. The fruits of the oraple differ mostly in colour. The planets differ in everything: Earth is high-contrast cloud, Mars is nearly smooth, and their colours are opposite. The number of levels now matters. With four, the widest mask is narrow and the colour changes over a short distance, which still reads as a cut, only a soft one. With eight, the coarsest band is blended across most of the disc, and the colours mix over that whole width: Mars turns pink and Earth's oceans go mauve. Six gives one planet that is Earth on one side and Mars on the other, with the clouds thinning out into Martian dust. The general point is that the blend hides a seam between pictures that are already similar at coarse scales. Where they are not, the coarse bands have to change somewhere, and the only choice is over what distance.</p>
+        <p><b>A harder straight seam: Earth and Mars.</b> My photos agree everywhere but in one place. These two agree nowhere: cloud against smooth ground, opposite colours. The discs are found by thresholding and matched in centre and radius. Now the number of levels matters. With four, the colour changes over a short distance and it still reads as a cut. With eight, the colours mix across most of the disc: Mars turns pink and the oceans go mauve. Six is the compromise. The blend hides a seam between pictures that are already similar at coarse scales; where they are not, the coarse bands have to change somewhere, and the only choice is over what distance.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/blend/earth-mars-a.jpg" loading="lazy" decoding="async" alt="Earth. Apollo 17" width="800" height="800"><figcaption><b>Earth</b>Apollo 17</figcaption></figure>
@@ -638,7 +632,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/earth-mars-8-levels.jpg" loading="lazy" decoding="async" alt="8 levels. Widest σ = 128" width="800" height="800"><figcaption><b>8 levels</b>Widest σ = 128</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>A second irregular mask: yin and yang.</b> The same two planets joined along a curve, with a dot of each inside the other. The seam now runs in every direction, which a stack handles without any change, since the mask is only an image that gets blurred. The dots are the interesting part. Each is 100 pixels across. With five levels the widest mask blur is σ = 16 and the dots hold. With six it is σ = 32, comparable to the dot itself, so in the coarse bands the dot's mask is blurred almost flat: the dot keeps its fine texture but takes its colour from the planet around it, and fades. A region can only keep the bands that are narrower than it is.</p>
+        <p><b>A second irregular mask: yin and yang.</b> The same planets joined along a curve, with a dot of each inside the other. A stack handles a seam in any direction, since the mask is only an image that gets blurred. The dots are 100 pixels across. With five levels (widest σ = 16) they hold. With six (σ = 32) the dot's mask is blurred almost flat in the coarse bands, so the dot keeps its texture but takes its colour from the planet around it, and fades. A region can only keep the bands that are narrower than it is.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/yinyang-mask.png" loading="lazy" decoding="async" alt="Mask. White is Earth" width="800" height="800"><figcaption><b>Mask</b>White is Earth</figcaption></figure>
@@ -654,7 +648,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <h2>Colour in blending<small>Bells &amp; whistles · part 2.4</small></h2>
       </header>
       <div class="prose">
-        <p><b>Colour.</b> I blend the three colour channels separately with the same mask stack. The blend is linear in the picture, so this is not really a choice: the gray version of the colour blend is the blend of the gray versions, and they agree to 9e-12. What is a choice is whether colour should change over the same distance as brightness. I split each picture into gray (luma) and the rest (chroma), blended them with mask stacks of different widths, and added them back. On the oraple the versions are hard to tell apart, because an apple and an orange are close in colour to begin with. Earth and Mars are not, so the experiment is on them, with one addition.</p>
+        <p><b>Colour.</b> I blend the three colour channels separately with the same mask stack. The blend is linear, so this is not really a choice: the gray of the colour blend is the blend of the grays (they agree to 9e-12). The real choice is whether colour should change over the same distance as brightness. I split each picture into luma and chroma, blended them with mask stacks of different widths, and added them back. On the oraple the versions are hard to tell apart, since the fruits are close in colour, so the experiment is on Earth and Mars.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/earth-mars-gray.jpg" loading="lazy" decoding="async" alt="Gray. No colour at all" width="800" height="800"><figcaption><b>Gray</b>No colour at all</figcaption></figure>
@@ -663,33 +657,23 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/earth-mars-earth-chroma.jpg" loading="lazy" decoding="async" alt="Earth&#x27;s colour throughout. Brightness blended, colour from Earth only" width="800" height="800"><figcaption><b>Earth's colour throughout</b>Brightness blended, colour from Earth only</figcaption></figure>
       </div>
       <div class="prose">
-        <p>In gray the join is still easy to find, which I did not expect: it is cloud texture against smooth ground, so here colour is not the only thing giving the seam away. Widening the chroma mask spreads a pink haze onto Earth's limb and pales Mars near the middle; narrowing it keeps both planets' colours clean up to a crisper colour boundary. I prefer the narrower chroma, the opposite of what I expected: when the two colours are this far apart, every mixture of them is a colour that belongs to neither planet, so a short transition with less of that mixture looks better than a long one. The last picture answers the question from the other side. It keeps the blended brightness and takes all of its colour from Earth, and it reads as a single planet, a pale blue world with Martian terrain on one side. So colour is what says "two objects" here, and the way to use colour to enhance a blend is to make the colours agree (as they nearly do for the apple and the orange), not to find a cleverer way to mix colours that disagree.</p>
-      </div>
-    </section>
-
-    <section class="part" id="libraries">
-      <header class="part-head">
-        <p class="param"><span>0</span><i aria-hidden="true">→</i><span>1</span><small>libraries</small></p>
-        <h2>What is from scratch</h2>
-      </header>
-      <div class="prose">
-        <p>Part 1.1 is NumPy only: padding, both convolutions, the box and difference filters. From part 1.2 on I use <code>scipy.signal.convolve2d</code> for speed, as the assignment allows, and <code>cv2.getGaussianKernel</code> for the 1D Gaussian. The gradient orientation (CORDIC and the arctangent series), the HSV conversion, the unsharp filter, the hybrid, both stacks and the blend are written by hand on top of those two calls. scikit-image is used once, to resample the aligned picture for the hybrids; Pillow reads and writes files. <code>np.arctan2</code> and <code>colorsys</code> appear only in checks.</p>
+        <p>In gray the join is still easy to find: cloud texture against smooth ground, so colour is not the only thing giving it away. A wider chroma mask spreads a pink haze onto Earth and pales Mars; a narrower one keeps both colours clean. I prefer the narrower: when two colours are this far apart, every mixture belongs to neither planet, so less mixture looks better. The last picture keeps the blended brightness and takes all its colour from Earth, and it reads as one planet. So colour is what says "two objects", and the way to use colour to enhance a blend is to make the colours agree, as they nearly do for the apple and the orange.</p>
       </div>
     </section>
 
     <section class="part" id="learned">
       <header class="part-head">
-        <p class="param"><span>1</span><i aria-hidden="true">→</i><span>6</span><small>bands</small></p>
+        <p class="param" aria-label="convolution in space is multiplication in frequency"><span>∗</span><i aria-hidden="true">→</i><span>×</span><small>space to frequency</small></p>
         <h2>The most important thing I learned</h2>
       </header>
       <div class="prose">
-        <p>A picture is a sum of frequency bands, and each band can be handled on its own. Every part of this project is that one idea. Edge detection fails on the finest band, so I blur it away first. Sharpening scales the fine bands up, and cannot restore a band the blur already removed. A hybrid takes its coarse bands from one picture and its fine bands from another. A blend joins each band over a distance that suits it. The part I did not expect is how much the pictures matter compared with the method: the same code that hides the seam between a tiger and a cat cannot hide it between Earth and Mars, and the same filters that turn a cat into a tiger leave a bicycle sitting on a tiger at every distance.</p>
+        <p>The equivalence of convolution and the Fourier transform: convolving an image with a filter is the same as multiplying their spectra. So I can use the frequency model of an image without ever computing its Fourier transform, just by convolving with well-known low-pass and high-pass filters.</p>
       </div>
     </section>
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Bicycle: 齐健, CC BY 2.0. Earth: NASA, Apollo 17. Moon: Gregory H. Revera, CC BY-SA 3.0. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All six from Wikimedia Commons. The rest are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Bicycle: 齐健, CC BY 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All five from Wikimedia Commons. The rest are mine.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj2</p>
   </footer>
 

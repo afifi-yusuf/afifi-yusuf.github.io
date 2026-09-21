@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.055,
-     "two": 0.509,
-     "scipy": 0.02677
+     "four": 4.014,
+     "two": 0.498,
+     "scipy": 0.0258
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -20,7 +20,7 @@
     "seconds": {
      "four": 0.136,
      "two": 0.457,
-     "scipy": 0.00221
+     "scipy": 0.00202
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.148,
-     "two": 0.453,
-     "scipy": 0.00304
+     "four": 0.145,
+     "two": 0.45,
+     "scipy": 0.00319
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -254,18 +254,6 @@
    "cutoff_high_cycles_per_px": 0.02082118056991973,
    "chroma_energy_kept_by_low_pass": 0.9198099871933146,
    "chroma_energy_kept_by_high_pass": 0.0383787455050561
-  },
-  "moon-earth": {
-   "shape": [
-    900,
-    900
-   ],
-   "sigma_low": 6.0,
-   "sigma_high": 3.0,
-   "cutoff_low_cycles_per_px": 0.031231770854879597,
-   "cutoff_high_cycles_per_px": 0.06246354170975919,
-   "chroma_energy_kept_by_low_pass": 0.9019386471997706,
-   "chroma_energy_kept_by_high_pass": 0.04702867967662353
   },
   "tiger-bicycle": {
    "shape": [
