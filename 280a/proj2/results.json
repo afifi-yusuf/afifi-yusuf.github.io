@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.014,
-     "two": 0.498,
-     "scipy": 0.0258
+     "four": 4.19,
+     "two": 0.529,
+     "scipy": 0.02638
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -18,9 +18,9 @@
    },
    "dx": {
     "seconds": {
-     "four": 0.136,
-     "two": 0.457,
-     "scipy": 0.00202
+     "four": 0.139,
+     "two": 0.478,
+     "scipy": 0.00222
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.145,
-     "two": 0.45,
-     "scipy": 0.00319
+     "four": 0.152,
+     "two": 0.468,
+     "scipy": 0.00281
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -254,18 +254,6 @@
    "cutoff_high_cycles_per_px": 0.02082118056991973,
    "chroma_energy_kept_by_low_pass": 0.9198099871933146,
    "chroma_energy_kept_by_high_pass": 0.0383787455050561
-  },
-  "tiger-bicycle": {
-   "shape": [
-    986,
-    960
-   ],
-   "sigma_low": 7.0,
-   "sigma_high": 9.0,
-   "cutoff_low_cycles_per_px": 0.026770089304182513,
-   "cutoff_high_cycles_per_px": 0.02082118056991973,
-   "chroma_energy_kept_by_low_pass": 0.9198099871933146,
-   "chroma_energy_kept_by_high_pass": 0.08725347799973665
   }
  },
  "blend": {
@@ -286,14 +274,6 @@
   "rgb_blend_luma_vs_gray_blend": 9.029665903881323e-12
  },
  "custom": {
-  "half-smile": {
-   "shape": [
-    900,
-    681
-   ],
-   "levels": 6,
-   "sigma0": 2.0
-  },
   "half-glasses": {
    "shape": [
     900,

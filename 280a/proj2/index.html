@@ -442,18 +442,6 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:25%"><img src="images/hybrid/shades-reversed-far-4.jpg" loading="lazy" decoding="async" alt="1/4. " width="170" height="225"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
         <figure style="width:12.5%"><img src="images/hybrid/shades-reversed-far-8.jpg" loading="lazy" decoding="async" alt="1/8. Still glasses" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Still glasses</figcaption></figure>
       </div>
-      <div class="prose">
-        <p><b>A failure: tiger and bicycle.</b> Chosen to fail, with the same filters as the cat. Up close the tiger does not hide: the bicycle is thin lines with nothing between them to cover it. From far away the bicycle does not go: a high-pass keeps the edges of a large dark shape as well as it keeps fine texture, so the wheels are still there at quarter size. In the hybrids that work, the two pictures put their edges in the same places.</p>
-      </div>
-      <div class="row" style="--n:2">
-        <figure><img src="images/hybrid/tiger-bicycle-high-input.jpg" loading="lazy" decoding="async" alt="Bicycle. High-frequency picture" width="1920" height="1280"><figcaption><b>Bicycle</b>High-frequency picture</figcaption></figure>
-        <figure><img src="images/hybrid/tiger-bicycle-overlay.jpg" loading="lazy" decoding="async" alt="Overlay. No shared structure to align" width="960" height="986"><figcaption><b>Overlay</b>No shared structure to align</figcaption></figure>
-      </div>
-      <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/tiger-bicycle-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="Hybrid at full size" width="960" height="986"><figcaption><b>1/1</b>Up close: both</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/tiger-bicycle-far-4.jpg" loading="lazy" decoding="async" alt="Hybrid at quarter size" width="240" height="246"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/tiger-bicycle-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>Still both</figcaption></figure>
-      </div>
     </section>
 
     <section class="part" id="stacks">
@@ -569,13 +557,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <h2>Part 2.4 · My own blends</h2>
       </header>
       <div class="prose">
-        <p><b>Straight seam, my own photos: half a smile, half a pair of glasses.</b> Three photos of me from the same propped phone (neutral, smiling, in glasses), registered and joined down the bridge of the nose with a step mask. This is what the method is made for: two pictures that agree everywhere except in one thing. In the cuts the join shows anyway: the wall changes brightness, because the phone exposed each shot slightly differently, and the collar does not line up. The blend spreads the exposure difference over a wide band in the coarse levels, where it cannot be seen, and joins skin and hair over a few pixels in the fine ones. The glasses still end abruptly at the nose, as they must: there is nothing on the other side to blend into.</p>
-      </div>
-      <div class="row" style="--n:4">
-        <figure><img src="images/blend/half-smile-a.jpg" loading="lazy" decoding="async" alt="Neutral. Left of the seam" width="681" height="900"><figcaption><b>Neutral</b>Left of the seam</figcaption></figure>
-        <figure><img src="images/blend/half-smile-b.jpg" loading="lazy" decoding="async" alt="Smile. Right of the seam, registered" width="681" height="900"><figcaption><b>Smile</b>Right of the seam, registered</figcaption></figure>
-        <figure><img src="images/blend/half-smile-cut.jpg" loading="lazy" decoding="async" alt="Cut. A step in the wall, a jump at the mouth" width="681" height="900"><figcaption><b>Cut</b>A step in the wall, a jump at the mouth</figcaption></figure>
-        <figure><img src="images/blend/half-smile.jpg" loading="lazy" decoding="async" alt="Multiresolution. Half a smile" width="681" height="900"><figcaption><b>Multiresolution</b>Half a smile</figcaption></figure>
+        <p><b>Straight seam, my own photos: half a pair of glasses.</b> The two photos from the hybrid section, with and without the mirrored glasses, registered and joined down the bridge of the nose with a step mask. This is what the method is made for: two pictures that agree everywhere except in one thing. In the cut the join shows anyway: the wall changes brightness at the seam, because the phone exposed each shot slightly differently, and the forehead does not quite match. The blend spreads the exposure difference over a wide band in the coarse levels, where it cannot be seen, and joins skin and hair over a few pixels in the fine ones. The glasses still end abruptly at the nose, as they must: there is nothing on the other side to blend into.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/half-glasses-a.jpg" loading="lazy" decoding="async" alt="Glasses. Left of the seam, registered" width="681" height="900"><figcaption><b>Glasses</b>Left of the seam, registered</figcaption></figure>
@@ -673,7 +655,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Bicycle: 齐健, CC BY 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All five from Wikimedia Commons. The rest are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All four from Wikimedia Commons. The rest are mine.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj2</p>
   </footer>
 
