@@ -7,9 +7,9 @@
   "kernels": {
    "box9": {
     "seconds": {
-     "four": 4.118,
-     "two": 0.529,
-     "scipy": 0.02763
+     "four": 4.448,
+     "two": 0.548,
+     "scipy": 0.02726
     },
     "max_abs_diff": {
      "four": 1.9984014443252818e-15,
@@ -18,9 +18,9 @@
    },
    "dx": {
     "seconds": {
-     "four": 0.139,
-     "two": 0.487,
-     "scipy": 0.00218
+     "four": 0.144,
+     "two": 0.555,
+     "scipy": 0.00249
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -29,9 +29,9 @@
    },
    "dy": {
     "seconds": {
-     "four": 0.15,
-     "two": 0.49,
-     "scipy": 0.00288
+     "four": 0.158,
+     "two": 0.479,
+     "scipy": 0.00311
     },
     "max_abs_diff": {
      "four": 0.0,
@@ -298,20 +298,12 @@
    "levels": 6,
    "sigma0": 2.0
   },
-  "moon-watch": {
+  "yinyang": {
    "shape": [
-    1200,
-    1200
+    800,
+    800
    ],
-   "levels": 6,
-   "sigma0": 2.0
-  },
-  "tiger-face": {
-   "shape": [
-    1000,
-    1200
-   ],
-   "levels": 6,
+   "levels": 5,
    "sigma0": 2.0
   }
  }

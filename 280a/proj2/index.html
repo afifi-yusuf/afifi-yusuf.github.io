@@ -417,12 +417,12 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A tiger</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>A failure: the same pair the other way round.</b> Cat low, tiger high, with the same two σ values. It is a tiger at every distance. The stripes are long, high-contrast edges, so the high-pass keeps most of them, and they are wide enough to still show at one eighth size. The blurred cat underneath has nothing strong enough to compete. The tiger loses its orange, since the colour was in its low frequencies, but it still reads as a tiger.</p>
+        <p><b>The same pair the other way round.</b> Cat low, tiger high, with the same two σ values. It still switches, a cat from far away and a tiger up close, but the near view is the weaker one. The stripes are long, high-contrast edges, so the high-pass keeps them, and the cat's pale face shows through between them, so up close it is a tiger with a cat underneath. The tiger also loses its orange, since the colour was in its low frequencies. The first assignment gives the cleaner switch: the cat's fine fur covers the blurred tiger completely.</p>
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/tiger-cat-reversed.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at full size: a tiger" width="960" height="986"><figcaption><b>1/1</b>Up close: a tiger</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-cat-reversed.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at full size: a tiger" width="960" height="986"><figcaption><b>1/1</b>Up close: a tiger, the cat showing through</figcaption></figure>
         <figure style="width:25%"><img src="images/hybrid/tiger-cat-reversed-far-4.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at quarter size" width="240" height="246"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-reversed-far-8.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at one eighth size: still a tiger" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>Still a tiger</figcaption></figure>
+        <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-reversed-far-8.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at one eighth size: still a tiger" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A cat</figcaption></figure>
       </div>
       <div class="prose">
         <p><b>Shades: my own photos.</b> Two photos of me taken with the phone propped up, one of them in mirrored glasses. My eyes are hidden behind the lenses, so there are no two points to click. Instead I register the photos with OpenCV's ECC, which finds the affine warp that maximises the correlation between the two gray images. I only fit it on the hair and the lower face so the glasses can't pull the fit off. It found that I was standing 8% closer in the second photo.</p>
@@ -574,50 +574,6 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/golden-gate.jpg" loading="lazy" decoding="async" alt="Multiresolution. Six levels" width="932" height="648"><figcaption><b>Multiresolution</b>Six levels</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Irregular mask: a cat with a tiger's face.</b> I aligned the tiger to the cat by the eyes and used an ellipse over the face as the mask. I made it wide enough to include the tiger's white cheeks, because pale fur next to pale fur is an easier join than orange next to gray. Cutting with the mask alone makes the face look like a sticker. With the blend, the whiskers and hairs stay sharp and the orange fades into the tabby's beige without a visible edge. The images are 1200 × 1000, so the stack starts at σ = 2 instead of 1.</p>
-      </div>
-      <div class="row" style="--n:3">
-        <figure><img src="images/blend/tiger-face-a.jpg" loading="lazy" decoding="async" alt="Tiger, aligned. Eyes carried onto the cat&#x27;s" width="1200" height="1000"><figcaption><b>Tiger, aligned</b>Eyes carried onto the cat's</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-b.jpg" loading="lazy" decoding="async" alt="Cat" width="1200" height="1000"><figcaption><b>Cat</b></figcaption></figure>
-        <figure><img src="images/blend/tiger-face-mask.png" loading="lazy" decoding="async" alt="Mask. An ellipse over the face" width="1200" height="1000"><figcaption><b>Mask</b>An ellipse over the face</figcaption></figure>
-      </div>
-      <div class="row narrow" style="--n:2">
-        <figure><img src="images/blend/tiger-face-cut.jpg" loading="lazy" decoding="async" alt="Cut. The mask used as it is" width="1200" height="1000"><figcaption><b>Cut</b>The mask used as it is</figcaption></figure>
-        <figure><img src="images/blend/tiger-face.jpg" loading="lazy" decoding="async" alt="Multiresolution. Six bands, each with its own mask width" width="1200" height="1000"><figcaption><b>Multiresolution</b>Six bands, each with its own mask width</figcaption></figure>
-      </div>
-      <div class="prose">
-        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, and in the last row all six bands added up. In band 0 the ellipse has a hard edge. By band 4 the tiger is a soft orange glow with no outline, which is why the join is hard to spot in the final result.</p>
-      </div>
-      <div class="row keep" style="--n:3">
-        <figure><img src="images/blend/tiger-face-fig-0-a.jpg" loading="lazy" decoding="async" alt="Band 0 · finest. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 0 · finest</b>Tiger × mask</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-0-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-0-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
-      </div>
-      <div class="row keep" style="--n:3">
-        <figure><img src="images/blend/tiger-face-fig-1-a.jpg" loading="lazy" decoding="async" alt="Band 2. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 2</b>Tiger × mask</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-1-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-1-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
-      </div>
-      <div class="row keep" style="--n:3">
-        <figure><img src="images/blend/tiger-face-fig-2-a.jpg" loading="lazy" decoding="async" alt="Band 4 · coarse. Tiger × mask" width="1200" height="1000"><figcaption><b>Band 4 · coarse</b>Tiger × mask</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-2-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-2-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
-      </div>
-      <div class="row keep" style="--n:3">
-        <figure><img src="images/blend/tiger-face-fig-3-a.jpg" loading="lazy" decoding="async" alt="Sum of all bands. Tiger × mask" width="1200" height="1000"><figcaption><b>Sum of all bands</b>Tiger × mask</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-3-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Cat × (1 − mask)" width="1200" height="1000"><figcaption><b>&nbsp;</b>Cat × (1 − mask)</figcaption></figure>
-        <figure><img src="images/blend/tiger-face-fig-3-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="1200" height="1000"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
-      </div>
-      <div class="prose">
-        <p><b>A moon in a watch.</b> Here I replaced the dial of a wristwatch with the full moon. The moon sits on a black background, so I find it by thresholding, scale it to the size of the dial and paste it onto a copy of the watch photo. The mask is a disc slightly smaller than the dial. The plain cut looks like a sticker, with a hard rim and a flat moon against a bezel that has highlights and shadow. In the blend the coarse bands come from the watch, so the bezel's highlight and the case's shadow fall across the moon, and it looks more like a moon behind glass.</p>
-      </div>
-      <div class="row" style="--n:4">
-        <figure><img src="images/blend/moon-watch-b.jpg" loading="lazy" decoding="async" alt="Watch. " width="1200" height="1200"><figcaption><b>Watch</b></figcaption></figure>
-        <figure><img src="images/blend/moon-watch-moon.jpg" loading="lazy" decoding="async" alt="Moon. Fitted to the dial" width="640" height="640"><figcaption><b>Moon</b>Fitted to the dial</figcaption></figure>
-        <figure><img src="images/blend/moon-watch-cut.jpg" loading="lazy" decoding="async" alt="Cut. A disc mask, used as it is" width="1200" height="1200"><figcaption><b>Cut</b>A disc mask, used as it is</figcaption></figure>
-        <figure><img src="images/blend/moon-watch.jpg" loading="lazy" decoding="async" alt="Multiresolution. Six levels" width="1200" height="1200"><figcaption><b>Multiresolution</b>Six levels</figcaption></figure>
-      </div>
-      <div class="prose">
         <p><b>A harder straight seam: Earth and Mars.</b> The glasses photos matched everywhere except in one place. Earth and Mars don't match anywhere: Earth has clouds where Mars has smooth ground, and their colours are opposite. I find each disc by thresholding and match their centres and radii. Here the number of levels makes a big difference. With four levels the colour changes over a short distance and the join still looks like a cut. With eight, the colours mix across most of the disc, so Mars turns pink and the oceans go mauve. I went with six as a middle ground. Blending can hide a seam when the two pictures are already similar at coarse scales. When they aren't, the coarse bands have to change somewhere, and the number of levels only decides over what distance that happens.</p>
       </div>
       <div class="row" style="--n:3">
@@ -631,13 +587,36 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/earth-mars-8-levels.jpg" loading="lazy" decoding="async" alt="8 levels. Widest σ = 128" width="800" height="800"><figcaption><b>8 levels</b>Widest σ = 128</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>A second irregular mask: yin and yang.</b> The same two planets joined along a curve, with a dot of each one inside the other. The seam can have any shape, because the mask is just an image that gets blurred. The dots are 100 pixels across. With five levels (widest σ = 16) they come through clearly. With six (σ = 32), the dots' mask is blurred almost flat in the coarse bands, so each dot keeps its texture but takes its colour from the planet around it and fades. A region of the mask can only keep the bands that are smaller than the region itself.</p>
+        <p><b>Irregular mask: yin and yang.</b> The same two planets joined along a curve, with a dot of each inside the other. A stack handles a seam in any direction, since the mask is only an image that gets blurred. The dots are 100 pixels across. With five levels (widest σ = 16) they hold. With six (σ = 32) the dot's mask is blurred almost flat in the coarse bands, so the dot keeps its texture but takes its colour from the planet around it, and fades. A region can only keep the bands that are narrower than it is. This is my favourite result, so its bands are laid out below as in figure 10 of the paper.</p>
       </div>
       <div class="row" style="--n:4">
         <figure><img src="images/blend/yinyang-mask.png" loading="lazy" decoding="async" alt="Mask. White is Earth" width="800" height="800"><figcaption><b>Mask</b>White is Earth</figcaption></figure>
         <figure><img src="images/blend/yinyang-cut.jpg" loading="lazy" decoding="async" alt="Cut. The mask used as it is" width="800" height="800"><figcaption><b>Cut</b>The mask used as it is</figcaption></figure>
-        <figure class="pick"><img src="images/blend/yinyang-5-levels.jpg" loading="lazy" decoding="async" alt="5 levels. Widest σ = 16" width="800" height="800"><figcaption><b>5 levels</b>Widest σ = 16</figcaption></figure>
+        <figure class="pick"><img src="images/blend/yinyang.jpg" loading="lazy" decoding="async" alt="5 levels. Widest σ = 16" width="800" height="800"><figcaption><b>5 levels</b>Widest σ = 16</figcaption></figure>
         <figure><img src="images/blend/yinyang-6-levels.jpg" loading="lazy" decoding="async" alt="6 levels. Widest σ = 32: the dots fade" width="800" height="800"><figcaption><b>6 levels</b>Widest σ = 32: the dots fade</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all five bands added up. In band 0 the curve and the dots have hard edges. By band 4 each planet is a soft glow with no outline, and the dots have all but gone, which is why one more level makes them fade.</p>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/yinyang-fig-0-a.jpg" loading="lazy" decoding="async" alt="Band 0 · finest. Earth × mask" width="800" height="800"><figcaption><b>Band 0 · finest</b>Earth × mask</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-0-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Mars × (1 − mask)" width="800" height="800"><figcaption><b>&nbsp;</b>Mars × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-0-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="800" height="800"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/yinyang-fig-1-a.jpg" loading="lazy" decoding="async" alt="Band 2. Earth × mask" width="800" height="800"><figcaption><b>Band 2</b>Earth × mask</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-1-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Mars × (1 − mask)" width="800" height="800"><figcaption><b>&nbsp;</b>Mars × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-1-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="800" height="800"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/yinyang-fig-2-a.jpg" loading="lazy" decoding="async" alt="Band 4 · coarse. Earth × mask" width="800" height="800"><figcaption><b>Band 4 · coarse</b>Earth × mask</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-2-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Mars × (1 − mask)" width="800" height="800"><figcaption><b>&nbsp;</b>Mars × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-2-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="800" height="800"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/blend/yinyang-fig-3-a.jpg" loading="lazy" decoding="async" alt="Sum of all bands. Earth × mask" width="800" height="800"><figcaption><b>Sum of all bands</b>Earth × mask</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-3-b.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Mars × (1 − mask)" width="800" height="800"><figcaption><b>&nbsp;</b>Mars × (1 − mask)</figcaption></figure>
+        <figure><img src="images/blend/yinyang-fig-3-both.jpg" loading="lazy" decoding="async" alt="&amp;nbsp;. Both" width="800" height="800"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
       </div>
     </section>
 
@@ -672,7 +651,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Golden Gate by day: Wattewyl, CC BY 3.0; by night: Christoph Strässler, CC BY-SA 2.0. Watch: Pradeepkulasekaran, CC BY-SA 3.0. Moon: Gregory H. Revera, CC BY-SA 3.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All eight from Wikimedia Commons. The rest are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Golden Gate by day: Wattewyl, CC BY 3.0; by night: Christoph Strässler, CC BY-SA 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. All six from Wikimedia Commons. The rest are mine.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj2</p>
   </footer>
 
