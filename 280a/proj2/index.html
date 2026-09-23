@@ -417,14 +417,6 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-far-8.jpg" loading="lazy" decoding="async" alt="Hybrid at one eighth size" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A tiger</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>The same pair the other way round.</b> Cat low, tiger high, with the same two σ values. It still switches, a cat from far away and a tiger up close, but the near view is the weaker one. The stripes are long, high-contrast edges, so the high-pass keeps them, and the cat's pale face shows through between them, so up close it is a tiger with a cat underneath. The tiger also loses its orange, since the colour was in its low frequencies. The first assignment gives the cleaner switch: the cat's fine fur covers the blurred tiger completely.</p>
-      </div>
-      <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/tiger-cat-reversed.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at full size: a tiger" width="960" height="986"><figcaption><b>1/1</b>Up close: a tiger, the cat showing through</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/tiger-cat-reversed-far-4.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at quarter size" width="240" height="246"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/tiger-cat-reversed-far-8.jpg" loading="lazy" decoding="async" alt="Reversed hybrid at one eighth size: still a tiger" width="120" height="123"><figcaption style="white-space:nowrap"><b>1/8</b>A cat</figcaption></figure>
-      </div>
-      <div class="prose">
         <p><b>Shades: my own photos.</b> Two photos of me taken with the phone propped up, one of them in mirrored glasses. My eyes are hidden behind the lenses, so there are no two points to click. Instead I register the photos with OpenCV's ECC, which finds the affine warp that maximises the correlation between the two gray images. I only fit it on the hair and the lower face so the glasses can't pull the fit off. It found that I was standing 8% closer in the second photo.</p>
       </div>
       <div class="row" style="--n:4">
