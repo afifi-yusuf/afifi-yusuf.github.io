@@ -397,7 +397,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <h2>Part 2.2 · More hybrids</h2>
       </header>
       <div class="prose">
-        <p><b>Tiger and cat.</b> Tigers and cats have the same face layout, so once the eyes line up nearly everything else does too. With the tiger as the low (σ = 7) and the cat as the high (σ = 9), you see a hissing tabby up close and a tiger at one eighth size. The cat's ears still show from a distance, because an outline against a dark background is a strong edge at every scale. This is my favourite result, so its spectra are below. Both spectra look about the same in every direction, since fur has no preferred direction. The low-pass leaves a small disc and the high-pass leaves a dark hole in the centre.</p>
+        <p><b>Tiger and cat.</b> Tigers and cats have the same face layout, so once the eyes line up nearly everything else does too. With the tiger as the low (σ = 11) and the cat as the high (σ = 9), you see a hissing tabby up close and a tiger at one eighth size. The cat's ears still show from a distance, because an outline against a dark background is a strong edge at every scale. This is my favourite result, so its spectra are below. Both spectra look about the same in every direction, since fur has no preferred direction. The low-pass leaves a small disc and the high-pass leaves a dark hole in the centre.</p>
       </div>
       <div class="row" style="--n:3">
         <figure><img src="images/hybrid/tiger-cat-low-input.jpg" loading="lazy" decoding="async" alt="Tiger. Low-frequency picture" width="960" height="986"><figcaption><b>Tiger</b>Low-frequency picture</figcaption></figure>
@@ -407,7 +407,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
       <div class="row keep" style="--n:5">
         <figure><img src="images/hybrid/tiger-cat-fft-low-input.jpg" loading="lazy" decoding="async" alt="Tiger. log |FFT|" width="960" height="986"><figcaption><b>Tiger</b>log |FFT|</figcaption></figure>
         <figure><img src="images/hybrid/tiger-cat-fft-high-input.jpg" loading="lazy" decoding="async" alt="Cat. " width="960" height="986"><figcaption><b>Cat</b></figcaption></figure>
-        <figure><img src="images/hybrid/tiger-cat-fft-low.jpg" loading="lazy" decoding="async" alt="Low-pass. σ = 7" width="960" height="986"><figcaption><b>Low-pass</b>σ = 7</figcaption></figure>
+        <figure><img src="images/hybrid/tiger-cat-fft-low.jpg" loading="lazy" decoding="async" alt="Low-pass. σ = 11" width="960" height="986"><figcaption><b>Low-pass</b>σ = 11</figcaption></figure>
         <figure><img src="images/hybrid/tiger-cat-fft-high.jpg" loading="lazy" decoding="async" alt="High-pass. σ = 9" width="960" height="986"><figcaption><b>High-pass</b>σ = 9</figcaption></figure>
         <figure><img src="images/hybrid/tiger-cat-fft-hybrid.jpg" loading="lazy" decoding="async" alt="Hybrid. " width="960" height="986"><figcaption><b>Hybrid</b></figcaption></figure>
       </div>
@@ -588,7 +588,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/yinyang-6-levels.jpg" loading="lazy" decoding="async" alt="6 levels. Widest σ = 32: the dots fade" width="800" height="800"><figcaption><b>6 levels</b>Widest σ = 32: the dots fade</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all five bands added up. In band 0 the curve and the dots have hard edges. By band 4 each planet is a soft glow with no outline, and the dots have all but gone, which is why one more level makes them fade.</p>
+        <p><b>The process, as in figure 10 of the paper.</b> Bands 0, 2 and 4 of each masked input and their sum, then all five bands added up. In band 0 the curve and the dots have hard edges. By band 4 each planet is a soft glow with no outline and the dots are faint blobs. One more level blurs the dots' mask almost flat, which is why they fade with six levels.</p>
       </div>
       <div class="row keep" style="--n:3">
         <figure><img src="images/blend/yinyang-fig-0-a.jpg" loading="lazy" decoding="async" alt="Band 0 · finest. Earth × mask" width="800" height="800"><figcaption><b>Band 0 · finest</b>Earth × mask</figcaption></figure>
@@ -638,6 +638,8 @@ def laplacian_stack(im, levels, sigma0=1.0):
       </header>
       <div class="prose">
         <p>The convolution theorem: convolving an image with a filter is the same as multiplying their spectra. So I can use the frequency model of an image without ever computing its Fourier transform, just by convolving with well-known low-pass and high-pass filters.</p>
+        <p>Most of this project is that one idea. A Gaussian multiplies the spectrum by a bump around zero frequency, and the impulse minus a Gaussian multiplies it by one minus that bump. The unsharp mask multiplies the high frequencies by up to 1 + α. A hybrid keeps the centre of one spectrum and the outside of another, and a Laplacian stack cuts the spectrum into rings so the blend can join each ring over a different distance. I only computed Fourier transforms to check this, and the hybrid's spectrum looked the way the theory says it should: a disc from one picture inside a hole in the other.</p>
+        <p>It also explains why sharpening has a limit. When I blurred the wall and sharpened it again, the brush strokes did not come back. The blur had multiplied those frequencies by almost zero, and multiplying by 1 + α cannot undo that. A filter can only reweight the frequencies that are still in the image.</p>
       </div>
     </section>
   </main>
