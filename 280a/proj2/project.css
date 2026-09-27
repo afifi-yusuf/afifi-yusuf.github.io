@@ -359,3 +359,186 @@
 .prose + .table-wrap {
   margin-top: 1.25rem;
 }
+
+/* Walk away from a hybrid: the slider shrinks the picture the way distance does. */
+.walk {
+  display: grid;
+  grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 0 clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+  margin: 1.5rem 0 0;
+}
+
+.walk-frame {
+  grid-row: 1 / span 2;
+}
+
+.walk + .prose {
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .walk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .walk-frame {
+    grid-row: auto;
+  }
+}
+
+.walk-frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--ar, 732 / 1024);
+  max-height: 34rem;
+  background: var(--surface);
+  --d: 1;
+}
+
+.walk-frame img {
+  display: block;
+  width: calc(100% / var(--d));
+  height: auto;
+  max-height: calc(34rem / var(--d));
+  object-fit: contain;
+}
+
+.walk-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: flex-start;
+  margin-top: 0.75rem;
+  font-family: var(--display);
+  font-size: 0.86rem;
+  color: var(--ink-2);
+}
+
+.walk-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.walk-pick button {
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--indigo);
+  font: 650 0.82rem var(--display);
+  cursor: pointer;
+}
+
+.walk-pick button[aria-pressed="true"] {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: var(--on-dark);
+}
+
+.walk-pick button:focus-visible,
+.walk-range input:focus-visible {
+  outline: 3px solid var(--amber-ink);
+  outline-offset: 2px;
+}
+
+.walk-range {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 650;
+}
+
+.walk-range input {
+  width: 11rem;
+  accent-color: var(--indigo);
+}
+
+.walk-range output {
+  min-width: 2.6em;
+  font-stretch: 70%;
+  font-weight: 750;
+  font-size: 1.05rem;
+  color: var(--indigo);
+  font-variant-numeric: tabular-nums;
+}
+
+.walk figcaption {
+  margin-top: 0.9rem;
+  max-width: 26rem;
+  font-family: var(--display);
+  font-size: 0.86rem;
+  color: var(--ink-2);
+}
+
+/* The error curve in part 2.1: one series, so no legend; hover for values. */
+.chart {
+  position: relative;
+  margin: 1.75rem 0 0;
+  max-width: 50rem;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--display);
+  overflow: visible;
+}
+
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .tick { fill: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+.chart .axis { fill: var(--ink-2); font-size: 14px; font-weight: 650; }
+.chart .ref { stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.chart .note-t { fill: var(--ink); font-size: 14px; font-weight: 600; }
+.chart .line { fill: none; stroke: var(--indigo); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .best { fill: var(--amber); stroke: var(--bg); stroke-width: 2; }
+.chart .hover { opacity: 0; pointer-events: none; }
+.chart .hover.on { opacity: 1; }
+.chart .cross { stroke: var(--ink-2); stroke-width: 1; }
+.chart .hover circle { fill: var(--indigo); stroke: var(--bg); stroke-width: 2; }
+.chart .hit { fill: transparent; cursor: crosshair; }
+
+.chart-tip {
+  position: absolute;
+  margin: 0;
+  padding: 0.3rem 0.55rem;
+  transform: translate(-50%, calc(-100% - 12px));
+  background: var(--indigo-deep);
+  color: var(--on-dark);
+  border-radius: 4px;
+  font: 650 0.78rem var(--display);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart figcaption {
+  margin-top: 0.4rem;
+  font-family: var(--display);
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+
+.chart + .table-wrap .results {
+  max-width: 50rem;
+  margin-top: 0.75rem;
+}
+
+.chart + .table-wrap .results th {
+  text-transform: none;                  /* the headers are α values, not labels */
+}
+
+@media print {
+  .walk { display: none; }
+  .chart { break-inside: avoid; }
+}
+
+/* The comparator prints as one picture, so it gets its own caption on paper. */
+.print-cap { display: none; }
+
+@media print {
+  .screen-cap { display: none; }
+  .print-cap { display: inline; }
+}
