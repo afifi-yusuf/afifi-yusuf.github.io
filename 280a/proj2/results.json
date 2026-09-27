@@ -390,17 +390,17 @@
    "chroma_energy_kept_by_low_pass": 0.8832239117991436,
    "chroma_energy_kept_by_high_pass": 0.0383787455050561
   },
-  "skull-me": {
+  "broccoli-tree": {
    "shape": [
-    951,
-    661
+    960,
+    896
    ],
-   "sigma_low": 12.0,
+   "sigma_low": 10.0,
    "sigma_high": 5.0,
-   "cutoff_low_cycles_per_px": 0.015615885427439798,
+   "cutoff_low_cycles_per_px": 0.01873906251292776,
    "cutoff_high_cycles_per_px": 0.03747812502585552,
-   "chroma_energy_kept_by_low_pass": 0.9527304638859554,
-   "chroma_energy_kept_by_high_pass": 0.01966081827679126
+   "chroma_energy_kept_by_low_pass": 0.9522825265869367,
+   "chroma_energy_kept_by_high_pass": 0.05828804103706521
   }
  },
  "blend": {
@@ -445,15 +445,13 @@
    "levels": 6,
    "sigma0": 2.0
   },
-  "durer": {
+  "daynight": {
    "shape": [
-    640,
-    570
+    1000,
+    2000
    ],
-   "levels": 6,
-   "sigma0": 2.0,
-   "painting_keeps_from_level": 5,
-   "mask_fraction": 0.08689144736842105
+   "levels": 5,
+   "sigma0": 2.0
   },
   "yinyang": {
    "shape": [

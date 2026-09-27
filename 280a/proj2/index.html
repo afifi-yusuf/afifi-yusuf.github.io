@@ -442,7 +442,7 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
             <button type="button" aria-pressed="true" data-src="images/hybrid/derek-nutmeg-hybrid-color-both.jpg" data-w="732" data-h="1024" data-alt="The Derek and Nutmeg hybrid">Derek + Nutmeg</button>
             <button type="button" aria-pressed="false" data-src="images/hybrid/tiger-cat-hybrid-color-both.jpg" data-w="960" data-h="986" data-alt="The tiger and cat hybrid">Tiger + cat</button>
             <button type="button" aria-pressed="false" data-src="images/hybrid/shades-hybrid-color-both.jpg" data-w="681" data-h="900" data-alt="The shades hybrid">Shades</button>
-            <button type="button" aria-pressed="false" data-src="images/hybrid/skull-me-hybrid-color-both.jpg" data-w="661" data-h="951" data-alt="The skull hybrid">Skull</button>
+            <button type="button" aria-pressed="false" data-src="images/hybrid/broccoli-tree-hybrid-color-both.jpg" data-w="896" data-h="960" data-alt="The broccoli and tree hybrid">Broccoli</button>
           </div>
           <label class="walk-range">Step back <input type="range" min="1" max="10" step="0.1" value="1" aria-label="Viewing distance, as a multiple of the starting distance"> <output>1×</output></label>
         </div>
@@ -486,19 +486,18 @@ cat_aligned = warp(cat, t.inverse, output_shape=derek.shape[:2], mode=&quot;edge
         <figure style="width:12.5%"><img src="images/hybrid/shades-far-8.jpg" loading="lazy" decoding="async" alt="The shades hybrid at one eighth size: the glasses win" width="85" height="112"><figcaption style="white-space:nowrap"><b>1/8</b>Shades</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Memento mori: me and a skull</b> (σ = 12 low, 5 high). An anatomical drawing as the high frequencies, its eye sockets on my pupils. The drawing is clean outlines on white, so its high-pass is almost all edges, while my blurred photo has almost none. Up close a skull shows through my face; at one eighth only my face is left.</p>
-        <p>Unlike Derek's, these bands leave a gap (below 0.016 and above 0.037 cycles/px). With a high-pass σ of 7 or 8 the skull's outline still showed at one eighth, like the cat's ears, so the high-pass has to be tight for it to vanish from afar.</p>
+        <p><b>Broccoli and a tree</b> (σ = 10 low, 5 high). A head of broccoli is a tree at a smaller scale: a round crown on a single trunk. I line up the top and bottom of the two crowns. The florets are tiny bumps, so the broccoli's high-pass is almost all texture, while the tree's leaves blur into one dark-green crown against the sky. Up close it is broccoli; at one eighth the florets are too fine to see and it is a tree in a field. The broccoli's side lobes stick out past the crown and pick up the sky's blue, but they vanish from a distance too.</p>
       </div>
       <div class="row" style="--n:4">
-        <figure><img src="images/hybrid/skull-me-low-input.jpg" loading="lazy" decoding="async" alt="My photo, the low-frequency picture" width="661" height="951"><figcaption><b>Me</b>Low-frequency picture</figcaption></figure>
-        <figure><img src="images/hybrid/skull-me-high-input.jpg" loading="lazy" decoding="async" alt="An anatomical drawing of a skull, the high-frequency picture" width="829" height="1099"><figcaption><b>Skull</b>High-frequency picture, a drawing</figcaption></figure>
-        <figure><img src="images/hybrid/skull-me-high-aligned.jpg" loading="lazy" decoding="async" alt="The skull aligned so its eye sockets sit on my pupils" width="661" height="951"><figcaption><b>Skull, aligned</b>Eye sockets on my pupils</figcaption></figure>
-        <figure><img src="images/hybrid/skull-me-overlay.jpg" loading="lazy" decoding="async" alt="Half and half overlay of the skull and my photo" width="661" height="951"><figcaption><b>Overlay</b>Half and half</figcaption></figure>
+        <figure><img src="images/hybrid/broccoli-tree-low-input.jpg" loading="lazy" decoding="async" alt="An oak tree alone in a field, the low-frequency picture" width="896" height="960"><figcaption><b>Tree</b>Low-frequency picture</figcaption></figure>
+        <figure><img src="images/hybrid/broccoli-tree-high-input.jpg" loading="lazy" decoding="async" alt="A head of broccoli on white, the high-frequency picture" width="854" height="960"><figcaption><b>Broccoli</b>High-frequency picture</figcaption></figure>
+        <figure><img src="images/hybrid/broccoli-tree-high-aligned.jpg" loading="lazy" decoding="async" alt="The broccoli aligned so its crown covers the tree's" width="896" height="960"><figcaption><b>Broccoli, aligned</b>Crown on crown</figcaption></figure>
+        <figure><img src="images/hybrid/broccoli-tree-overlay.jpg" loading="lazy" decoding="async" alt="Half and half overlay of the broccoli and the tree" width="896" height="960"><figcaption><b>Overlay</b>Half and half</figcaption></figure>
       </div>
       <div class="row narrow" style="--n:3; align-items:end">
-        <figure><img src="images/hybrid/skull-me-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="The skull hybrid at full size: a skull showing through a face" width="661" height="951"><figcaption><b>1/1</b>Up close: the skull</figcaption></figure>
-        <figure style="width:25%"><img src="images/hybrid/skull-me-far-4.jpg" loading="lazy" decoding="async" alt="The skull hybrid at quarter size" width="165" height="237"><figcaption style="white-space:nowrap"><b>1/4</b>Fading</figcaption></figure>
-        <figure style="width:12.5%"><img src="images/hybrid/skull-me-far-8.jpg" loading="lazy" decoding="async" alt="The skull hybrid at one eighth size: my face" width="82" height="118"><figcaption style="white-space:nowrap"><b>1/8</b>Me</figcaption></figure>
+        <figure><img src="images/hybrid/broccoli-tree-hybrid-color-both.jpg" loading="lazy" decoding="async" alt="The hybrid at full size: a head of broccoli" width="896" height="960"><figcaption><b>1/1</b>Up close: broccoli</figcaption></figure>
+        <figure style="width:25%"><img src="images/hybrid/broccoli-tree-far-4.jpg" loading="lazy" decoding="async" alt="The hybrid at quarter size" width="224" height="240"><figcaption style="white-space:nowrap"><b>1/4</b></figcaption></figure>
+        <figure style="width:12.5%"><img src="images/hybrid/broccoli-tree-far-8.jpg" loading="lazy" decoding="async" alt="The hybrid at one eighth size: a tree" width="112" height="120"><figcaption style="white-space:nowrap"><b>1/8</b>A tree</figcaption></figure>
       </div>
     </section>
 
@@ -678,20 +677,21 @@ def laplacian_stack(im, levels, sigma0=1.0):
         <figure><img src="images/blend/yinyang-fig-3-both.jpg" loading="lazy" decoding="async" alt="Sum of all bands: Both" width="800" height="800"><figcaption><b>&nbsp;</b>Both</figcaption></figure>
       </div>
       <div class="prose">
-        <p><b>Irregular mask, my own face: me in Dürer's self-portrait.</b> In 1500 Dürer painted himself looking straight out, the same pose as my photo. My pupils go onto his, and the same two points place the mask, an egg from above the brows to below the lower lip. His hair, beard and coat stay as painted.</p>
-        <p>The plain blend hides the egg's edge but not the lighting. His face is lit from the left and mine evenly, and inside the mask the coarse bands are mine, so my bright cheek shows as a glow in his shadow. Matching my colours to his fixes the skin tone but not the glow. The fix is the hybrid idea: the coarsest band, the lighting over the whole face, comes from the painting everywhere, and my photo supplies only the finer bands.</p>
-<pre class="code">out = blend(matched_me, durer, face_mask, levels=6, sigma0=2, b_from=5)
-# b_from=5: the mask is 0 in band 5, the leftover blur, so the painting sets the lighting</pre>
+        <p><b>Irregular mask: Earth by day and at night.</b> NASA's Blue Marble and its city-lights map use the same projection, so they line up pixel for pixel. The mask is the half of the Earth the sun is on, here at the June solstice, 04:00 UTC, when the terminator is as curved as it gets. The sun is above the horizon where sin φ sin δ + cos φ cos δ cos(λ − λ<sub>sun</sub>) &gt; 0, with latitude φ, longitude λ and declination δ = 23.44°. Five levels (widest σ = 16) give a dusk band close to the width of real twilight.</p>
+        <p><b>Why it needs the stack</b> (crops over West Africa). A single feather of σ = 12 dims the city lights across the whole twilight band and lays daytime cloud faintly over the night side. The stack joins the lights, a fine band, along a sharp line, so they stay bright right up to the terminator, and only the broad brightness of daylight fades over a wide band, as it does at dusk.</p>
       </div>
       <div class="row" style="--n:3">
-        <figure><img src="images/blend/durer-b.jpg" loading="lazy" decoding="async" alt="Albrecht Dürer's self-portrait of 1500, the head" width="570" height="640"><figcaption><b>Dürer, 1500</b>My photo is the skull hybrid's</figcaption></figure>
-        <figure><img src="images/blend/durer-mask.png" loading="lazy" decoding="async" alt="The egg-shaped face mask, white where my face is used" width="570" height="640"><figcaption><b>Mask</b>Set by the two pupils</figcaption></figure>
-        <figure><img src="images/blend/durer-cut.jpg" loading="lazy" decoding="async" alt="My face pasted into the painting with a hard edge" width="570" height="640"><figcaption><b>Cut</b>The mask used as it is</figcaption></figure>
+        <figure><img src="images/blend/daynight-a.jpg" loading="lazy" decoding="async" alt="NASA Blue Marble world map by day" width="2000" height="1000"><figcaption><b>Day</b>Blue Marble</figcaption></figure>
+        <figure><img src="images/blend/daynight-b.jpg" loading="lazy" decoding="async" alt="NASA world map of city lights at night" width="2000" height="1000"><figcaption><b>Night</b>City lights</figcaption></figure>
+        <figure><img src="images/blend/daynight-mask.png" loading="lazy" decoding="async" alt="The mask: white where the sun is up at the June solstice, 04:00 UTC" width="2000" height="1000"><figcaption><b>Mask</b>Where the sun is up</figcaption></figure>
+      </div>
+      <div class="row" style="--n:1">
+        <figure class="pick"><img src="images/blend/daynight.jpg" loading="lazy" decoding="async" alt="The blend: night over the Americas, dawn over Africa and Europe, day over Asia and Australia" width="2000" height="1000"><figcaption><b>Multiresolution</b>Five levels, June solstice, 04:00 UTC</figcaption></figure>
       </div>
       <div class="row" style="--n:3">
-        <figure><img src="images/blend/durer-plain.jpg" loading="lazy" decoding="async" alt="Multiresolution blend without colour matching: a pale glow on the shadowed cheek" width="570" height="640"><figcaption><b>Multiresolution</b>No seam, but a glow on the shadowed cheek</figcaption></figure>
-        <figure><img src="images/blend/durer-matched.jpg" loading="lazy" decoding="async" alt="Multiresolution blend after matching my colours to the painting" width="570" height="640"><figcaption><b>Colours matched</b>The painting's palette; the glow stays</figcaption></figure>
-        <figure class="pick"><img src="images/blend/durer.jpg" loading="lazy" decoding="async" alt="Final blend: my features with the painting's lighting and colour" width="570" height="640"><figcaption><b>His lighting</b>Band 5 from the painting everywhere</figcaption></figure>
+        <figure><img src="images/blend/daynight-crop-cut.jpg" loading="lazy" decoding="async" alt="West Africa with the mask used as it is: a hard line" width="400" height="400"><figcaption><b>Cut</b>The mask used as it is</figcaption></figure>
+        <figure><img src="images/blend/daynight-crop-feather.jpg" loading="lazy" decoding="async" alt="West Africa with one feather: dim lights and faint cloud on the night side" width="400" height="400"><figcaption><b>Feather, σ = 12</b>Lights dimmed, cloud ghosts</figcaption></figure>
+        <figure><img src="images/blend/daynight-crop-blend.jpg" loading="lazy" decoding="async" alt="West Africa with the multiresolution blend: bright lights up to a soft dusk" width="400" height="400"><figcaption><b>Multiresolution</b>Sharp lights, soft dusk</figcaption></figure>
       </div>
     </section>
 
@@ -711,7 +711,6 @@ def laplacian_stack(im, levels, sigma0=1.0):
       </div>
       <div class="prose">
         <p>Even in gray the join shows, where cloud meets smooth ground. A wider chroma mask spreads a pink haze over Earth and pales Mars; a narrower one keeps both colours clean, and I prefer it, since any mix of two colours this far apart looks like neither planet. Taking all the colour from Earth (last) makes it read as one planet, so most of what separates the two is colour. Colour improves a blend most by making the colours agree.</p>
-        <p><b>Making the colours agree first.</b> The Dürer blend in part 2.4 does that. Before blending, each channel of my photo is shifted and scaled so its mean and spread inside the mask equal the painting's, turning my skin to his warm brown. The blend alone couldn't, because inside the mask every band, including the face's overall colour, is mine. Lighting is a broad change in brightness, a coarse band, so it has to come from the painting instead.</p>
       </div>
     </section>
 
@@ -729,7 +728,7 @@ def laplacian_stack(im, levels, sigma0=1.0):
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Golden Gate by day: Wattewyl, CC BY 3.0; by night: Christoph Strässler, CC BY-SA 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. Skull: Patrick J. Lynch, CC BY 2.5. Self-portrait: Albrecht Dürer, 1500, public domain. All eight from Wikimedia Commons. The rest are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 2 · Fall 2026 · Cameraman, Taj Mahal, Derek, Nutmeg, apple and orange are the course's images. Tiger: Steve Wilson, CC BY 2.0. Cat: Augustus Binu, CC BY-SA 3.0. Golden Gate by day: Wattewyl, CC BY 3.0; by night: Christoph Strässler, CC BY-SA 2.0. Earth: NASA, Apollo 17. Mars: ESA &amp; MPS for OSIRIS Team, CC BY-SA 3.0 IGO. Tree: John H Darch, CC BY-SA 2.0. Broccoli: Fir0002, GFDL 1.2. Earth by day and at night: NASA, public domain. All ten from Wikimedia Commons. The rest are mine.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj2</p>
   </footer>
 
