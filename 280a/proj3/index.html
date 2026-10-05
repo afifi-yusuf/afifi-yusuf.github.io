@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project 3 · Fun with flow models · Yusuf Afifi</title>
+  <meta name="description" content="CS 280A Project 3, Part A: sampling, guidance, image editing, visual anagrams, hybrids and a course logo with PixNerd, a pretrained flow model, run on a Mac.">
+  <meta name="theme-color" content="#1d1a4f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:opsz,wdth,wght@8..144,25..151,400..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css?v=5002a705">
+  <link rel="stylesheet" href="project.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-left">
+      <a class="who" href="../">
+        <strong>Yusuf Afifi</strong>
+        <span>CS 280A · Fall 2026</span>
+      </a>
+      <a class="home" href="../"><b aria-hidden="true">←</b> All projects</a>
+    </div>
+    <nav class="jump" aria-label="Sections">
+      <a href="#idea"><b>v</b> Idea</a>
+      <a href="#noise"><b>1.1</b> Noise</a>
+      <a href="#denoise"><b>1.3</b> One step</a>
+      <a href="#euler"><b>1.5</b> Euler</a>
+      <a href="#cfg"><b>2.1</b> CFG</a>
+      <a href="#edit"><b>3.1</b> Edit</a>
+      <a href="#text"><b>3.2</b> Text</a>
+      <a href="#anagrams"><b>3.3</b> Anagrams</a>
+      <a href="#hybrids"><b>3.4</b> Hybrids</a>
+      <a href="#views"><b>B&amp;W</b> Views</a>
+      <a href="#logo"><b>B&amp;W</b> Logo</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <h1>Fun with flow models</h1>
+          <p class="lede">
+            A flow model turns noise into a picture by following a velocity, one small step at a time. In Part A I drive a pretrained one, PixNerd, to denoise, generate, edit my own photos and drawings, and make visual anagrams and hybrid images.
+          </p>
+        </div>
+        <p class="print-only print-note">This is a print of afifi-yusuf.github.io/280a/proj3. On the web page the sweeps have sliders and the anagrams turn; here each is shown as a strip or as both orientations.</p>
+        <figure class="hero-photo">
+          <div class="hero-turn"><img src="images/a/logo-anagram-ghost.jpg" decoding="async" alt="A gold enamel pin of the Cal script that, turned upside down, is a cartoon bear's face" width="512" height="512"></div>
+          <figcaption class="hero-turn-cap">Cal, or a bear: the same pin, turned.</figcaption>
+        </figure>
+        <div class="barrel barrel-hero" role="img" aria-label="Flow time from pure noise at 0 to a clean picture at 1">
+          <ol class="ticks">
+            <li style="--p:0">0</li>
+            <li style="--p:0.25">0.25</li>
+            <li style="--p:0.5">0.5</li>
+            <li style="--p:0.75">0.75</li>
+            <li style="--p:1">1</li>
+          </ol>
+          <span class="index"></span>
+          <span class="unit">flow time t, noise to picture</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="idea">
+      <header class="part-head">
+        <p class="param" aria-label="from noise to picture"><span><var>t</var> = 0</span><i aria-hidden="true">→</i><span>1</span><small>noise to picture</small></p>
+        <h2>The one idea: follow the velocity</h2>
+      </header>
+      <div class="prose">
+        <p>A flow model is trained on straight lines from noise to images, x<sub>t</sub> = (1 − t) x<sub>0</sub> + t x<sub>1</sub>, and learns the velocity x<sub>1</sub> − x<sub>0</sub>. It only sees x<sub>t</sub>, so it learns the average velocity of every pair through that point, which is why sampling paths curve and I ask the model again at every small step.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x</var><sub>t</sub> = (1 − <var>t</var>) ε + <var>t</var> <var>x</var><sub>1</sub></p><span class="eq-tag">the path, t = 0 noise, t = 1 picture</span></div><div class="eq-row"><p class="eq-line"><var>v</var><sub>θ</sub>(<var>x</var><sub>t</sub>, <var>t</var>, <var>c</var>) ≈ <var>x</var><sub>1</sub> − ε</p><span class="eq-tag">what the model predicts</span></div><div class="eq-row"><p class="eq-line"><var>x</var><sub>t+h</sub> = <var>x</var><sub>t</sub> + <var>h</var> · <var>v</var>(<var>x</var><sub>t</sub>, <var>t</var>)</p><span class="eq-tag">how sampling follows it, h = 0.02</span></div></div>
+    </section>
+    <section class="part" id="noise">
+      <header class="part-head">
+        <p class="param" aria-label="t from 0.25 to 0.75"><span><var>t</var> = 0.25</span><i aria-hidden="true">→</i><span>0.75</span><small>noise level</small></p>
+        <h2>Part 1.1–1.2 · Noisy inputs and Gaussian blur</h2>
+      </header>
+      <div class="prose">
+        <p>I took this picture of Mirror Lake on a trip to Yosemite in June. Here it is mixed with one noise sample at three values of t: at 0.25 only the sky and the water show through, and by 0.75 the noise is just grain.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x</var><sub>t</sub> = (1 − <var>t</var>) ε + <var>t</var> <var>x</var><sub>1</sub></p><span class="eq-tag">A.1 · noisy input</span></div><div class="eq-row"><p class="eq-line"><var>x̂</var><sub>1</sub><sup>blur</sup> = <var>G</var><sub>σ</sub> ∗ (<var>x</var><sub>t</sub> / <var>t</var>)</p><span class="eq-tag">1.2 · blur baseline</span></div></div>
+      <div class="prose">
+        <pre class="code">def interpolate(image, noise, t):
+    x_t = (1-t)*noise + t*image
+    return x_t</pre>
+      </div>
+      <div class="row" style="--n:4">
+        <figure><img src="images/a/noisy-0.jpg" decoding="async" alt="Mirror Lake. 512×512, values in [−1, 1]" width="404" height="404"><figcaption><b>Mirror Lake</b>512×512, values in [−1, 1]</figcaption></figure>
+        <figure><img src="images/a/noisy-1.jpg" loading="lazy" decoding="async" alt="t = 0.25" width="404" height="404"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure><img src="images/a/noisy-2.jpg" loading="lazy" decoding="async" alt="t = 0.50" width="404" height="404"><figcaption><b>t = 0.50</b></figcaption></figure>
+        <figure><img src="images/a/noisy-3.jpg" loading="lazy" decoding="async" alt="t = 0.75" width="404" height="404"><figcaption><b>t = 0.75</b></figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>1.2 · Gaussian blur.</b> Dividing by t and blurring averages the zero-mean noise away. The best σ grows with the noise (8, 4 and 1 for t = 0.25, 0.50 and 0.75), and at σ = 8 the lake goes with it.</p>
+      </div>
+      <div class="row keep" style="--n:6">
+        <figure><img src="images/a/blur-25-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.25" width="404" height="404"><figcaption><b>Noisy</b>t = 0.25</figcaption></figure>
+        <figure><img src="images/a/blur-25-1.jpg" loading="lazy" decoding="async" alt="Blurred. σ = 8" width="404" height="404"><figcaption><b>Blurred</b>σ = 8</figcaption></figure>
+        <figure><img src="images/a/blur-50-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.50" width="404" height="404"><figcaption><b>Noisy</b>t = 0.50</figcaption></figure>
+        <figure><img src="images/a/blur-50-1.jpg" loading="lazy" decoding="async" alt="Blurred. σ = 4" width="404" height="404"><figcaption><b>Blurred</b>σ = 4</figcaption></figure>
+        <figure><img src="images/a/blur-75-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.75" width="404" height="404"><figcaption><b>Noisy</b>t = 0.75</figcaption></figure>
+        <figure><img src="images/a/blur-75-1.jpg" loading="lazy" decoding="async" alt="Blurred. σ = 1" width="404" height="404"><figcaption><b>Blurred</b>σ = 1</figcaption></figure>
+      </div>
+    </section>
+    <section class="part" id="denoise">
+      <header class="part-head">
+        <p class="param" aria-label="from the noisy image to the one-step estimate"><span><var>t</var> = 0.25</span><i aria-hidden="true">→</i><span>0.75</span><small>one step each</small></p>
+        <h2>Part 1.3–1.4 · One-step denoising and the velocity</h2>
+      </header>
+      <div class="prose">
+        <p>One step follows the predicted velocity straight to t = 1. At 0.25 everything lands in the right place but comes out smooth and painted, since a model trained on squared error predicts the average of every lake that fits; by 0.75 it is almost my photo.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x̂</var><sub>1</sub> = <var>x</var><sub>t</sub> + (1 − <var>t</var>) <var>v</var><sub>θ</sub>(<var>x</var><sub>t</sub>, <var>t</var>, <var>c</var>)</p><span class="eq-tag">A.2 · one step</span></div><div class="eq-row"><p class="eq-line">(1 − <var>t</var>) <var>v</var><sub>gt</sub> = <var>x</var><sub>1</sub> − <var>x</var><sub>t</sub></p><span class="eq-tag">1.4 · the true update</span></div><div class="eq-row"><p class="eq-line"><var>E</var><sub>t</sub> = √ mean<sub>RGB</sub> [ (1 − <var>t</var>)(<var>v̂</var> − <var>v</var><sub>gt</sub>) ]²</p><span class="eq-tag">1.4 · error per pixel</span></div></div>
+      <div class="prose">
+        <pre class="code">def one_step_denoise(x, t, condition, predict_velocity):
+    v = predict_velocity(x,t,condition)
+    x_1 = x + (1-t)*v
+    return x_1</pre>
+      </div>
+      <div class="row keep narrow" style="--n:3">
+        <figure><img src="images/a/onestep-25-0.jpg" loading="lazy" decoding="async" alt="Original" width="388" height="387"><figcaption><b>Original</b></figcaption></figure>
+        <figure><img src="images/a/onestep-25-1.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.25" width="388" height="387"><figcaption><b>Noisy</b>t = 0.25</figcaption></figure>
+        <figure><img src="images/a/onestep-25-2.jpg" loading="lazy" decoding="async" alt="One step. from t = 0.25" width="388" height="387"><figcaption><b>One step</b>from t = 0.25</figcaption></figure>
+      </div>
+      <div class="row keep narrow" style="--n:3">
+        <figure><img src="images/a/onestep-50-0.jpg" loading="lazy" decoding="async" alt="Original" width="388" height="387"><figcaption><b>Original</b></figcaption></figure>
+        <figure><img src="images/a/onestep-50-1.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.50" width="388" height="387"><figcaption><b>Noisy</b>t = 0.50</figcaption></figure>
+        <figure><img src="images/a/onestep-50-2.jpg" loading="lazy" decoding="async" alt="One step. from t = 0.50" width="388" height="387"><figcaption><b>One step</b>from t = 0.50</figcaption></figure>
+      </div>
+      <div class="row keep narrow" style="--n:3">
+        <figure><img src="images/a/onestep-75-0.jpg" loading="lazy" decoding="async" alt="Original" width="388" height="387"><figcaption><b>Original</b></figcaption></figure>
+        <figure><img src="images/a/onestep-75-1.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.75" width="388" height="387"><figcaption><b>Noisy</b>t = 0.75</figcaption></figure>
+        <figure><img src="images/a/onestep-75-2.jpg" loading="lazy" decoding="async" alt="One step. from t = 0.75" width="388" height="387"><figcaption><b>One step</b>from t = 0.75</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>1.4 · Predicted vs. true update.</b> The noise cancels between the two updates, so the error map is just one step vs. my photo. It looks like a Laplacian: dark in the sky and the water, bright on edges and foliage, and it thins out as t grows.</p>
+      </div>
+      <div class="prose"><pre class="code">@torch.inference_mode()
+def velocity_diagnostics(x_t, t, clean_image, epsilon, condition, predict_velocity):
+    x_1_hat = one_step_denoise(x_t, t, condition, predict_velocity)
+    predicted_update = x_1_hat - x_t
+    ground_truth_update = clean_image - x_t
+    error_map = torch.sqrt(((predicted_update - ground_truth_update) ** 2).mean(dim=1))
+    return predicted_update, ground_truth_update, error_map</pre></div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/a/noisy-0.jpg" loading="lazy" decoding="async" alt="Original. Mirror Lake" width="404" height="404"><figcaption><b>Original</b>Mirror Lake</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/a/vel-25-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.25" width="372" height="371"><figcaption><b>Noisy</b>t = 0.25</figcaption></figure>
+        <figure><img src="images/a/vel-25-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
+        <figure><img src="images/a/vel-25-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
+        <figure><img src="images/a/vel-25-3.jpg" loading="lazy" decoding="async" alt="Error. RGB RMS" width="372" height="371"><figcaption><b>Error</b>RGB RMS</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/a/vel-50-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.50" width="372" height="371"><figcaption><b>Noisy</b>t = 0.50</figcaption></figure>
+        <figure><img src="images/a/vel-50-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
+        <figure><img src="images/a/vel-50-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
+        <figure><img src="images/a/vel-50-3.jpg" loading="lazy" decoding="async" alt="Error" width="372" height="371"><figcaption><b>Error</b></figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/a/vel-75-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.75" width="372" height="371"><figcaption><b>Noisy</b>t = 0.75</figcaption></figure>
+        <figure><img src="images/a/vel-75-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
+        <figure><img src="images/a/vel-75-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
+        <figure><img src="images/a/vel-75-3.jpg" loading="lazy" decoding="async" alt="Error" width="372" height="371"><figcaption><b>Error</b></figcaption></figure>
+      </div>
+      <p class="note">All three error maps share one colour scale, from 0 (dark purple) to the largest error over the three.</p>
+    </section>
+    <section class="part" id="euler">
+      <header class="part-head">
+        <p class="param" aria-label="from 1 to 25 Euler steps"><span>1</span><i aria-hidden="true">→</i><span>25</span><small>Euler steps</small></p>
+        <h2>Part 1.5–1.6 · Euler sampling, from my photo and from noise</h2>
+      </header>
+      <div class="prose">
+        <p>Euler takes small steps of h = 0.02 and asks the model again each time, so it can commit to finer detail as the picture cleans up. From my photo at t = 0.5 that is 25 steps; from pure noise it makes a new image (1.6).</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x</var><sub>t+h</sub> = <var>x</var><sub>t</sub> + <var>h</var> · <var>v</var><sub>θ</sub>(<var>x</var><sub>t</sub>, <var>t</var>, <var>c</var>)</p><span class="eq-tag">A.3 · one Euler step, h = 0.02</span></div></div>
+      <div class="prose">
+        <pre class="code">@torch.inference_mode()
+def euler_sample(x_start, t_start, step_size, velocity):
+    n = math.ceil((1 - t_start) / step_size - 1e-9)
+    x, t = x_start, t_start
+    states = [(t, x)]
+    for i in range(1, n + 1):
+        t_next = 1.0 if i == n else t_start + i * step_size
+        x = x + (t_next - t) * velocity(x, t)
+        t = t_next
+        if i % 5 == 0 or i == n:
+            states.append((t, x))
+    return x, states</pre>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/traj-0.jpg" loading="lazy" decoding="async" alt="" width="406" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Denoising Mirror Lake from t = 0.5</p>
+          <p>Drag through the 25 steps. Each frame is five steps after the last.</p>
+          <label class="scrub-range"><span class="visually-hidden">Euler step</span>
+            <input type="range" min="0" max="5" step="1" value="0">
+            <span class="scrub-ticks" aria-hidden="true"><span>0.50</span><span>0.60</span><span>0.70</span><span>0.80</span><span>0.90</span><span>1.00</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:6">
+        <figure data-at="t = 0.50"><img src="images/a/traj-0.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 0.50 (start)" width="406" height="405"><figcaption><b>t = 0.50</b>start</figcaption></figure>
+        <figure data-at="t = 0.60"><img src="images/a/traj-1.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 0.60 (5 steps)" width="406" height="405"><figcaption><b>t = 0.60</b>5 steps</figcaption></figure>
+        <figure data-at="t = 0.70"><img src="images/a/traj-2.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 0.70 (10 steps)" width="406" height="405"><figcaption><b>t = 0.70</b>10 steps</figcaption></figure>
+        <figure data-at="t = 0.80"><img src="images/a/traj-3.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 0.80 (15 steps)" width="406" height="405"><figcaption><b>t = 0.80</b>15 steps</figcaption></figure>
+        <figure data-at="t = 0.90"><img src="images/a/traj-4.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 0.90 (20 steps)" width="406" height="405"><figcaption><b>t = 0.90</b>20 steps</figcaption></figure>
+        <figure data-at="t = 1.00"><img src="images/a/traj-5.jpg" loading="lazy" decoding="async" alt="Mirror Lake during Euler sampling, t = 1.00 (25 steps)" width="406" height="405"><figcaption><b>t = 1.00</b>25 steps</figcaption></figure>
+      </div>
+      </div>
+      <div class="prose">
+        <p><b>Blur vs. one step vs. Euler.</b> One step has the lowest error (0.026) because it predicts the average; Euler is sharper but commits to detail that is not exactly mine (0.031); blur loses on both (0.041). Euler is the only one that looks like a photo, so it is my pick.</p>
+      </div>
+      <div class="row" style="--n:4">
+        <figure><img src="images/a/compare-0.jpg" loading="lazy" decoding="async" alt="Original" width="388" height="387"><figcaption><b>Original</b></figcaption></figure>
+        <figure><img src="images/a/compare-1.jpg" loading="lazy" decoding="async" alt="Blur. error 0.041" width="388" height="387"><figcaption><b>Blur</b>error 0.041</figcaption></figure>
+        <figure><img src="images/a/compare-2.jpg" loading="lazy" decoding="async" alt="One step. error 0.026" width="388" height="387"><figcaption><b>One step</b>error 0.026</figcaption></figure>
+        <figure class="pick"><img src="images/a/compare-3.jpg" loading="lazy" decoding="async" alt="Euler. error 0.031" width="388" height="387"><figcaption><b>Euler</b>error 0.031</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>1.6 · Sampling from pure noise.</b> Five unguided samples of "a high quality photo", seeds 280 to 284. Four are rough people (a man fused with a camera, a smeared face) and one is a jar of machine parts: they look like photos until you look twice.</p>
+      </div>
+      <div class="row" style="--n:5">
+        <figure><img src="images/a/sample-0.jpg" loading="lazy" decoding="async" alt="Seed 280" width="512" height="512"><figcaption><b>Seed 280</b></figcaption></figure>
+        <figure><img src="images/a/sample-1.jpg" loading="lazy" decoding="async" alt="Seed 281" width="512" height="512"><figcaption><b>Seed 281</b></figcaption></figure>
+        <figure><img src="images/a/sample-2.jpg" loading="lazy" decoding="async" alt="Seed 282" width="512" height="512"><figcaption><b>Seed 282</b></figcaption></figure>
+        <figure><img src="images/a/sample-3.jpg" loading="lazy" decoding="async" alt="Seed 283" width="512" height="512"><figcaption><b>Seed 283</b></figcaption></figure>
+        <figure><img src="images/a/sample-4.jpg" loading="lazy" decoding="async" alt="Seed 284" width="512" height="512"><figcaption><b>Seed 284</b></figcaption></figure>
+      </div>
+    </section>
+    <section class="part" id="cfg">
+      <header class="part-head">
+        <p class="param" aria-label="guidance weight from 0 to 7"><span><var>w</var> = 0</span><i aria-hidden="true">→</i><span>7</span><small>guidance</small></p>
+        <h2>Part 2.1 · Classifier-free guidance</h2>
+      </header>
+      <div class="part-body">
+        <figure class="wipe square" data-wipe>
+          <div class="wipe-frame" style="--pos:50%">
+            <img class="wipe-under" src="images/a/cfg-3.jpg" loading="lazy" decoding="async" alt="" width="512" height="512">
+            <img class="wipe-over" src="images/a/sample-3.jpg" loading="lazy" decoding="async" alt="" width="512" height="512">
+            <span class="wipe-tag wipe-tag-l">w = 0</span>
+            <span class="wipe-tag wipe-tag-r">w = 7</span>
+            <span class="wipe-line" aria-hidden="true"></span>
+            <span class="wipe-knob" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg></span>
+            <input type="range" min="0" max="100" value="50" aria-label="Wipe between the unguided and the guided sample from seed 283">
+          </div>
+          <img class="print-only" src="images/a/cfg-3.jpg" loading="lazy" decoding="async" alt="Seed 283 with guidance" width="512" height="512">
+          <figcaption><span class="screen-cap">Seed 283, the same noise both sides: without guidance a man fused with a camera, with w = 7 a clean portrait.</span><span class="print-cap">Seed 283 with guidance, w = 7.</span></figcaption>
+        </figure>
+        <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var><sub>cfg</sub> = <var>v</var><sub>c</sub> + <var>w</var> (<var>v</var><sub>c</sub> − <var>v</var><sub>u</sub>)</p><span class="eq-tag">A.4 · c = my prompt, u = the empty prompt</span></div></div>
+        <div class="prose">
+        <p>Guidance fixes that: each step uses two predictions, with and without my prompt, and pushes past the conditional one (w = 7, same noises as 1.6). Every sample becomes a clean studio portrait, even the jar, so I gain quality and lose diversity.</p>
+        <pre class="code">def cfg_velocity(x, t, condition, w, predict_velocity, null_condition=&#x27;&#x27;):
+    v_unconditional = predict_velocity(x,t,null_condition)
+    v_conditional = predict_velocity(x,t,condition)
+    return v_conditional + w*(v_conditional-v_unconditional)</pre>
+      </div>
+      </div>
+      <div class="row" style="--n:5">
+        <figure><img src="images/a/cfg-0.jpg" loading="lazy" decoding="async" alt="Seed 280. w = 7" width="512" height="512"><figcaption><b>Seed 280</b>w = 7</figcaption></figure>
+        <figure><img src="images/a/cfg-1.jpg" loading="lazy" decoding="async" alt="Seed 281. w = 7" width="512" height="512"><figcaption><b>Seed 281</b>w = 7</figcaption></figure>
+        <figure><img src="images/a/cfg-2.jpg" loading="lazy" decoding="async" alt="Seed 282. w = 7" width="512" height="512"><figcaption><b>Seed 282</b>w = 7</figcaption></figure>
+        <figure><img src="images/a/cfg-3.jpg" loading="lazy" decoding="async" alt="Seed 283. w = 7" width="512" height="512"><figcaption><b>Seed 283</b>w = 7</figcaption></figure>
+        <figure><img src="images/a/cfg-4.jpg" loading="lazy" decoding="async" alt="Seed 284. w = 7" width="512" height="512"><figcaption><b>Seed 284</b>w = 7</figcaption></figure>
+      </div>
+    </section>
+    <section class="part" id="edit">
+      <header class="part-head">
+        <p class="param" aria-label="starting time from 0.02 to 0.5"><span><var>t</var><sub>0</sub> = 0.02</span><i aria-hidden="true">→</i><span>0.5</span><small>starting time</small></p>
+        <h2>Part 3.1 · Image-to-image editing</h2>
+      </header>
+      <div class="prose">
+        <p><code>edit</code> noises a picture to the starting time and runs guided Euler steps to 1 with the prompt "a high quality photo". The smaller the starting time, the more noise, and the more freedom the model has to hallucinate its way back to the photo manifold. Drag each slider from left (most noise) to right.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x</var><sub>t₀</sub> = (1 − <var>t</var><sub>0</sub>) ε + <var>t</var><sub>0</sub> <var>y</var></p><span class="eq-tag">noise my picture y to the starting time</span></div><div class="eq-row"><p class="eq-line"><var>x</var><sub>t+h</sub> = <var>x</var><sub>t</sub> + <var>h</var> · <var>v</var><sub>cfg</sub>(<var>x</var><sub>t</sub>, <var>t</var>)</p><span class="eq-tag">then guided Euler steps from t₀ to 1</span></div></div>
+      <div class="prose">
+        <pre class="code">def edit(image, noise, t_start, condition, predict_velocity, w=7, step_size=0.02):
+    x = interpolate(image, noise, t_start)
+    velocity = lambda x, t: cfg_velocity(x, t, condition, w, predict_velocity, null_condition)
+    final, _ = euler_sample(x, t_start, step_size, velocity)
+    return final</pre>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-campanile-3.jpg" loading="lazy" decoding="async" alt="" width="404" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">The Campanile</p>
+          <p>At 0.02 only a pale column on blue survives, and the model turns it into a pipe beside a machine. From 0.04 to 0.10 it is a smooth white tower with the right outline and no openings; the belfry comes back at 0.14 and the clock face by 0.50.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="3">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="Campanile"><img src="images/a/edit-campanile-0.jpg" loading="lazy" decoding="async" alt="The Campanile edited, Campanile" width="404" height="405"><figcaption><b>Campanile</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-campanile-1.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.02" width="404" height="405"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-campanile-2.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.04" width="404" height="405"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-campanile-3.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.06" width="404" height="405"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-campanile-4.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.10" width="404" height="405"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-campanile-5.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.14" width="404" height="405"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-campanile-6.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.25" width="404" height="405"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-campanile-7.jpg" loading="lazy" decoding="async" alt="The Campanile edited, t = 0.50" width="404" height="405"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-lake-3.jpg" loading="lazy" decoding="async" alt="" width="404" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Mirror Lake, Yosemite</p>
+          <p>My lake from June. The colours survive first: at 0.02 to 0.06 they become people at laptops. At 0.10 the model keeps the low-frequency layout, water below and trees above, but hallucinates a waterfall under a sign of made-up letters. From 0.14 it is my lake again, cliff and reflection included.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="3">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="Mirror Lake"><img src="images/a/edit-lake-0.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, Mirror Lake" width="404" height="405"><figcaption><b>Mirror Lake</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-lake-1.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.02" width="404" height="405"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-lake-2.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.04" width="404" height="405"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-lake-3.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.06" width="404" height="405"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-lake-4.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.10" width="404" height="405"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-lake-5.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.14" width="404" height="405"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-lake-6.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.25" width="404" height="405"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-lake-7.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited, t = 0.50" width="404" height="405"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-duomo-4.jpg" loading="lazy" decoding="async" alt="" width="404" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">The Duomo, Milan</p>
+          <p>I took this one at night on my high school graduation trip to Milan a few years ago. The model's first guesses are a man's portrait at 0.02 and an appliance at 0.04 to 0.06, both in the night palette. At 0.10 and 0.14 it is a plain white cathedral with the right spires; the tracery and the crowd return at 0.25.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="4">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="The Duomo"><img src="images/a/edit-duomo-0.jpg" loading="lazy" decoding="async" alt="The Duomo edited, The Duomo" width="404" height="405"><figcaption><b>The Duomo</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-duomo-1.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.02" width="404" height="405"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-duomo-2.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.04" width="404" height="405"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-duomo-3.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.06" width="404" height="405"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-duomo-4.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.10" width="404" height="405"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-duomo-5.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.14" width="404" height="405"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-duomo-6.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.25" width="404" height="405"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-duomo-7.jpg" loading="lazy" decoding="async" alt="The Duomo edited, t = 0.50" width="404" height="405"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="prose">
+        <p><b>Web image and hand drawings.</b> Here the model should pull a non-photo onto the photo manifold.</p>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-litho-5.jpg" loading="lazy" decoding="async" alt="" width="367" height="367"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Web image: <q>Pyramids of Gizeh</q></p>
+          <p>I'm from Egypt, so the pyramids were the obvious pick. Louis Haghe's 1838 lithograph is almost one beige tone, so at early starting times the model keeps only its first-order statistics, the colour: a woman at a laptop, a cream living room, a sea of clouds. By 0.25 it finds sand dunes, and the pyramid itself returns at 0.50.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="5">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="Lithograph"><img src="images/a/edit-litho-0.jpg" loading="lazy" decoding="async" alt="The lithograph edited, Lithograph (Haghe, 1838)" width="367" height="367"><figcaption><b>Lithograph</b>Haghe, 1838</figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-litho-1.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.02" width="367" height="367"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-litho-2.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.04" width="367" height="367"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-litho-3.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.06" width="367" height="367"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-litho-4.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.10" width="367" height="367"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-litho-5.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.14" width="367" height="367"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-litho-6.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.25" width="367" height="367"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-litho-7.jpg" loading="lazy" decoding="async" alt="The lithograph edited, t = 0.50" width="367" height="367"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-car-4.jpg" loading="lazy" decoding="async" alt="" width="404" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">My drawing: a Porsche 911</p>
+          <p>My dream car, a red 911, in coloured pencil. At 0.02 to 0.06 the white paper wins and I get a laptop and a hand; from 0.10 to 0.25 it is a real car in my drawing's pose, but white, since the paper dominates the colours, and by 0.50 it is a sketch again.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="4">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="My drawing"><img src="images/a/edit-car-0.jpg" loading="lazy" decoding="async" alt="The car drawing edited, My drawing (coloured pencil)" width="404" height="405"><figcaption><b>My drawing</b>coloured pencil</figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-car-1.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.02" width="404" height="405"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-car-2.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.04" width="404" height="405"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-car-3.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.06" width="404" height="405"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-car-4.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.10" width="404" height="405"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-car-5.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.14" width="404" height="405"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-car-6.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.25" width="404" height="405"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-car-7.jpg" loading="lazy" decoding="async" alt="The car drawing edited, t = 0.50" width="404" height="405"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/edit-shark-6.jpg" loading="lazy" decoding="async" alt="" width="404" height="405"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">My drawing: Jaws</p>
+          <p>Jaws was one of my favourite movies when I was younger. Sadly, the shark never becomes a shark. The model does pick up the blue, and at 0.25 the water becomes a real ocean.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="6">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="My drawing"><img src="images/a/edit-shark-0.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, My drawing (coloured pencil)" width="404" height="405"><figcaption><b>My drawing</b>coloured pencil</figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/edit-shark-1.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.02" width="404" height="405"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/edit-shark-2.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.04" width="404" height="405"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/edit-shark-3.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.06" width="404" height="405"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/edit-shark-4.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.10" width="404" height="405"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/edit-shark-5.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.14" width="404" height="405"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/edit-shark-6.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.25" width="404" height="405"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/edit-shark-7.jpg" loading="lazy" decoding="async" alt="The shark drawing edited, t = 0.50" width="404" height="405"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+    </section>
+    <section class="part" id="text">
+      <header class="part-head">
+        <p class="param" aria-label="starting time from 0.02 to 0.5, with a prompt"><span><var>t</var><sub>0</sub> = 0.02</span><i aria-hidden="true">→</i><span>0.5</span><small>starting time</small></p>
+        <h2>Part 3.2 · Text-guided image editing</h2>
+      </header>
+      <div class="prose">
+        <p>The same procedure with my own prompt in place of "a high quality photo". The prompt describes the picture I want, not an instruction: the model matches a caption.</p>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/text-campanile-4.jpg" loading="lazy" decoding="async" alt="" width="392" height="391"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Campanile, <q>a photograph of Big Ben in London</q></p>
+          <p>At 0.02 to 0.10 the prompt wins outright: Big Ben with the Houses of Parliament. At 0.14 Big Ben's clock and spire stand in the Campanile's sky beside its trees, the hybrid I was after: Big Ben at Berkeley. By 0.50 it is the Campanile again.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="4">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="Campanile"><img src="images/a/text-campanile-0.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, Campanile" width="392" height="391"><figcaption><b>Campanile</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/text-campanile-1.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.02" width="392" height="391"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/text-campanile-2.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.04" width="392" height="391"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/text-campanile-3.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.06" width="392" height="391"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/text-campanile-4.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.10" width="392" height="391"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/text-campanile-5.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.14" width="392" height="391"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/text-campanile-6.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.25" width="392" height="391"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/text-campanile-7.jpg" loading="lazy" decoding="async" alt="The Campanile edited toward Big Ben, t = 0.50" width="392" height="391"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/text-lake-4.jpg" loading="lazy" decoding="async" alt="" width="392" height="391"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Mirror Lake, <q>a photograph of a mountain lake in autumn with bright orange and red trees</q></p>
+          <p>The progression is the interesting part: the lower the starting time, the more orange. At 0.02 to 0.06 it is a generic alpine lake lined with orange larches; at 0.10 and 0.14 it is my lake, with orange trees and orange reflections; at 0.25 only a hint of autumn is left.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="4">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="Mirror Lake"><img src="images/a/text-lake-0.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, Mirror Lake" width="392" height="391"><figcaption><b>Mirror Lake</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/text-lake-1.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.02" width="392" height="391"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/text-lake-2.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.04" width="392" height="391"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/text-lake-3.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.06" width="392" height="391"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/text-lake-4.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.10" width="392" height="391"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/text-lake-5.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.14" width="392" height="391"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/text-lake-6.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.25" width="392" height="391"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/text-lake-7.jpg" loading="lazy" decoding="async" alt="Mirror Lake edited toward autumn, t = 0.50" width="392" height="391"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/text-duomo-2.jpg" loading="lazy" decoding="async" alt="" width="392" height="391"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">The Duomo, <q>a photograph of a cathedral built from Lego bricks at night</q></p>
+          <p>The outcome was really cool here. Even at 0.02 and 0.04 the model keeps the structure of the Duomo, not just any cathedral, and it looks like a real Lego set. From 0.25 it is the photo again, crowd included.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="7" step="1" value="2">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.02</span><span>0.04</span><span>0.06</span><span>0.10</span><span>0.14</span><span>0.25</span><span>0.50</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:8">
+        <figure data-at="The Duomo"><img src="images/a/text-duomo-0.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, The Duomo" width="392" height="391"><figcaption><b>The Duomo</b></figcaption></figure>
+        <figure data-at="t = 0.02"><img src="images/a/text-duomo-1.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.02" width="392" height="391"><figcaption><b>t = 0.02</b></figcaption></figure>
+        <figure data-at="t = 0.04"><img src="images/a/text-duomo-2.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.04" width="392" height="391"><figcaption><b>t = 0.04</b></figcaption></figure>
+        <figure data-at="t = 0.06"><img src="images/a/text-duomo-3.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.06" width="392" height="391"><figcaption><b>t = 0.06</b></figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/text-duomo-4.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.10" width="392" height="391"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.14"><img src="images/a/text-duomo-5.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.14" width="392" height="391"><figcaption><b>t = 0.14</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/text-duomo-6.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.25" width="392" height="391"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.50"><img src="images/a/text-duomo-7.jpg" loading="lazy" decoding="async" alt="The Duomo edited toward Lego, t = 0.50" width="392" height="391"><figcaption><b>t = 0.50</b></figcaption></figure>
+      </div>
+      </div>
+    </section>
+    <section class="part" id="anagrams">
+      <header class="part-head">
+        <p class="param" aria-label="turned 180 degrees"><span>0°</span><i aria-hidden="true">→</i><span>180°</span><small>rotation</small></p>
+        <h2>Part 3.3 · Visual anagrams</h2>
+      </header>
+      <div class="prose">
+        <p>Visual anagrams come from arithmetic on velocities: at every step I average the guided velocity for the picture as it is and the guided velocity for the picture turned upside down, with a second prompt, turned back. Hover over or tap a picture to turn it. Hover over or tap a picture to turn it.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var> = ½ [ <var>v</var><sub>cfg</sub>(<var>x</var><sub>t</sub>, <var>t</var>, <var>p</var><sub>1</sub>) + <var>F</var>( <var>v</var><sub>cfg</sub>(<var>F</var>(<var>x</var><sub>t</sub>), <var>t</var>, <var>p</var><sub>2</sub>) ) ]</p><span class="eq-tag">F turns the picture 180°</span></div></div>
+      <div class="prose">
+        <pre class="code">def visual_anagrams(noise, condition_a, condition_b, predict_velocity, w=7, step_size=0.02):
+    def velocity(x, t):
+        v1 = cfg_velocity(x, t, condition_a, w, predict_velocity, null_condition)
+        v2 = rotate180(cfg_velocity(rotate180(x), t, condition_b, w, predict_velocity, null_condition))
+        return (v1 + v2) / 2
+    final, _ = euler_sample(noise, 0, step_size, velocity)
+    return final</pre>
+      </div>
+      <div class="turn-row">
+        <figure class="turn" data-turn style="--deg:180deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="an oil painting of a bowl of vegetables upright; an oil painting of an alien wearing a helmet when turned. Press to turn it."><img class="spin" src="images/a/anagram-veg.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/anagram-veg.jpg" alt="" width="512" height="512"></div><div><img class="spin" src="images/a/anagram-veg.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">an oil painting of a bowl of vegetables</span><span class="b" data-k="Turned">an oil painting of an alien wearing a helmet</span></span>Seed 180. The bowl's rim becomes the helmet, the greens the alien's shoulders and two red peppers its goggles. The alien's black eyes still show in the vegetables: a face is the strongest thing in either view.</figcaption>
+        </figure>
+        <figure class="turn" data-turn style="--deg:180deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="an ink painting of a bare winter tree against a stormy night sky upright; an ink painting of lightning striking a dark sea at night when turned. Press to turn it."><img class="spin" src="images/a/anagram-tree.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/anagram-tree.jpg" alt="" width="512" height="512"></div><div><img class="spin" src="images/a/anagram-tree.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">an ink painting of a bare winter tree against a stormy night sky</span><span class="b" data-k="Turned">an ink painting of lightning striking a dark sea at night</span></span>Seed 181. Branches fork upward from the trunk; turned over, they fork down from the sky into the sea. Both prompts describe the same dark ink scene, so the views only have to disagree about which way is up.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="part" id="hybrids">
+      <header class="part-head">
+        <p class="param" aria-label="viewing distance from 1 to 8 times"><span>1×</span><i aria-hidden="true">→</i><span>8×</span><small>distance</small></p>
+        <h2>Part 3.4 · Hybrid images</h2>
+      </header>
+      <div class="prose">
+        <p>Taking inspiration from Project 2's hybrids, I make pictures that look different up close and from far away by adding the low-pass velocity of one prompt to the high-pass velocity of another, split by a Gaussian with σ = 16.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var> = <var>G</var><sub>σ</sub> ∗ <var>v</var><sub>1</sub> + (<var>v</var><sub>2</sub> − <var>G</var><sub>σ</sub> ∗ <var>v</var><sub>2</sub>)</p><span class="eq-tag">low frequencies of prompt 1, high of prompt 2, σ = 16</span></div></div>
+      <div class="prose">
+        <pre class="code">def highpass(x, sigma=16.0):
+    return x - lowpass(x, sigma)
+
+def make_hybrids(noise, condition_a, condition_b, predict_velocity, w=7, step_size=0.02):
+    def velocity(x, t):
+        v1 = cfg_velocity(x, t, condition_a, w, predict_velocity, null_condition)
+        v2 = cfg_velocity(x, t, condition_b, w, predict_velocity, null_condition)
+        return lowpass(v1) + highpass(v2)
+    final, _ = euler_sample(noise, 0, step_size, velocity)
+    return final</pre>
+      </div>
+      <div class="walk2">
+          <figure class="walk2-item" data-walk>
+            <div class="walk-frame"><img src="images/a/hybrid-forest.jpg" loading="lazy" decoding="async" alt="The forest and face hybrid, shrunk to simulate stepping back" width="512" height="512"></div>
+            <figcaption class="walk2-cap"><b>Forest / face</b>close: a pine forest · far: an old man's face</figcaption>
+            <label class="walk-range">Step back <input type="range" min="1" max="10" step="0.1" value="1" aria-label="Viewing distance for the Forest / face hybrid, as a multiple of the starting distance"> <output>1×</output></label>
+          </figure>
+          <figure class="walk2-item" data-walk>
+            <div class="walk-frame"><img src="images/a/hybrid-lion.jpg" loading="lazy" decoding="async" alt="The leaves and lion hybrid, shrunk to simulate stepping back" width="512" height="512"></div>
+            <figcaption class="walk2-cap"><b>Leaves / lion</b>close: autumn leaves · far: a lion's head</figcaption>
+            <label class="walk-range">Step back <input type="range" min="1" max="10" step="0.1" value="1" aria-label="Viewing distance for the Leaves / lion hybrid, as a multiple of the starting distance"> <output>1×</output></label>
+          </figure>
+        </div>
+      <p class="note">Drag a slider to walk away from that picture: it shrinks the way distance does.</p>
+      <div class="prose">
+        <p><b>Forest and face</b> ("a lithograph of an old man's face" far, "a lithograph of a pine forest" close). Up close it is a ring of pines; at 64 px the dark trunks and the gap between the trees settle into a face. <b>Leaves and lion</b> ("an oil painting of a lion's head" far, "an oil painting of autumn leaves" close) reads more strongly: maple leaves up close, a lion's head and mane from a distance.</p>
+      </div>
+      <div class="row hyb-sizes" style="--n:4"><figure><img src="images/a/hybrid-forest.jpg" loading="lazy" decoding="async" alt="Forest and face hybrid at full size" width="512" height="512"><figcaption><b>Full size</b>close: "a lithograph of a pine forest"</figcaption></figure><figure class="tiny"><img src="images/a/hybrid-forest-64.jpg" loading="lazy" decoding="async" alt="Forest and face hybrid at 64 pixels" width="64" height="64"><figcaption><b>64 px</b>far: "a lithograph of an old man's face"</figcaption></figure><figure><img src="images/a/hybrid-lion.jpg" loading="lazy" decoding="async" alt="Leaves and lion hybrid at full size" width="512" height="512"><figcaption><b>Full size</b>close: "an oil painting of autumn leaves"</figcaption></figure><figure class="tiny"><img src="images/a/hybrid-lion-64.jpg" loading="lazy" decoding="async" alt="Leaves and lion hybrid at 64 pixels" width="64" height="64"><figcaption><b>64 px</b>far: "an oil painting of a lion's head"</figcaption></figure></div>
+    </section>
+    <section class="part" id="views">
+      <header class="part-head">
+        <p class="param" aria-label="from a 180 degree turn to a 90 degree turn and a turning disc"><span>0°</span><i aria-hidden="true">→</i><span>90°</span><small>rotation</small></p>
+        <h2>Visual anagrams with other views<small>Bells &amp; whistles</small></h2>
+      </header>
+      <div class="prose">
+        <p>Different arithmetic gives more visual anagrams. A view has to be an exact pixel permutation, so that noise stays noise from every view and the model sees the inputs it was trained on. I used a 90° rotation and an inner-circle rotation, which turns only a central disc. The owl is my favourite: only the centre changes and the ring stays put, purely from arithmetic on velocities.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var> = ¹⁄<sub>N</sub> Σ<sub>i</sub> <var>V</var><sub>i</sub><sup>−1</sup> <var>v</var><sub>cfg</sub>(<var>V</var><sub>i</sub> <var>x</var><sub>t</sub>, <var>t</var>, <var>p</var><sub>i</sub>)</p><span class="eq-tag">each view V a pixel permutation</span></div></div>
+      <div class="prose">
+        <pre class="code">def multiview_anagram(noise, conditions, views, w=7, step_size=0.02):
+    def velocity(x, t):
+        vs = [inv(cfg_velocity(f(x), t, c, w, predict_velocity, null_condition))
+              for (f, inv), c in zip(views, conditions)]
+        return sum(vs) / len(vs)
+    final, _ = euler_sample(noise, 0, step_size, velocity)
+    return final
+
+rot90 = (lambda x: torch.rot90(x, 1, (-2, -1)), lambda x: torch.rot90(x, -1, (-2, -1)))
+disc  = (((yy - 255.5) ** 2 + (xx - 255.5) ** 2) &lt; 200 ** 2).to(device)
+inner = (lambda x: torch.where(disc, torch.rot90(x, 1, (-2, -1)), x),
+         lambda x: torch.where(disc, torch.rot90(x, -1, (-2, -1)), x))</pre>
+      </div>
+      <div class="turn-row">
+        <figure class="turn" data-turn style="--deg:-90deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="a mosaic of a kitchen upright; a mosaic of a dog when turned. Press to turn it."><img class="spin" src="images/a/bw-kitchen.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/bw-kitchen.jpg" alt="" width="512" height="512"></div><div><img class="spin" src="images/a/bw-kitchen.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">a mosaic of a kitchen</span><span class="b" data-k="Turned">a mosaic of a dog</span></span>Seed 230, turned 90° to the left. The tiles break every outline into squares, so cabinets and counters double as the dog's ears and muzzle. A faint dog face still shows in the kitchen.</figcaption>
+        </figure>
+        <figure class="turn" data-turn style="--deg:-90deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="an oil painting of a clock tower upright; an oil painting of an owl&#x27;s face when turned. Press to turn it."><img src="images/a/bw-clock.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"><img class="spin disc" src="images/a/bw-clock.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/bw-clock.jpg" alt="" width="512" height="512"></div><div><img src="images/a/bw-clock.jpg" alt="" width="512" height="512"><img class="spin disc" src="images/a/bw-clock.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">an oil painting of a clock tower</span><span class="b" data-k="Turned">an oil painting of an owl's face</span></span>Seed 231. Only the disc turns, 90° to the left, and the outer ring stays put. The clock face becomes the owl's eye.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="part" id="logo">
+      <header class="part-head">
+        <p class="param" aria-label="starting time from 0.10 to 0.40"><span><var>t</var><sub>0</sub> = 0.10</span><i aria-hidden="true">→</i><span>0.40</span><small>starting time</small></p>
+        <h2>Course logo<small>Bells &amp; whistles</small></h2>
+      </header>
+      <div class="prose">
+        <p>PixNerd can't spell, so I added "CS 280A" under the Cal and Oski logos myself and prompted a neon sign and an embroidered patch. Texture is an easy change for the model, and from t = 0.15 the letters hold.</p>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/logo-cal-2.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title"><q>a photograph of a glowing gold and white neon sign on a dark blue brick wall at night</q></p>
+          <p>My pick is 0.15: glossy gold tubes and a brick wall, with every letter intact.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="6" step="1" value="2">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.10</span><span>0.15</span><span>0.20</span><span>0.25</span><span>0.30</span><span>0.40</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:7">
+        <figure data-at="Cal + CS 280A"><img src="images/a/logo-cal-0.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, Cal + CS 280A (input)" width="512" height="512"><figcaption><b>Cal + CS 280A</b>input</figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/logo-cal-1.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.10" width="512" height="512"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.15"><img src="images/a/logo-cal-2.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.15" width="512" height="512"><figcaption><b>t = 0.15</b></figcaption></figure>
+        <figure data-at="t = 0.20"><img src="images/a/logo-cal-3.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.20" width="512" height="512"><figcaption><b>t = 0.20</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/logo-cal-4.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.25" width="512" height="512"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.30"><img src="images/a/logo-cal-5.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.30" width="512" height="512"><figcaption><b>t = 0.30</b></figcaption></figure>
+        <figure data-at="t = 0.40"><img src="images/a/logo-cal-6.jpg" loading="lazy" decoding="async" alt="The Cal logo edited, t = 0.40" width="512" height="512"><figcaption><b>t = 0.40</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub" data-scrub>
+        <figure class="scrub-view"><img src="images/a/logo-oski-3.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title"><q>a photograph of an embroidered patch of a smiling cartoon bear in a blue cap, gold and navy thread</q></p>
+          <p>My pick is 0.20: visible stitching, "CAL" still legible on the cap.</p>
+          <label class="scrub-range"><span class="visually-hidden">Starting time</span>
+            <input type="range" min="0" max="6" step="1" value="3">
+            <span class="scrub-ticks" aria-hidden="true"><span>input</span><span>0.10</span><span>0.15</span><span>0.20</span><span>0.25</span><span>0.30</span><span>0.40</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:7">
+        <figure data-at="Oski + CS 280A"><img src="images/a/logo-oski-0.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, Oski + CS 280A (input)" width="512" height="512"><figcaption><b>Oski + CS 280A</b>input</figcaption></figure>
+        <figure data-at="t = 0.10"><img src="images/a/logo-oski-1.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.10" width="512" height="512"><figcaption><b>t = 0.10</b></figcaption></figure>
+        <figure data-at="t = 0.15"><img src="images/a/logo-oski-2.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.15" width="512" height="512"><figcaption><b>t = 0.15</b></figcaption></figure>
+        <figure data-at="t = 0.20"><img src="images/a/logo-oski-3.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.20" width="512" height="512"><figcaption><b>t = 0.20</b></figcaption></figure>
+        <figure data-at="t = 0.25"><img src="images/a/logo-oski-4.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.25" width="512" height="512"><figcaption><b>t = 0.25</b></figcaption></figure>
+        <figure data-at="t = 0.30"><img src="images/a/logo-oski-5.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.30" width="512" height="512"><figcaption><b>t = 0.30</b></figcaption></figure>
+        <figure data-at="t = 0.40"><img src="images/a/logo-oski-6.jpg" loading="lazy" decoding="async" alt="The Oski logo edited, t = 0.40" width="512" height="512"><figcaption><b>t = 0.40</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="prose">
+        <p><b>Logo anagram: Cal turned upside down is a bear.</b> I combined the two ideas: <code>edit</code>'s noisy start keeps the letters, and the anagram velocity pushes the turned view toward "a gold and navy blue enamel pin of a cartoon bear's face" (the upright prompt asks for cursive lettering). From the plain Cal start the bear is clearest at t = 0.05. Adding a faint upside-down Oski to the start gives the best balance at 0.10.</p>
+      </div>
+      <div class="turn-row">
+        <figure class="turn" data-turn style="--deg:180deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="Cal, as an enamel pin upright; a cartoon bear&#x27;s face when turned. Press to turn it."><img class="spin" src="images/a/logo-anagram-plain.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/logo-anagram-plain.jpg" alt="" width="512" height="512"></div><div><img class="spin" src="images/a/logo-anagram-plain.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">Cal, as an enamel pin</span><span class="b" data-k="Turned">a cartoon bear's face</span></span>Plain Cal start, t = 0.05.</figcaption>
+        </figure>
+        <figure class="turn" data-turn style="--deg:180deg">
+          <button class="turn-stage" type="button" aria-pressed="false" aria-label="Cal, as an enamel pin upright; a cartoon bear&#x27;s face when turned. Press to turn it."><img class="spin" src="images/a/logo-anagram-ghost.jpg" loading="lazy" decoding="async" alt="" width="512" height="512"></button>
+          <div class="print-pair" aria-hidden="true"><div><img src="images/a/logo-anagram-ghost.jpg" alt="" width="512" height="512"></div><div><img class="spin" src="images/a/logo-anagram-ghost.jpg" alt="" width="512" height="512"></div></div>
+          <figcaption><span class="views"><span class="a" data-k="Upright">Cal, as an enamel pin</span><span class="b" data-k="Turned">a cartoon bear's face</span></span>Start with a faint upside-down Oski behind the script, t = 0.10.</figcaption>
+        </figure>
+      </div>
+      <div class="row narrow" style="--n:2">
+        <figure><img src="images/a/logo-start-plain.jpg" loading="lazy" decoding="async" alt="Plain start. the Cal script" width="512" height="512"><figcaption><b>Plain start</b>the Cal script</figcaption></figure>
+        <figure><img src="images/a/logo-start-ghost.jpg" loading="lazy" decoding="async" alt="Start with a hint. Oski upside down at 40%" width="512" height="512"><figcaption><b>Start with a hint</b>Oski upside down at 40%</figcaption></figure>
+      </div>
+    </section>
+    <section class="part" id="learned">
+      <header class="part-head">
+        <p class="param" aria-label="w and t"><span><var>w</var></span><i aria-hidden="true">→</i><span><var>t</var><sub>0</sub></span><small>two knobs</small></p>
+        <h2>What I learned</h2>
+      </header>
+      <div class="prose">
+        <p>Flow matching only ever trains noise → image, but starting from any x<sub>t</sub> lets the same model reconstruct, edit and invent. And simple arithmetic on velocities goes surprisingly far: amplify one for CFG, average two flipped ones for anagrams.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Yusuf Afifi · CS 280A Project 3 · Fall 2026 · Model: PixNerd-XXL-P16-T2I (MCG-NJU), with the course's notebook. The Campanile is the course's image. <q>Pyramids of Gizeh</q>: Louis Haghe after David Roberts, 1838, Cleveland Museum of Art, CC0. Cal script: UC Berkeley, public domain on Wikimedia Commons. Oski the Bear: Cal Athletics. Mirror Lake, the Duomo and the two drawings are mine.</p>
+    <p class="colophon-url">afifi-yusuf.github.io/280a/proj3</p>
+  </footer>
+
+  <script src="../shared/site.js?v=177a1a56"></script>
+  <script src="project.js"></script>
+</body>
+</html>
