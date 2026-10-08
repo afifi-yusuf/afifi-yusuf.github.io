@@ -733,3 +733,7 @@
 .hyb-sizes figure.tiny img { width: 64px; height: 64px; background: none; }
 .hyb-sizes { align-items: end; }
 @media print { .hyb-sizes figure.tiny img { width: 0.9cm; height: 0.9cm; } }
+
+/* Inline key for the magma colour scale of the 1.4 error maps. */
+.cbar { display: inline-block; width: 5.5rem; height: 0.7em; vertical-align: -0.05em; margin: 0 0.15rem; border-radius: 2px;
+  background: linear-gradient(90deg, #000004, #3b0f70 20%, #8c2981 40%, #de4968 60%, #fe9f6d 80%, #fcfdbf); }

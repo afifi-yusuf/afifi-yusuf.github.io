@@ -153,21 +153,21 @@ def velocity_diagnostics(x_t, t, clean_image, epsilon, condition, predict_veloci
         <figure><img src="images/a/vel-25-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.25" width="372" height="371"><figcaption><b>Noisy</b>t = 0.25</figcaption></figure>
         <figure><img src="images/a/vel-25-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
         <figure><img src="images/a/vel-25-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
-        <figure><img src="images/a/vel-25-3.jpg" loading="lazy" decoding="async" alt="Error. RGB RMS" width="372" height="371"><figcaption><b>Error</b>RGB RMS</figcaption></figure>
+        <figure><img src="images/a/vel-25-3.jpg" loading="lazy" decoding="async" alt="Error. RGB RMS" width="371" height="371"><figcaption><b>Error</b>RGB RMS</figcaption></figure>
       </div>
       <div class="row keep" style="--n:4">
         <figure><img src="images/a/vel-50-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.50" width="372" height="371"><figcaption><b>Noisy</b>t = 0.50</figcaption></figure>
         <figure><img src="images/a/vel-50-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
         <figure><img src="images/a/vel-50-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
-        <figure><img src="images/a/vel-50-3.jpg" loading="lazy" decoding="async" alt="Error" width="372" height="371"><figcaption><b>Error</b></figcaption></figure>
+        <figure><img src="images/a/vel-50-3.jpg" loading="lazy" decoding="async" alt="Error" width="371" height="371"><figcaption><b>Error</b></figcaption></figure>
       </div>
       <div class="row keep" style="--n:4">
         <figure><img src="images/a/vel-75-0.jpg" loading="lazy" decoding="async" alt="Noisy. t = 0.75" width="372" height="371"><figcaption><b>Noisy</b>t = 0.75</figcaption></figure>
         <figure><img src="images/a/vel-75-1.jpg" loading="lazy" decoding="async" alt="Predicted update" width="372" height="371"><figcaption><b>Predicted update</b></figcaption></figure>
         <figure><img src="images/a/vel-75-2.jpg" loading="lazy" decoding="async" alt="True update" width="372" height="371"><figcaption><b>True update</b></figcaption></figure>
-        <figure><img src="images/a/vel-75-3.jpg" loading="lazy" decoding="async" alt="Error" width="372" height="371"><figcaption><b>Error</b></figcaption></figure>
+        <figure><img src="images/a/vel-75-3.jpg" loading="lazy" decoding="async" alt="Error" width="371" height="371"><figcaption><b>Error</b></figcaption></figure>
       </div>
-      <p class="note">All three error maps share one colour scale, from 0 (dark purple) to the largest error over the three.</p>
+      <p class="note">All three error maps share one colour scale, <span class="cbar" aria-hidden="true"></span> from 0 (black) to 0.5 (pale yellow), about the 99th percentile of the errors. Scaling to the single largest error, 1.46, left the maps almost black.</p>
     </section>
     <section class="part" id="euler">
       <header class="part-head">
