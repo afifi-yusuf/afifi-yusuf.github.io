@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project 3 · Fun with flow models · Yusuf Afifi</title>
-  <meta name="description" content="CS 280A Project 3, Part A: sampling, guidance, image editing, visual anagrams, hybrids and a course logo with PixNerd, a pretrained flow model, run on a Mac.">
+  <meta name="description" content="CS 280A Project 3. Part A: sampling, guidance, image editing, visual anagrams, hybrids and a course logo with PixNerd, a pretrained flow model. Part B: flow matching from scratch on MNIST, with autoguidance for the time-only model.">
   <meta name="theme-color" content="#1d1a4f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,17 +22,16 @@
       <a class="home" href="../"><b aria-hidden="true">←</b> All projects</a>
     </div>
     <nav class="jump" aria-label="Sections">
-      <a href="#idea"><b>v</b> Idea</a>
-      <a href="#noise"><b>1.1</b> Noise</a>
-      <a href="#denoise"><b>1.3</b> One step</a>
       <a href="#euler"><b>1.5</b> Euler</a>
       <a href="#cfg"><b>2.1</b> CFG</a>
       <a href="#edit"><b>3.1</b> Edit</a>
-      <a href="#text"><b>3.2</b> Text</a>
       <a href="#anagrams"><b>3.3</b> Anagrams</a>
       <a href="#hybrids"><b>3.4</b> Hybrids</a>
-      <a href="#views"><b>B&amp;W</b> Views</a>
       <a href="#logo"><b>B&amp;W</b> Logo</a>
+      <a href="#partb" class="part-b-first"><b>B1</b> Denoiser</a>
+      <a href="#bflow"><b>B2</b> Flow</a>
+      <a href="#bclass"><b>B2.4</b> Class</a>
+      <a href="#bbetter"><b>B3</b> Better</a>
     </nav>
   </header>
 
@@ -42,10 +41,10 @@
         <div class="hero-copy">
           <h1>Fun with flow models</h1>
           <p class="lede">
-            A flow model turns noise into a picture by following a velocity, one small step at a time. In Part A I drive a pretrained one, PixNerd, to denoise, generate, edit my own photos and drawings, and make visual anagrams and hybrid images.
+            Using a pretrained flow model, PixNerd, to play around with its velocity: denoising, editing and generating new images with guidance (Part A). Then training my own on MNIST (Part B).
           </p>
         </div>
-        <p class="print-only print-note">This is a print of afifi-yusuf.github.io/280a/proj3. On the web page the sweeps have sliders and the anagrams turn; here each is shown as a strip or as both orientations.</p>
+        <p class="print-only print-note">This is a print of afifi-yusuf.github.io/280a/proj3. On the web page the sweeps and sample grids have sliders and the anagrams turn; here each is shown as a strip or as both orientations. Part B starts on its own page.</p>
         <figure class="hero-photo">
           <div class="hero-turn"><img src="images/a/logo-anagram-ghost.jpg" decoding="async" alt="A gold enamel pin of the Cal script that, turned upside down, is a cartoon bear's face" width="512" height="512"></div>
           <figcaption class="hero-turn-cap">Cal, or a bear: the same pin, turned.</figcaption>
@@ -491,7 +490,7 @@ def euler_sample(x_start, t_start, step_size, velocity):
         <h2>Part 3.3 · Visual anagrams</h2>
       </header>
       <div class="prose">
-        <p>Visual anagrams come from arithmetic on velocities: at every step I average the guided velocity for the picture as it is and the guided velocity for the picture turned upside down, with a second prompt, turned back. Hover over or tap a picture to turn it. Hover over or tap a picture to turn it.</p>
+        <p>Visual anagrams come from arithmetic on velocities: at every step I average the guided velocity for the picture as it is and the guided velocity for the picture turned upside down, with a second prompt, turned back. Hover over or tap a picture to turn it.</p>
       </div>
       <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var> = ½ [ <var>v</var><sub>cfg</sub>(<var>x</var><sub>t</sub>, <var>t</var>, <var>p</var><sub>1</sub>) + <var>F</var>( <var>v</var><sub>cfg</sub>(<var>F</var>(<var>x</var><sub>t</sub>), <var>t</var>, <var>p</var><sub>2</sub>) ) ]</p><span class="eq-tag">F turns the picture 180°</span></div></div>
       <div class="prose">
@@ -659,19 +658,292 @@ inner = (lambda x: torch.where(disc, torch.rot90(x, 1, (-2, -1)), x),
         <figure><img src="images/a/logo-start-ghost.jpg" loading="lazy" decoding="async" alt="Start with a hint. Oski upside down at 40%" width="512" height="512"><figcaption><b>Start with a hint</b>Oski upside down at 40%</figcaption></figure>
       </div>
     </section>
+    <section class="hero hero-b" id="partb">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="spec">Part B</p>
+          <h2 class="hero-title">Flow matching from scratch</h2>
+          <p class="lede">Training a UNet on MNIST, first as a denoiser and then as a generative flow model.</p>
+        </div>
+        <figure class="hero-photo" data-flip data-fps="9" data-hold="1800"
+                data-frames="images/b/flip-0.png,images/b/flip-1.png,images/b/flip-2.png,images/b/flip-3.png,images/b/flip-4.png,images/b/flip-5.png,images/b/flip-6.png,images/b/flip-7.png,images/b/flip-8.png,images/b/flip-9.png,images/b/flip-10.png,images/b/flip-11.png,images/b/flip-12.png,images/b/flip-13.png,images/b/flip-14.png,images/b/flip-15.png,images/b/flip-16.png,images/b/flip-17.png,images/b/flip-18.png,images/b/flip-19.png,images/b/flip-20.png"
+                data-ts="0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95,1.00">
+          <img src="images/b/flip-20.png" decoding="async" alt="Twenty digits, 0 to 9 twice, forming from pure noise as t goes from 0 to 1" width="864" height="690">
+          <figcaption class="hero-turn-cap"><span class="flip-t">t = 1.00</span> · twenty samples from my class-conditioned model, noise to digits</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="part" id="bden">
+      <header class="part-head">
+        <p class="param" aria-label="noise level from 0 to 1"><span><var>σ</var> = 0</span><i aria-hidden="true">→</i><span>1</span><small>noise level</small></p>
+        <h2>Part B 1.1–1.2 · A one-step denoiser</h2>
+      </header>
+      <div class="prose">
+        <p>A UNet (D = 128) sees a digit with Gaussian noise added and is trained with squared error to give back the clean digit. σ is fixed at 0.5 during training.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>z</var> = <var>x</var> + σ ε</p><span class="eq-tag">1.2 · noising, ε ~ N(0, I)</span></div><div class="eq-row"><p class="eq-line"><var>L</var> = ‖ <var>D</var><sub>θ</sub>(<var>z</var>) − <var>x</var> ‖²</p><span class="eq-tag">1.2 · the denoiser's loss</span></div></div>
+      <div class="prose">
+        <pre class="code">def forward(self, x):                                 # UnconditionalUNet
+    h1 = self.conv_in(x)                              # D, 28
+    h2 = self.down1(h1)                               # D, 14
+    h3 = self.down2(h2)                               # 2D, 7
+    h4 = self.unflatten(self.flatten(h3))             # 2D, 7
+    h5 = self.up1(torch.cat([h4, h3], dim=1))         # D, 14
+    h6 = self.up2(torch.cat([h5, h2], dim=1))         # D, 28
+    h7 = self.conv_out(torch.cat([h6, h1], dim=1))    # D, 28
+    return self.final(h7)</pre>
+        <p><b>1.2.0 · Noising.</b> Ten test digits with the same noise sample, scaled by σ. They stay easy to read up to 0.5; by 1.0 the noise is as bright as the strokes.</p>
+      </div>
+      <div class="ladder" style="--c:1">
+        <span class="ladder-k">σ = 0.0</span><img src="images/b/noise-0.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.0" width="1156" height="112">
+        <span class="ladder-k">σ = 0.2</span><img src="images/b/noise-1.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.2" width="1156" height="112">
+        <span class="ladder-k">σ = 0.4</span><img src="images/b/noise-2.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.4" width="1156" height="112">
+        <span class="ladder-k">σ = 0.5</span><img src="images/b/noise-3.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.5" width="1156" height="112">
+        <span class="ladder-k">σ = 0.6</span><img src="images/b/noise-4.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.6" width="1156" height="112">
+        <span class="ladder-k">σ = 0.8</span><img src="images/b/noise-5.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.8" width="1156" height="112">
+        <span class="ladder-k">σ = 1.0</span><img src="images/b/noise-6.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 1.0" width="1156" height="112">
+      </div>
+      <div class="prose">
+        <p><b>1.2.1 · Training at σ = 0.5.</b> Five epochs, batch 256, Adam at 10<sup>−4</sup>. Almost all of the loss goes in the first 200 steps. After one epoch the outputs are already clean digits with faint smudges around them; after five the strokes are sharp and the background is black.</p>
+      </div>
+      <div class="ladder" style="--c:1">
+        <span class="ladder-k">Clean</span><img src="images/b/den5-clean.png" loading="lazy" decoding="async" alt="ten MNIST test digits, clean" width="1156" height="112">
+        <span class="gap"></span>
+        <span class="ladder-k">Noisy<small>epoch 1</small></span><img src="images/b/den1-noisy.png" loading="lazy" decoding="async" alt="ten MNIST test digits with σ = 0.5" width="1156" height="112">
+        <span class="ladder-k">Denoised<small>epoch 1</small></span><img src="images/b/den1-out.png" loading="lazy" decoding="async" alt="The denoiser&#x27;s output after one epoch" width="1156" height="112">
+        <span class="gap"></span>
+        <span class="ladder-k">Noisy<small>epoch 5</small></span><img src="images/b/den5-noisy.png" loading="lazy" decoding="async" alt="ten MNIST test digits with σ = 0.5" width="1156" height="112">
+        <span class="ladder-k">Denoised<small>epoch 5</small></span><img src="images/b/den5-out.png" loading="lazy" decoding="async" alt="The denoiser&#x27;s output after five epochs" width="1156" height="112">
+      </div>
+      <div class="row loss" style="--n:1"><figure><img src="images/b/loss-denoise.png" loading="lazy" decoding="async" alt="Training loss: Training loss" width="960" height="324"><figcaption><b>Training loss</b>MSE per step, 5 epochs × 235 steps; the orange line is a 100-step mean</figcaption></figure></div>
+      <div class="prose">
+        <p><b>1.2.2 · Other noise levels.</b> The denoiser only ever saw σ = 0.5. Below it, it is close to an identity: σ = 0 comes back untouched. Above it, it starts to guess. At 0.8 stray stroke fragments appear, and at 1.0 it draws strokes that look like handwriting but not always the right digit: the 4 becomes a pair of brackets and the 9 a tangle.</p>
+      </div>
+      <div class="ladder" style="--c:2">
+        <span></span><span class="ladder-h">Noisy input</span><span class="ladder-h">Denoised</span>
+        <span class="ladder-k">σ = 0.0</span><img src="images/b/ood-0-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.0" width="1156" height="112"><img src="images/b/ood-0-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.0" width="1156" height="112">
+        <span class="ladder-k">σ = 0.2</span><img src="images/b/ood-1-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.2" width="1156" height="112"><img src="images/b/ood-1-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.2" width="1156" height="112">
+        <span class="ladder-k">σ = 0.4</span><img src="images/b/ood-2-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.4" width="1156" height="112"><img src="images/b/ood-2-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.4" width="1156" height="112">
+        <span class="ladder-k">σ = 0.5</span><img src="images/b/ood-3-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.5" width="1156" height="112"><img src="images/b/ood-3-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.5" width="1156" height="112">
+        <span class="ladder-k">σ = 0.6</span><img src="images/b/ood-4-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.6" width="1156" height="112"><img src="images/b/ood-4-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.6" width="1156" height="112">
+        <span class="ladder-k">σ = 0.8</span><img src="images/b/ood-5-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 0.8" width="1156" height="112"><img src="images/b/ood-5-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 0.8" width="1156" height="112">
+        <span class="ladder-k">σ = 1.0</span><img src="images/b/ood-6-in.png" loading="lazy" decoding="async" alt="ten MNIST test digits with noise σ = 1.0" width="1156" height="112"><img src="images/b/ood-6-out.png" loading="lazy" decoding="async" alt="The σ = 0.5 denoiser&#x27;s output at σ = 1.0" width="1156" height="112">
+      </div>
+      <div class="prose">
+        <p><b>1.2.3 · Denoising pure noise.</b> All ten outputs are the same blurry overlay of every digit, a 0 with an 8 and a 9 inside. The squared-error denoiser outputs a weighted average of the training digits, weighting each by how likely it is to have produced the input. At small σ the input is close to one digit, so that digit gets almost all the weight. Pure noise is the limit of large σ: the input says nothing about the digit, so every training digit gets the same weight and the output is their mean. It matches the actual mean of the 60,000 training digits to within 0.02 RMS, and the loss levels off at 0.068, the training digits' variance around that mean.</p>
+      </div>
+      <div class="ladder" style="--c:1">
+        <span class="ladder-k">Epoch 1</span><img src="images/b/pure1.png" loading="lazy" decoding="async" alt="Ten outputs of the pure-noise model after one epoch" width="1156" height="112">
+        <span class="ladder-k">Epoch 5</span><img src="images/b/pure5.png" loading="lazy" decoding="async" alt="Ten outputs of the pure-noise model after five epochs, all the same" width="1156" height="112">
+      </div>
+      <div class="row keep grids" style="--n:4">
+        <figure><img src="images/b/pure5-one.png" loading="lazy" decoding="async" alt="One output. epoch 5, from pure noise" width="224" height="224"><figcaption><b>One output</b>epoch 5, from pure noise</figcaption></figure>
+        <figure><img src="images/b/train-mean.png" loading="lazy" decoding="async" alt="The training mean. all 60,000 digits averaged" width="224" height="224"><figcaption><b>The training mean</b>all 60,000 digits averaged</figcaption></figure>
+      </div>
+      <div class="row loss" style="--n:1"><figure><img src="images/b/loss-pure_noise.png" loading="lazy" decoding="async" alt="Training loss: Training loss" width="960" height="324"><figcaption><b>Training loss</b>levels off at 0.068, the cost of predicting the mean</figcaption></figure></div>
+    </section>
+    <section class="part" id="bflow">
+      <header class="part-head">
+        <p class="param" aria-label="flow time from noise at 0 to a digit at 1"><span><var>t</var> = 0</span><i aria-hidden="true">→</i><span>1</span><small>noise to digit</small></p>
+        <h2>Part B 2.1–2.3 · Flow matching with time</h2>
+      </header>
+      <div class="prose">
+        <p>Flow matching turns the denoiser into a generator. A digit x<sub>1</sub> and noise x<sub>0</sub> are joined by a straight line, and the UNet (now D = 64) learns the velocity along it from x<sub>t</sub> and t. Time enters through two small fully connected blocks whose outputs scale the features after unflatten and after up1.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>x</var><sub>t</sub> = (1 − <var>t</var>) <var>x</var><sub>0</sub> + <var>t</var> <var>x</var><sub>1</sub></p><span class="eq-tag">2.2 · the path, x₀ ~ N(0, I), t ~ U(0, 1)</span></div><div class="eq-row"><p class="eq-line"><var>L</var> = ‖ (<var>x</var><sub>1</sub> − <var>x</var><sub>0</sub>) − <var>u</var><sub>θ</sub>(<var>x</var><sub>t</sub>, <var>t</var>) ‖²</p><span class="eq-tag">2.2 · flow-matching loss</span></div><div class="eq-row"><p class="eq-line"><var>t</var><sub>1</sub> · unflatten,   <var>t</var><sub>2</sub> · up1</p><span class="eq-tag">2.1 · features scaled by t₁, t₂ = FCBlocks(t)</span></div><div class="eq-row"><p class="eq-line"><var>x</var><sub>t+h</sub> = <var>x</var><sub>t</sub> + <var>h</var> · <var>u</var><sub>θ</sub>(<var>x</var><sub>t</sub>, <var>t</var>)</p><span class="eq-tag">2.3 · Euler sampling, h = 1/50</span></div></div>
+      <div class="prose">
+        <pre class="code">def time_fm_forward(unet, x_1, num_ts):
+    t = torch.rand(x_1.shape[0], device=x_1.device)          # t ~ Uniform(0, 1), shape (N,)
+    x_0 = torch.randn_like(x_1)                              # x_0 ~ N(0, I)
+    t_ = t[:, None, None, None]                              # broadcast over C, H, W
+    x_t = (1 - t_) * x_0 + t_ * x_1
+    return F.mse_loss(unet(x_t, t), x_1 - x_0)
+
+def time_fm_sample(unet, img_wh, num_ts, seed=0):
+    torch.manual_seed(seed)
+    x = torch.randn(1, 1, *img_wh, device=param_device)      # x_0 ~ N(0, I)
+    step = 1.0 / num_ts
+    for i in range(num_ts):
+        t = torch.full((x.shape[0],), i * step, device=param_device)
+        x = x + step * unet(x, t)
+    return x</pre>
+        <p><b>2.2 · Training.</b> Ten epochs, batch 64, Adam starting at 10<sup>−2</sup> and decaying exponentially to about 10<sup>−3</sup>. The loss falls fast and levels off near 0.09. Unlike the denoiser's it can never reach zero, because one x<sub>t</sub> lies on paths to many different digits.</p>
+      </div>
+      <div class="row loss" style="--n:1"><figure><img src="images/b/loss-time.png" loading="lazy" decoding="async" alt="Training loss: Training loss" width="960" height="324"><figcaption><b>Training loss</b>MSE per step, 10 epochs × 938 steps</figcaption></figure></div>
+      <div class="scrub wide" data-scrub>
+        <figure class="scrub-view"><img src="images/b/time-2.png" loading="lazy" decoding="async" alt="" width="1156" height="460"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">2.3 · Samples from pure noise, 50 Euler steps</p>
+          <p>Forty samples, seeds 0 to 39. After one epoch they are tangled strokes; by five most are digit-shaped; after ten most are clean digits, but about one in four is still a scribble or a cross between two digits. With no label, each path has to settle on a digit by itself, and some end up in between.</p>
+          <label class="scrub-range"><span class="visually-hidden">Epoch</span>
+            <input type="range" min="0" max="2" step="1" value="2">
+            <span class="scrub-ticks" aria-hidden="true"><span>1</span><span>5</span><span>10</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:3">
+        <figure data-at="Epoch 1"><img src="images/b/time-0.png" loading="lazy" decoding="async" alt="Samples of the time-conditioned model, Epoch 1" width="1156" height="460"><figcaption><b>Epoch 1</b></figcaption></figure>
+        <figure data-at="Epoch 5"><img src="images/b/time-1.png" loading="lazy" decoding="async" alt="Samples of the time-conditioned model, Epoch 5" width="1156" height="460"><figcaption><b>Epoch 5</b></figcaption></figure>
+        <figure data-at="Epoch 10"><img src="images/b/time-2.png" loading="lazy" decoding="async" alt="Samples of the time-conditioned model, Epoch 10" width="1156" height="460"><figcaption><b>Epoch 10</b></figcaption></figure>
+      </div>
+      </div>
+    </section>
+    <section class="part" id="bclass">
+      <header class="part-head">
+        <p class="param" aria-label="class from 0 to 9"><span><var>c</var> = 0</span><i aria-hidden="true">→</i><span>9</span><small>class</small></p>
+        <h2>Part B 2.4–2.6 · Class conditioning and guidance</h2>
+      </header>
+      <div class="prose">
+        <p>The class goes in as a one-hot vector through two more FC blocks: the class scales the features and time shifts them. 10% of the time the vector is zeroed, so the same network also learns the unconditional velocity, and I can sample with classifier-free guidance at γ = 5. Part B writes it as v<sub>u</sub> + γ(v<sub>c</sub> − v<sub>u</sub>), the same as Part A's with w = γ − 1.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>c</var><sub>1</sub> · unflatten + <var>t</var><sub>1</sub>,   <var>c</var><sub>2</sub> · up1 + <var>t</var><sub>2</sub></p><span class="eq-tag">2.4 · c₁, c₂ = FCBlocks(one-hot c), c zeroed with p = 0.1</span></div><div class="eq-row"><p class="eq-line"><var>u</var> = <var>u</var><sub>∅</sub> + γ ( <var>u</var><sub>c</sub> − <var>u</var><sub>∅</sub> )</p><span class="eq-tag">2.6 · CFG, γ = 5, 300 Euler steps</span></div></div>
+      <div class="prose">
+        <pre class="code">def class_fm_forward(unet, x_1, c, p_uncond, num_ts):
+    t = torch.rand(x_1.shape[0], device=x_1.device)
+    x_0 = torch.randn_like(x_1)
+    t_ = t[:, None, None, None]
+    x_t = (1 - t_) * x_0 + t_ * x_1
+    c = c.to(x_1.device)
+    mask = (torch.rand(x_1.shape[0], device=x_1.device) &gt;= p_uncond).float()
+    return F.mse_loss(unet(x_t, c, t, mask), x_1 - x_0)
+
+    # class_fm_sample: one guided Euler step
+    for i in range(num_ts):
+        t = torch.full((n,), i * step, device=param_device)
+        u_uncond = unet(x, c, t, torch.zeros(n, device=param_device))
+        u_cond = unet(x, c, t)
+        u = u_uncond + guidance_scale * (u_cond - u_uncond)
+        x = x + step * u</pre>
+        <p><b>2.5 · Training.</b> The same recipe as 2.2: ten epochs, batch 64, Adam from 10<sup>−2</sup> with the exponential schedule.</p>
+      </div>
+      <div class="row loss" style="--n:1"><figure><img src="images/b/loss-class.png" loading="lazy" decoding="async" alt="Training loss: Training loss" width="960" height="324"><figcaption><b>Training loss</b>MSE per step, 10 epochs × 938 steps</figcaption></figure></div>
+      <div class="scrub wide" data-scrub>
+        <figure class="scrub-view"><img src="images/b/class-2.png" loading="lazy" decoding="async" alt="" width="1156" height="460"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">2.6 · Four of each digit, γ = 5</p>
+          <p>Seed 0, one column per digit. Guidance makes the class clear from the first epoch, but the strokes are speckled and the 5s are broken; by epoch 5 every digit is clean, and epoch 10 adds variety in slant and thickness.</p>
+          <label class="scrub-range"><span class="visually-hidden">Epoch</span>
+            <input type="range" min="0" max="2" step="1" value="2">
+            <span class="scrub-ticks" aria-hidden="true"><span>1</span><span>5</span><span>10</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:3">
+        <figure data-at="Epoch 1"><img src="images/b/class-0.png" loading="lazy" decoding="async" alt="Samples of the class-conditioned model, Epoch 1" width="1156" height="460"><figcaption><b>Epoch 1</b></figcaption></figure>
+        <figure data-at="Epoch 5"><img src="images/b/class-1.png" loading="lazy" decoding="async" alt="Samples of the class-conditioned model, Epoch 5" width="1156" height="460"><figcaption><b>Epoch 5</b></figcaption></figure>
+        <figure data-at="Epoch 10"><img src="images/b/class-2.png" loading="lazy" decoding="async" alt="Samples of the class-conditioned model, Epoch 10" width="1156" height="460"><figcaption><b>Epoch 10</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="scrub stack" data-scrub>
+        <figure class="scrub-view"><img src="images/b/traj-10.png" loading="lazy" decoding="async" alt="" width="1156" height="112"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">How the digits form</p>
+          <p>The first row of the epoch-10 samples, from pure noise at t = 0 to the digits at t = 1. Each x<sub>t</sub> is part noise and part digit, so the shapes show through from about t = 0.3 and the last steps clean away the grain.</p>
+          <label class="scrub-range"><span class="visually-hidden">Flow time</span>
+            <input type="range" min="0" max="10" step="1" value="10">
+            <span class="scrub-ticks" aria-hidden="true"><span>0</span><span></span><span></span><span></span><span></span><span>0.5</span><span></span><span></span><span></span><span></span><span>1</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:11">
+        <figure data-at="t = 0.0"><img src="images/b/traj-0.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.0" width="1156" height="112"><figcaption><b>t = 0.0</b></figcaption></figure>
+        <figure data-at="t = 0.1"><img src="images/b/traj-1.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.1" width="1156" height="112"><figcaption><b>t = 0.1</b></figcaption></figure>
+        <figure data-at="t = 0.2"><img src="images/b/traj-2.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.2" width="1156" height="112"><figcaption><b>t = 0.2</b></figcaption></figure>
+        <figure data-at="t = 0.3"><img src="images/b/traj-3.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.3" width="1156" height="112"><figcaption><b>t = 0.3</b></figcaption></figure>
+        <figure data-at="t = 0.4"><img src="images/b/traj-4.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.4" width="1156" height="112"><figcaption><b>t = 0.4</b></figcaption></figure>
+        <figure data-at="t = 0.5"><img src="images/b/traj-5.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.5" width="1156" height="112"><figcaption><b>t = 0.5</b></figcaption></figure>
+        <figure data-at="t = 0.6"><img src="images/b/traj-6.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.6" width="1156" height="112"><figcaption><b>t = 0.6</b></figcaption></figure>
+        <figure data-at="t = 0.7"><img src="images/b/traj-7.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.7" width="1156" height="112"><figcaption><b>t = 0.7</b></figcaption></figure>
+        <figure data-at="t = 0.8"><img src="images/b/traj-8.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.8" width="1156" height="112"><figcaption><b>t = 0.8</b></figcaption></figure>
+        <figure data-at="t = 0.9"><img src="images/b/traj-9.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 0.9" width="1156" height="112"><figcaption><b>t = 0.9</b></figcaption></figure>
+        <figure data-at="t = 1.0"><img src="images/b/traj-10.png" loading="lazy" decoding="async" alt="Ten digits forming, t = 1.0" width="1156" height="112"><figcaption><b>t = 1.0</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="prose">
+        <p><b>Without the learning-rate scheduler.</b> The schedule starts at 10<sup>−2</sup> and multiplies by 0.1<sup>1/10</sup> every epoch, ending near 1.3 × 10<sup>−3</sup>. To drop it I trained at a constant 10<sup>−3</sup> instead: a constant 10<sup>−2</sup> would not converge cleanly. Ten epochs at 10<sup>−3</sup> give digits as clean as the scheduled run.</p>
+      </div>
+      <div class="row grids" style="--n:2">
+        <figure><img src="images/b/class-2.png" loading="lazy" decoding="async" alt="With the scheduler. 10−2 decaying to 1.3 × 10−3, epoch 10" width="1156" height="460"><figcaption><b>With the scheduler</b>10<sup>−2</sup> decaying to 1.3 × 10<sup>−3</sup>, epoch 10</figcaption></figure>
+        <figure><img src="images/b/class-nosched.png" loading="lazy" decoding="async" alt="Constant 10−3. no scheduler, epoch 10" width="1156" height="460"><figcaption><b>Constant 10<sup>−3</sup></b>no scheduler, epoch 10</figcaption></figure>
+      </div>
+      <div class="row loss" style="--n:1"><figure><img src="images/b/loss-class_nosched.png" loading="lazy" decoding="async" alt="Training loss: Training loss without the scheduler" width="960" height="324"><figcaption><b>Training loss without the scheduler</b>constant learning rate 10<sup>−3</sup></figcaption></figure></div>
+    </section>
+    <section class="part" id="bbetter">
+      <header class="part-head">
+        <p class="param" aria-label="guidance weight from 0 to 3"><span><var>w</var> = 0</span><i aria-hidden="true">→</i><span>3</span><small>autoguidance</small></p>
+        <h2>A better time-only model<small>Bells &amp; whistles</small></h2>
+      </header>
+      <div class="prose">
+        <p>The time-only samples were the weakest result of Part B, about one in four a scribble. To measure progress rather than squint at grids, I score 1,000 samples per setting with a small MNIST classifier: the share it labels with over 90% confidence, and how evenly the ten digits appear (1 means all equally often). Real test digits score 94%.</p>
+        <p>The obvious fixes did little. 300 Euler steps instead of 50 change nothing, since the learned paths are nearly straight. Twenty more epochs at a constant 10<sup>−3</sup> help a little, from 73% to 79%. Doubling the width to D = 128 under the same schedule came out no better, if anything noisier.</p>
+      </div>
+      <div class="row grids" style="--n:2">
+        <figure><img src="images/b/time-10-300.png" loading="lazy" decoding="async" alt="Epoch 10, 300 steps. the same as 50 steps" width="1156" height="460"><figcaption><b>Epoch 10, 300 steps</b>the same as 50 steps</figcaption></figure>
+        <figure><img src="images/b/time-wide.png" loading="lazy" decoding="async" alt="D = 128, epoch 10. no better than D = 64" width="1156" height="460"><figcaption><b>D = 128, epoch 10</b>no better than D = 64</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>Autoguidance.</b> Like CFG in Part A, but in place of the unconditional prediction I use the same model with weights from an earlier epoch (epoch 5), and amplify the velocity in the direction of the later one (epoch 30), following Karras et al. (2024). It takes the time-only model from 79% to 93% confident digits at w = 2, with no extra training.</p>
+      </div>
+      <div class="eq" role="math"><div class="eq-row"><p class="eq-line"><var>v</var> = <var>v</var><sub>good</sub> + <var>w</var> ( <var>v</var><sub>good</sub> − <var>v</var><sub>bad</sub> )</p><span class="eq-tag">good = epoch 30, bad = epoch 5</span></div></div>
+      <div class="prose">
+        <pre class="code">@torch.inference_mode()
+def autoguided_sample(good, bad, w, img_wh=(28, 28), num_ts=300, seeds=range(40)):
+    ...                                   # x: the same noise per seed as time_fm_sample
+    h = 1.0 / num_ts
+    for i in range(num_ts):
+        t = torch.full((x.shape[0],), i * h, device=device)
+        v = good(x, t)
+        if w:
+            v = v + w * (v - bad(x, t))
+        x = x + h * v
+    return x</pre>
+      </div>
+      <div class="scrub wide" data-scrub>
+        <figure class="scrub-view"><img src="images/b/ag-2.png" loading="lazy" decoding="async" alt="" width="1156" height="460"><span class="scrub-at" aria-hidden="true"></span></figure>
+        <div class="scrub-side">
+          <p class="scrub-title">Epoch 30, guided by epoch 5</p>
+          <p>The same seeds in every frame, so each cell starts from the same noise. Drag w and the scribbles settle into digits, mostly the one that was already there. At w = 3 the samples score above real MNIST, a sign they have become too prototypical: w = 2 is my pick.</p>
+          <label class="scrub-range"><span class="visually-hidden">Guidance weight</span>
+            <input type="range" min="0" max="3" step="1" value="2">
+            <span class="scrub-ticks" aria-hidden="true"><span>0</span><span>1</span><span>2</span><span>3</span></span>
+          </label>
+        </div>
+        <div class="row keep" style="--n:4">
+        <figure data-at="w = 0"><img src="images/b/ag-0.png" loading="lazy" decoding="async" alt="Autoguided samples of the time-conditioned model, w = 0" width="1156" height="460"><figcaption><b>w = 0</b></figcaption></figure>
+        <figure data-at="w = 1"><img src="images/b/ag-1.png" loading="lazy" decoding="async" alt="Autoguided samples of the time-conditioned model, w = 1" width="1156" height="460"><figcaption><b>w = 1</b></figcaption></figure>
+        <figure data-at="w = 2"><img src="images/b/ag-2.png" loading="lazy" decoding="async" alt="Autoguided samples of the time-conditioned model, w = 2" width="1156" height="460"><figcaption><b>w = 2</b></figcaption></figure>
+        <figure data-at="w = 3"><img src="images/b/ag-3.png" loading="lazy" decoding="async" alt="Autoguided samples of the time-conditioned model, w = 3" width="1156" height="460"><figcaption><b>w = 3</b></figcaption></figure>
+      </div>
+      </div>
+      <div class="table-wrap"><table class="results"><thead><tr><th>Time-only model</th><th>Confident digits</th><th>Digit balance</th></tr></thead><tbody><tr><td>Real MNIST test digits</td><td class="num">94.1%</td><td class="num">0.996</td></tr><tr><td>Epoch 10 (2.3)</td><td class="num">73.4%</td><td class="num">0.998</td></tr><tr><td>Epoch 30, +20 epochs at 10<sup>−3</sup></td><td class="num">79.4%</td><td class="num">0.995</td></tr><tr class="pickrow"><td>Epoch 30 guided by epoch 5, <var>w</var> = 2</td><td class="num">93.2%</td><td class="num">0.975</td></tr><tr><td>Epoch 30 guided by epoch 5, <var>w</var> = 3</td><td class="num">94.4%</td><td class="num">0.971</td></tr><tr><td>Epoch 30 guided by epoch 1, <var>w</var> = 3</td><td class="num">91.8%</td><td class="num bad">0.838</td></tr></tbody></table></div>
+      <div class="prose">
+        <p><b>The weak model has to be weak in the right way.</b> Guided away from epoch 1 instead, the mix collapses: 337 of the 1,000 samples are 0s and only about 20 each are 2s, 3s or 8s. Epoch 1 over-produced 4s and 8s, and guidance amplifies that bias along with the quality gap.</p>
+      </div>
+      <div class="row grids" style="--n:2">
+        <figure><img src="images/b/ag-bad1.png" loading="lazy" decoding="async" alt="Guided by epoch 1, w = 3. mostly 0s, and a few spiky non-digits" width="1156" height="460"><figcaption><b>Guided by epoch 1, <var>w</var> = 3</b>mostly 0s, and a few spiky non-digits</figcaption></figure>
+      </div>
+    </section>
+    <section class="part" id="bfashion">
+      <header class="part-head">
+        <p class="param" aria-label="classes 0 to 9 of Fashion-MNIST"><span>0</span><i aria-hidden="true">→</i><span>9</span><small>classes</small></p>
+        <h2>Fashion-MNIST<small>Bells &amp; whistles</small></h2>
+      </header>
+      <div class="prose">
+        <p>The class-conditioned model and its training run unchanged on Fashion-MNIST, guided with γ = 5. Every column is the right kind of item after ten epochs. Trousers, sneakers and boots come out cleanest; the sandals' thin straps sometimes break apart.</p>
+      </div>
+      <div class="col-labels" aria-hidden="true"><span>T-shirt</span><span>Trouser</span><span>Pullover</span><span>Dress</span><span>Coat</span><span>Sandal</span><span>Shirt</span><span>Sneaker</span><span>Bag</span><span>Boot</span></div>
+      <figure><img src="images/b/fashion.png" loading="lazy" decoding="async" alt="Four Fashion-MNIST samples of each class: T-shirt, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, Boot" width="1156" height="460"><figcaption>Four of each class, seed 0, epoch 10, γ = 5.</figcaption></figure>
+    </section>
     <section class="part" id="learned">
       <header class="part-head">
-        <p class="param" aria-label="w and t"><span><var>w</var></span><i aria-hidden="true">→</i><span><var>t</var><sub>0</sub></span><small>two knobs</small></p>
+        <p class="param" aria-label="from a base version to a stronger one, and past it"><span>base</span><i aria-hidden="true">→</i><span>stronger</span><small>amplify the gap</small></p>
         <h2>What I learned</h2>
       </header>
       <div class="prose">
-        <p>Flow matching only ever trains noise → image, but starting from any x<sub>t</sub> lets the same model reconstruct, edit and invent. And simple arithmetic on velocities goes surprisingly far: amplify one for CFG, average two flipped ones for anagrams.</p>
+        <p>The same trick keeps coming back: image sharpening in Project 2, CFG in Part A, autoguidance in Part B. Take a base and a stronger version (blurred and sharp image, unconditional and conditional velocity, early and late checkpoint), subtract to get a direction, and amplify it.</p>
       </div>
     </section>
   </main>
 
   <footer class="colophon">
-    <p>Yusuf Afifi · CS 280A Project 3 · Fall 2026 · Model: PixNerd-XXL-P16-T2I (MCG-NJU), with the course's notebook. The Campanile is the course's image. <q>Pyramids of Gizeh</q>: Louis Haghe after David Roberts, 1838, Cleveland Museum of Art, CC0. Cal script: UC Berkeley, public domain on Wikimedia Commons. Oski the Bear: Cal Athletics. Mirror Lake, the Duomo and the two drawings are mine.</p>
+    <p>Yusuf Afifi · CS 280A Project 3 · Fall 2026 · Model: PixNerd-XXL-P16-T2I (MCG-NJU), with the course's notebook. The Campanile is the course's image. <q>Pyramids of Gizeh</q>: Louis Haghe after David Roberts, 1838, Cleveland Museum of Art, CC0. Cal script: UC Berkeley, public domain on Wikimedia Commons. Oski the Bear: Cal Athletics. Mirror Lake, the Duomo and the two drawings are mine. Part B: MNIST (LeCun, Cortes and Burges) and Fashion-MNIST (Zalando Research); autoguidance from Karras et al., <q>Guiding a Diffusion Model with a Bad Version of Itself</q>, 2024.</p>
     <p class="colophon-url">afifi-yusuf.github.io/280a/proj3</p>
   </footer>
 

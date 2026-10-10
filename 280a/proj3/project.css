@@ -737,3 +737,117 @@
 /* Inline key for the magma colour scale of the 1.4 error maps. */
 .cbar { display: inline-block; width: 5.5rem; height: 0.7em; vertical-align: -0.05em; margin: 0 0.15rem; border-radius: 2px;
   background: linear-gradient(90deg, #000004, #3b0f70 20%, #8c2981 40%, #de4968 60%, #fe9f6d 80%, #fcfdbf); }
+
+/* ===================== Part B ===================== */
+
+/* Part B opens with its own hero; on paper it starts a new page. */
+.hero-b .hero-title {
+  margin: 0;
+  max-width: 13ch;
+  font-family: var(--display);
+  font-weight: 850;
+  font-size: clamp(2.6rem, 1.4rem + 5vw, 4.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  color: var(--white);
+  text-wrap: balance;
+}
+.hero-b .spec { margin-bottom: 1rem; }
+.hero-b .hero-photo img { image-rendering: pixelated; box-shadow: 0 24px 60px var(--shadow-deep); }
+.flip-t { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--amber); }
+@media print {
+  .hero-b { break-before: page; }
+  .hero-b .hero-title { color: var(--ink); font-size: 30pt; }
+  .flip-t { color: var(--ink); }
+}
+
+/* Digit grids are drawn at 28 px a cell and scaled up: keep the pixels square. */
+.digits, .ladder img, .scrub.wide img, .scrub.stack img { image-rendering: pixelated; }
+
+/* A ladder: one labelled strip of ten digits per row, one or two strips across. */
+.ladder {
+  display: grid;
+  grid-template-columns: max-content repeat(var(--c, 1), minmax(0, 1fr));
+  gap: 0.3rem 0.75rem;
+  align-items: center;
+  margin: 1.25rem 0 0;
+  max-width: calc(var(--c, 1) * 46rem);
+}
+.ladder-k, .ladder-h {
+  font-family: var(--display);
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--indigo);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ladder-h { font-size: 0.78rem; font-weight: 650; color: var(--ink-2); letter-spacing: 0.03em; text-transform: uppercase; }
+.ladder-k small { display: block; font-weight: 550; font-size: 0.8em; color: var(--ink-2); }
+.ladder img { display: block; width: 100%; height: auto; background: var(--mat); }
+.ladder .gap { grid-column: 1 / -1; height: 0.4rem; }
+@media (max-width: 640px) {
+  .ladder { gap: 0.2rem 0.4rem; }
+  .ladder-k { font-size: 0.72rem; }
+}
+@media print {
+  .ladder { break-inside: avoid; gap: 0.15rem 0.4rem; }
+  .ladder-k, .ladder-h { font-size: 7.5pt; }
+}
+
+/* Wide scrubber: the frames are 4 x 10 grids, so the view spans the width under its text. */
+.scrub.wide { grid-template-columns: minmax(0, 1fr); }
+.scrub.wide .scrub-side { order: -1; max-width: 46rem; }
+.scrub.wide .scrub-view { max-width: 56rem; }
+.scrub.wide .scrub-view img { aspect-ratio: auto; object-fit: contain; }
+@media print { .scrub.wide > .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Stacked scrubber: frames are single strips; on screen the slider drives one, on paper all stack. */
+.scrub.stack { grid-template-columns: minmax(0, 1fr); }
+.scrub.stack .scrub-side { order: -1; max-width: 46rem; }
+.scrub.stack .scrub-view { max-width: 56rem; }
+.scrub.stack .scrub-view img { aspect-ratio: auto; object-fit: contain; }
+.scrub.stack > .row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scrub.stack.live > .row { display: none; }
+@media print { .scrub.stack.live > .row { display: grid; } }
+
+/* Loss curves are the notebook's plots, on white. */
+.row.loss img { background: #fff; border-radius: 3px; }
+.row.loss { max-width: 46rem; }
+.row.loss.two { max-width: none; }
+
+/* Digit grids in a plain row. */
+.row.grids img { image-rendering: pixelated; }
+
+/* Column labels over a 10-column grid (Fashion-MNIST). */
+.col-labels {
+  display: grid; grid-template-columns: repeat(10, minmax(0, 1fr));
+  margin: 1.25rem 0 0.3rem; max-width: 56rem;
+  font-family: var(--display); font-stretch: 75%; font-weight: 700; font-size: 0.78rem;
+  color: var(--indigo); text-align: center;
+}
+.col-labels + figure { margin: 0; max-width: 56rem; }
+.col-labels + figure img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.col-labels + figure figcaption { margin-top: 0.4rem; font-family: var(--display); font-size: 0.8rem; color: var(--ink-2); }
+@media (max-width: 640px) { .col-labels { font-size: 0.55rem; } }
+@media print { .col-labels { font-size: 6.5pt; } }
+
+/* The masthead's Part B links sit after a rule. */
+.jump a.part-b-first { padding-left: 1.5rem; border-left: 1px solid var(--rule); }
+.ladder + .prose, .ladder + .row, .row + .ladder, .prose + .ladder, .col-labels + figure + .prose { margin-top: 1.25rem; }
+.row.grids img.smooth { image-rendering: auto; background: #fff; border-radius: 3px; }
+.results tr.pickrow td:first-child::after { content: " · my pick"; font-size: 0.8em; color: var(--amber-ink); }
+.results td.bad::after { content: none; }
+.results td.bad { color: var(--amber-ink); }
+/* On the wide grids the frame label sits above the picture, not on a digit. */
+.scrub.wide .scrub-view, .scrub.stack .scrub-view { display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 0.4rem; }
+.scrub.wide .scrub-at, .scrub.stack .scrub-at { position: static; background: none; color: var(--amber-ink); padding: 0; }
+@media print { .scrub.wide .scrub-view, .scrub.stack .scrub-view { display: none; } }
+@media (max-width: 640px) {
+  .row.loss { grid-template-columns: minmax(0, 1fr); }
+  /* One swipeable line of section links, so the sticky header stays short. */
+  .jump { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; gap: 0 1.1rem; scrollbar-width: none; }
+  .jump::-webkit-scrollbar { display: none; }
+  .jump a { flex: none; padding: 0.5rem 0; }
+  .jump a.part-b-first { padding-left: 1.1rem; }
+}
