@@ -530,3 +530,7 @@
     page-break-after: avoid;
   }
 }
+
+.part-head + .prose + .sub {
+  margin-top: 1.5rem;
+}
