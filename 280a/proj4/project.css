@@ -502,3 +502,31 @@
     max-width: 34rem;
   }
 }
+
+/* Small source thumbnails above each mosaic. */
+.row.sources {
+  max-width: 22rem;
+  gap: 0.3rem;
+}
+
+.row.sources figcaption {
+  margin-top: 0.15rem;
+}
+
+.row.sources + .split,
+.row.sources + .wide {
+  margin-top: 1rem;
+}
+
+@media print {
+  .row.sources {
+    max-width: 14rem;
+  }
+}
+
+@media print {
+  .row.sources {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+}
