@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project 4 · Stitching photo mosaics · Yusuf Afifi</title>
+  <meta name="description" content="CS 280A Project 4A: homographies from clicked correspondences by least squares, inverse warping with nearest-neighbour and bilinear sampling, rectification, three blended mosaics, and a levelled cylindrical panorama.">
+  <meta name="theme-color" content="#1d1a4f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pathway+Extreme:opsz,wdth,wght@8..144,25..151,400..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css?v=5002a705">
+  <link rel="stylesheet" href="project.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-left">
+      <a class="who" href="../">
+        <strong>Yusuf Afifi</strong>
+        <span>CS 280A · Fall 2026</span>
+      </a>
+      <a class="home" href="../"><b aria-hidden="true">←</b> All projects</a>
+    </div>
+    <nav class="jump" aria-label="Sections">
+      <a href="#shoot"><b>A.1</b> Shoot</a>
+      <a href="#homography"><b>A.2</b> Homography</a>
+      <a href="#rectify"><b>A.3</b> Warp</a>
+      <a href="#mosaics"><b>A.4</b> Mosaics</a>
+      <a href="#cylinder"><b>B&amp;W</b> Cylinder</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="spec">Project 4A · my own iPhone photos and videos · NumPy</p>
+          <h1>Stitching photo mosaics</h1>
+          <p class="lede">
+            When the camera only turns, every pair of views is related by one 3×3 homography. I solve for it from points I clicked, warp each photo through it, and blend the warped photos into one picture. Hraunfossar, 142° wide, goes onto a cylinder.
+          </p>
+        </div>
+        <p class="print-only print-note">This is a print of afifi-yusuf.github.io/280a/proj4. On the web page the two before/after comparators in part A.4 are draggable; here they are static.</p>
+        <figure class="hero-photo">
+          <img src="images/curved/hraun-level.jpg" decoding="async" alt="Hraunfossar in Iceland: a 142 degree cylindrical panorama of waterfalls pouring out of a lava field into a blue river" width="2400" height="1512">
+        </figure>
+        <div class="barrel barrel-hero" role="img" aria-label="Horizontal field of view of the three mosaics: 70, 89 and 142 degrees">
+          <ol class="ticks">
+            <li style="--p:0">0</li>
+            <li style="--p:0.467">70</li>
+            <li style="--p:0.593">89</li>
+            <li style="--p:0.947">142</li>
+          </ol>
+          <span class="index"></span>
+          <span class="unit">degrees across each mosaic</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="shoot">
+      <header class="part-head">
+        <p class="param" aria-label="three to four frames per mosaic"><span>3</span><i aria-hidden="true">→</i><span>4</span><small>frames</small></p>
+        <h2>Part A.1 · Shoot the pictures</h2>
+      </header>
+      <div class="prose">
+        <p>Each set was shot by turning in place, so the centre of projection stays put. The frames are stills from my own iPhone videos, taken 1.5–2 s apart so that neighbours overlap by about half. The painting and the rug in part A.3 are single photos.</p>
+      </div>
+      <div class="row" style="--n:6">
+        <figure><img src="images/points/dallas-2.jpg" decoding="async" alt="Dallas frame 2: the scoreboard cube and the right side of the stadium" width="506" height="900"><figcaption><b>Dallas 2</b></figcaption></figure>
+        <figure><img src="images/points/dallas-3.jpg" decoding="async" alt="Dallas frame 3: the pitch and the scoreboard cube" width="506" height="900"><figcaption><b>Dallas 3</b>Reference</figcaption></figure>
+        <figure><img src="images/points/dallas-4.jpg" decoding="async" alt="Dallas frame 4: the near goal and the left stands" width="506" height="900"><figcaption><b>Dallas 4</b></figcaption></figure>
+        <figure><img src="images/points/hetch-2.jpg" decoding="async" alt="Hetch Hetchy frame 2: the ridge above the reservoir and the granite trail" width="506" height="900"><figcaption><b>Hetch Hetchy 2</b></figcaption></figure>
+        <figure><img src="images/points/hetch-3.jpg" decoding="async" alt="Hetch Hetchy frame 3: the reservoir with a hiker on the granite" width="506" height="900"><figcaption><b>Hetch Hetchy 3</b>Reference</figcaption></figure>
+        <figure><img src="images/points/hetch-4.jpg" decoding="async" alt="Hetch Hetchy frame 4: the far end of the reservoir" width="506" height="900"><figcaption><b>Hetch Hetchy 4</b></figcaption></figure>
+      </div>
+      <div class="row" style="--n:4">
+        <figure><img src="images/points/hraun-2.jpg" loading="lazy" decoding="async" alt="Hraunfossar frame 2: the largest cascade" width="675" height="900"><figcaption><b>Hraunfossar 2</b></figcaption></figure>
+        <figure><img src="images/points/hraun-3.jpg" loading="lazy" decoding="async" alt="Hraunfossar frame 3: the falls pouring out of the lava" width="675" height="900"><figcaption><b>Hraunfossar 3</b>Reference</figcaption></figure>
+        <figure><img src="images/points/hraun-4.jpg" loading="lazy" decoding="async" alt="Hraunfossar frame 4: the falls and the river" width="675" height="900"><figcaption><b>Hraunfossar 4</b></figcaption></figure>
+        <figure><img src="images/points/hraun-5.jpg" loading="lazy" decoding="async" alt="Hraunfossar frame 5: the river bending away" width="675" height="900"><figcaption><b>Hraunfossar 5</b></figcaption></figure>
+      </div>
+      <p class="note">AT&amp;T Stadium in Dallas at a World Cup 2026 match; Hetch Hetchy Reservoir in Yosemite; Hraunfossar in Iceland.</p>
+    </section>
+
+    <section class="part" id="homography">
+      <header class="part-head">
+        <p class="param" aria-label="from 6 to 10 points per pair"><span>6</span><i aria-hidden="true">→</i><span>10</span><small>points</small></p>
+        <h2>Part A.2 · Recover the homographies</h2>
+      </header>
+      <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="The two equations from one correspondence">
+          <p class="formula-line"><var>w</var>[<var>x′</var> <var>y′</var> 1]ᵀ = <var>H</var>[<var>x</var> <var>y</var> 1]ᵀ</p>
+          <p>With <var>h</var><sub>33</sub> = 1, multiplying out the divide gives two linear equations per point:</p>
+          <p class="formula-line"><var>x</var><var>h</var><sub>11</sub> + <var>y</var><var>h</var><sub>12</sub> + <var>h</var><sub>13</sub> − <var>x</var><var>x′</var><var>h</var><sub>31</sub> − <var>y</var><var>x′</var><var>h</var><sub>32</sub> = <var>x′</var></p>
+          <p class="formula-line"><var>x</var><var>h</var><sub>21</sub> + <var>y</var><var>h</var><sub>22</sub> + <var>h</var><sub>23</sub> − <var>x</var><var>y′</var><var>h</var><sub>31</sub> − <var>y</var><var>y′</var><var>h</var><sub>32</sub> = <var>y′</var></p>
+        </aside>
+        <div class="prose">
+          <p><b>Least squares.</b> <var>H</var> has 8 unknowns, so 4 points determine it exactly and leave nothing to absorb a misplaced click. I clicked 6–10 points per pair in a small browser tool and solve the 2<var>n</var>×8 system <var>A</var><var>h</var> = <var>b</var> with <code>np.linalg.lstsq</code>. Before solving, both point sets are moved to their centroid and scaled to a mean distance of √2 (Hartley normalization). Otherwise the columns of <var>A</var> range from 1 to 10⁶. Here the normalized and raw solves map the clicks to within 0.1 px of each other.</p>
+<pre class="code">def computeH(im1_pts, im2_pts, normalize=True):
+    p = np.asarray(im1_pts, np.float64)
+    q = np.asarray(im2_pts, np.float64)
+    T1 = _normalizer(p) if normalize else np.eye(3)
+    T2 = _normalizer(q) if normalize else np.eye(3)
+    A, b = homography_system(apply_h(T1, p), apply_h(T2, q))
+    h = np.linalg.lstsq(A, b, rcond=None)[0]
+    H = np.linalg.inv(T2) @ np.append(h, 1).reshape(3, 3) @ T1
+    return H / H[2, 2]</pre>
+          <p><b>Where I clicked.</b> I chose sharp, static points spread across each overlap: truss joints, the corners of the scoreboard cube, pitch markings, rock outcrops and shoreline corners. I avoided water, clouds, people and screen content, because they change between frames.</p>
+        </div>
+      </div>
+      <figure class="wide medium">
+        <img src="images/points/dallas-2-3.jpg" loading="lazy" decoding="async" alt="Dallas frames 2 and 3 side by side with nine numbered correspondences: two on the roof, two on the scoreboard cube's frame, five on the pitch markings" width="1140" height="1000">
+        <figcaption><b>Dallas 2 → 3</b>Nine points, from the roof trusses down to the penalty box</figcaption>
+      </figure>
+      <div class="prose">
+        <p><b>The system for Dallas 2 → 3</b>, in pixels. Each point gives the two rows in the box above, and the right-hand side is the clicked position in frame 3.</p>
+<pre class="code matrix">          A  (18 × 8)                                                     h        b
+[  428.6 1403.3    1.0    0.0    0.0    0.0     -365553    -1196875 ]   h11    [  852.9]
+[    0.0    0.0    0.0  428.6 1403.3    1.0     -618127    -2023839 ]   h12    [ 1442.2]
+[  122.7 1234.3    1.0    0.0    0.0    0.0      -67927     -683308 ]   h13    [  553.6]
+[    0.0    0.0    0.0  122.7 1234.3    1.0     -153682    -1545961 ]   h21    [ 1252.5]
+[  326.6 1124.9    1.0    0.0    0.0    0.0     -242076     -833776 ]   h22    [  741.2]
+[    0.0    0.0    0.0  326.6 1124.9    1.0     -375982    -1294985 ]   h23    [ 1151.2]
+[  174.8  679.8    1.0    0.0    0.0    0.0     -104670     -407064 ]   h31    [  598.8]
+[    0.0    0.0    0.0  174.8  679.8    1.0     -125000     -486125 ]   h32    [  715.1]
+[  163.5  397.3    1.0    0.0    0.0    0.0      -96890     -235440 ]          [  592.6]
+[    0.0    0.0    0.0  163.5  397.3    1.0      -72430     -176004 ]          [  443.0]
+[   70.8 1392.9    1.0    0.0    0.0    0.0      -35457     -697564 ]          [  500.8]
+[    0.0    0.0    0.0   70.8 1392.9    1.0      -99205    -1951732 ]          [ 1401.2]
+[   26.1 1489.6    1.0    0.0    0.0    0.0      -11988     -684173 ]          [  459.3]
+[    0.0    0.0    0.0   26.1 1489.6    1.0      -38957    -2223377 ]          [ 1492.6]
+[  566.5  190.6    1.0    0.0    0.0    0.0     -566500     -190600 ]          [ 1000.0]
+[    0.0    0.0    0.0  566.5  190.6    1.0     -112224      -37758 ]          [  198.1]
+[  157.3  192.7    1.0    0.0    0.0    0.0      -92131     -112864 ]          [  585.7]
+[    0.0    0.0    0.0  157.3  192.7    1.0      -38271      -46884 ]          [  243.3]
+
+H =  [  0.831796   -0.006530   442.042084 ]
+     [ -0.137733    0.938586    79.418809 ]
+     [ -0.000151   -0.000005     1.000000 ]</pre>
+        <p>The 442 px in <var>h</var><sub>13</sub> is mostly the shift between the frames. <var>h</var><sub>31</sub> = −0.00015 is the perspective term: the divisor 1 − 0.00015<var>x</var> shrinks toward the right of frame 2, so that side, which turns furthest away from frame 3's view, is stretched the most.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Pair</th><th>Points</th><th>RMS error</th><th>Largest</th><th>Left out, median</th></tr></thead>
+          <tbody>
+          <tr><td>Dallas 2 → 3</td><td class="num">9</td><td class="num">3.1 px</td><td class="num">6.9 px</td><td class="num">4.7 px</td></tr>
+          <tr><td>Dallas 3 → 4</td><td class="num">10</td><td class="num">2.0 px</td><td class="num">5.0 px</td><td class="num">2.1 px</td></tr>
+          <tr><td>Hetch Hetchy 2 → 3</td><td class="num">7</td><td class="num">1.1 px</td><td class="num">1.4 px</td><td class="num">2.5 px</td></tr>
+          <tr><td>Hetch Hetchy 3 → 4</td><td class="num">7</td><td class="num">1.3 px</td><td class="num">2.4 px</td><td class="num">3.6 px</td></tr>
+          <tr><td>Hraunfossar 2 → 3</td><td class="num">6</td><td class="num">0.5 px</td><td class="num">0.8 px</td><td class="num">1.5 px</td></tr>
+          <tr><td>Hraunfossar 3 → 4</td><td class="num">8</td><td class="num">1.3 px</td><td class="num">1.9 px</td><td class="num">2.7 px</td></tr>
+          <tr><td>Hraunfossar 4 → 5</td><td class="num">7</td><td class="num">1.3 px</td><td class="num">2.1 px</td><td class="num">2.5 px</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Errors are measured in the second frame (1080×1920 for Dallas and Hetch Hetchy, 1440×1920 for Hraunfossar). "Left out" fits <var>H</var> without each point in turn and measures how far off that point lands, which is a check on the clicks that the fit itself can't give.</p>
+      <div class="row" style="--n:3">
+        <figure><img src="images/points/dallas-3-4.jpg" loading="lazy" decoding="async" alt="Dallas frames 3 and 4 with ten numbered correspondences" width="1140" height="1000"><figcaption><b>Dallas 3 → 4</b>10 points</figcaption></figure>
+        <figure><img src="images/points/hetch-2-3.jpg" loading="lazy" decoding="async" alt="Hetch Hetchy frames 2 and 3 with seven numbered correspondences" width="1140" height="1000"><figcaption><b>Hetch Hetchy 2 → 3</b>7 points</figcaption></figure>
+        <figure><img src="images/points/hetch-3-4.jpg" loading="lazy" decoding="async" alt="Hetch Hetchy frames 3 and 4 with seven numbered correspondences" width="1140" height="1000"><figcaption><b>Hetch Hetchy 3 → 4</b>7 points</figcaption></figure>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/points/hraun-2-3.jpg" loading="lazy" decoding="async" alt="Hraunfossar frames 2 and 3 with six numbered correspondences" width="1516" height="1000"><figcaption><b>Hraunfossar 2 → 3</b>6 points</figcaption></figure>
+        <figure><img src="images/points/hraun-3-4.jpg" loading="lazy" decoding="async" alt="Hraunfossar frames 3 and 4 with eight numbered correspondences" width="1516" height="1000"><figcaption><b>Hraunfossar 3 → 4</b>8 points</figcaption></figure>
+        <figure><img src="images/points/hraun-4-5.jpg" loading="lazy" decoding="async" alt="Hraunfossar frames 4 and 5 with seven numbered correspondences" width="1516" height="1000"><figcaption><b>Hraunfossar 4 → 5</b>7 points</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="part" id="rectify">
+      <header class="part-head">
+        <p class="param" aria-label="from 4 to 6 points"><span>4</span><i aria-hidden="true">→</i><span>6</span><small>points</small></p>
+        <h2>Part A.3 · Warp the images and rectify</h2>
+      </header>
+      <div class="prose">
+        <p><b>Inverse warping.</b> For every pixel of the output I apply <var>H</var><sup>−1</sup> to find where it comes from in the source, and sample the source there. Sampling this way leaves no holes, which forward-splatting source pixels would. The output box is the warped image's four corners, rounded out to whole pixels. The alpha mask is true wherever the source point lands inside the photo.</p>
+<pre class="code">def sample_nearest(im, xs, ys):
+    c, r = np.floor(xs + 0.5).astype(int), np.floor(ys + 0.5).astype(int)
+    ...                                        # the closest pixel centre
+
+def sample_bilinear(im, xs, ys):
+    x0, y0 = np.floor(xs).astype(int), np.floor(ys).astype(int)
+    fx, fy = xs - x0, ys - y0
+    top = (1 - fx) * im[y0, x0] + fx * im[y0, x0 + 1]
+    bot = (1 - fx) * im[y0 + 1, x0] + fx * im[y0 + 1, x0 + 1]
+    return (1 - fy) * top + fy * bot           # the four closest, by distance</pre>
+        <p>Both samplers match OpenCV's <code>warpPerspective</code>, which I use only as a check, on all but 0.01% of interior pixels. Pixel (0, 0) is the centre of the top-left pixel, so a pixel covers ±0.5 around its integer coordinates.</p>
+        <p><b>Rectification.</b> This uses the same <code>computeH</code>, but only one side of each correspondence is clicked. The other side is where that point would be in a straight-on view: the corners of a rectangle with the object's measured proportions. Because the object is flat, one <var>H</var> maps it correctly however the camera was placed. Anything off the plane, like the wall and the depth of the frame, comes out sheared.</p>
+      </div>
+      <h3 class="sub">A painting, 15.5 × 13 in, shot from the side</h3>
+      <div class="row" style="--n:3">
+        <figure><img src="images/rect/painting-photo.jpg" loading="lazy" decoding="async" alt="The photo: a framed painting of a Ferrari driver seen from far to the left, with its four outer corners marked" width="1050" height="1400"><figcaption><b>Photo</b>Outer corners of the frame</figcaption></figure>
+        <figure><img src="images/rect/painting-bilinear.jpg" loading="lazy" decoding="async" alt="The painting rectified: a face-on view of the driver raising his fist" width="1200" height="1006"><figcaption><b>Rectified</b>1200 × 1006 px, bilinear</figcaption></figure>
+        <figure><img src="images/rect/painting-context.jpg" loading="lazy" decoding="async" alt="The painting rectified with the surrounding wall kept, which shears away to the right" width="1600" height="1342"><figcaption><b>With the wall</b>The frame's depth shears off the plane</figcaption></figure>
+      </div>
+      <p class="note">Exactly 4 points, so <var>H</var> is solved exactly and every corner lands where it was sent.</p>
+      <h3 class="sub">A rug, 29.5 × 43 in, on the floor</h3>
+      <div class="row" style="--n:3">
+        <figure><img src="images/rect/rug-photo.jpg" loading="lazy" decoding="async" alt="The photo: a Persian rug on a wood floor seen at a low angle, with six points marked" width="1050" height="1400"><figcaption><b>Photo</b>Four corners and both side midpoints</figcaption></figure>
+        <figure><img src="images/rect/rug-bilinear.jpg" loading="lazy" decoding="async" alt="The rug rectified: the medallion pattern seen from directly above" width="1000" height="1458"><figcaption><b>Rectified</b>1000 × 1458 px, bilinear</figcaption></figure>
+        <figure><img src="images/rect/rug-context.jpg" loading="lazy" decoding="async" alt="The rug rectified with the floor kept: the floorboards come out parallel" width="1098" height="1600"><figcaption><b>With the floor</b>The floorboards come out parallel</figcaption></figure>
+      </div>
+      <p class="note">Six points, so this one is least squares: the clicks land 0.12–0.73 in from where they were sent on a 43 in rug. The floor is the same plane as the rug, so it rectifies too.</p>
+      <h3 class="sub">Nearest neighbour against bilinear</h3>
+      <div class="row" style="--n:2">
+        <figure><img src="images/rect/painting-zoom-nearest.jpg" loading="lazy" decoding="async" alt="The signature warped with nearest neighbour: blocky, stair-stepped strokes" width="1020" height="450"><figcaption><b>Nearest</b>Each source pixel becomes a slanted block</figcaption></figure>
+        <figure><img src="images/rect/painting-zoom-bilinear.jpg" loading="lazy" decoding="async" alt="The signature warped with bilinear: smooth strokes" width="1020" height="450"><figcaption><b>Bilinear</b>Smooth strokes</figcaption></figure>
+        <figure><img src="images/rect/rug-zoom-nearest.jpg" loading="lazy" decoding="async" alt="The rug border warped with nearest neighbour: jagged outlines" width="960" height="480"><figcaption><b>Nearest</b></figcaption></figure>
+        <figure><img src="images/rect/rug-zoom-bilinear.jpg" loading="lazy" decoding="async" alt="The rug border warped with bilinear: smooth outlines" width="960" height="480"><figcaption><b>Bilinear</b></figcaption></figure>
+      </div>
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Rectification</th><th>Output</th><th>Nearest</th><th>Bilinear</th></tr></thead>
+          <tbody>
+          <tr><td>Painting</td><td class="num">1200 × 1006</td><td class="num">0.032 s</td><td class="num">0.102 s</td></tr>
+          <tr><td>Rug</td><td class="num">1000 × 1458</td><td class="num">0.044 s</td><td class="num">0.125 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="prose">
+        <p><b>Speed against quality.</b> Bilinear is about 3 times slower: it reads four pixels and does three interpolations where nearest neighbour reads one. The difference only shows when the warp enlarges the photo. The close-ups above are the same regions rectified 6 times larger, straight from the photo. Nearest neighbour turns each source pixel into a slanted block with stair-stepped edges, and bilinear blends between them. At the sizes above, where the warp mostly shrinks, the two are hard to tell apart. Everything else on this page uses bilinear, since a mosaic takes 1–4 s either way.</p>
+      </div>
+    </section>
+
+    <section class="part" id="mosaics">
+      <header class="part-head">
+        <p class="param" aria-label="three blends"><span>1</span><i aria-hidden="true">→</i><span>3</span><small>blends</small></p>
+        <h2>Part A.4 · Blend the images into a mosaic</h2>
+      </header>
+      <div class="prose">
+        <p><b>Procedure.</b></p>
+        <ol>
+          <li>The middle frame is the reference. Each neighbour's <var>H</var> comes from its clicks; frames further out compose the pairs (<var>H</var><sub>2→3</sub> for frame 2, <var>H</var><sub>4→3</sub> = <var>H</var><sub>3→4</sub><sup>−1</sup> for frame 4).</li>
+          <li>The canvas is the bounding box of every frame's warped corners.</li>
+          <li>Each frame is inverse-warped onto the canvas once, with bilinear sampling. A fourth channel goes along with it: each pixel's distance to the nearest edge of its own frame, which is 0 outside the frame.</li>
+          <li>The warped frames are blended, using that distance as the weight.</li>
+        </ol>
+        <p><b>Three blends.</b> <span class="tag">Overwrite</span> pastes each frame over the last, which gives hard seams wherever exposure differs. <span class="tag">Feather</span> is the weighted average, so seams fade, but anything that moved between frames shows twice. <span class="tag">Two-band</span> splits each frame at a Gaussian of σ = 8 px. The low band is feathered, which evens out exposure across the overlap. The high band at each pixel comes from the frame with the largest weight there, so detail is never averaged into a ghost. That choice is softened over 6 px, so drifting clouds don't meet in a hard edge.</p>
+      </div>
+
+      <h3 class="sub">AT&amp;T Stadium · 3 frames, 19 points</h3>
+      <div class="split">
+      <figure class="wipe full" data-wipe>
+        <div class="wipe-frame" style="--pos:50%; --ar:2193 / 2325">
+          <img class="wipe-under" src="images/mosaic/dallas-twoband.jpg" loading="lazy" decoding="async" alt="The Dallas mosaic, two-band blend" width="2193" height="2325">
+          <img class="wipe-over" src="images/mosaic/dallas-overwrite.jpg" loading="lazy" decoding="async" alt="The Dallas mosaic, overwrite" width="2193" height="2325">
+          <span class="wipe-tag wipe-tag-l">overwrite</span>
+          <span class="wipe-tag wipe-tag-r">two-band</span>
+          <span class="wipe-line" aria-hidden="true"></span>
+          <span class="wipe-knob" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+          </span>
+          <input type="range" min="0" max="100" value="50" aria-label="Wipe between the overwrite and two-band blends">
+        </div>
+        <img class="print-only" src="images/mosaic/dallas-twoband.jpg" alt="The Dallas mosaic, two-band blend" width="2193" height="2325">
+        <figcaption><span class="screen-cap">Drag across the roof and the fans in the front rows.</span><span class="print-cap">Two-band blend.</span> A World Cup 2026 match, frames 2–4 onto frame 3.</figcaption>
+      </figure>
+      <div class="split-side">
+      <div class="row keep" style="--n:3">
+        <figure><img src="images/mosaic/dallas-overwrite-roof.jpg" loading="lazy" decoding="async" alt="Roof close-up, overwrite: a hard vertical step in brightness" width="700" height="700"><figcaption><b>Overwrite</b>A brightness step at the seam</figcaption></figure>
+        <figure><img src="images/mosaic/dallas-feather-roof.jpg" loading="lazy" decoding="async" alt="Roof close-up, feather: smooth" width="700" height="700"><figcaption><b>Feather</b></figcaption></figure>
+        <figure><img src="images/mosaic/dallas-twoband-roof.jpg" loading="lazy" decoding="async" alt="Roof close-up, two-band: smooth, trusses continuous" width="700" height="700"><figcaption><b>Two-band</b>Trusses run straight through</figcaption></figure>
+        <figure><img src="images/mosaic/dallas-overwrite-fans.jpg" loading="lazy" decoding="async" alt="Fans close-up, overwrite" width="700" height="550"><figcaption><b>Overwrite</b></figcaption></figure>
+        <figure><img src="images/mosaic/dallas-feather-fans.jpg" loading="lazy" decoding="async" alt="Fans close-up, feather: the caps and the M. Salah shirt appear twice, see-through" width="700" height="550"><figcaption><b>Feather</b>Fans who moved appear twice</figcaption></figure>
+        <figure><img src="images/mosaic/dallas-twoband-fans.jpg" loading="lazy" decoding="async" alt="Fans close-up, two-band: each fan once" width="700" height="550"><figcaption><b>Two-band</b>Each fan once</figcaption></figure>
+      </div>
+      <p class="note">To line up the roof I had to click it. With all my points below it, the roof came out about 20 px off, because the fit was extrapolating up there. Two points on the trusses fixed it.</p>
+      </div>
+      </div>
+
+      <h3 class="sub">Hetch Hetchy · 3 frames, 14 points</h3>
+      <div class="split">
+      <figure class="wipe full" data-wipe>
+        <div class="wipe-frame" style="--pos:50%; --ar:2377 / 2400">
+          <img class="wipe-under" src="images/mosaic/hetch-deghost.jpg" loading="lazy" decoding="async" alt="The Hetch Hetchy mosaic, two-band blend with the moving hiker removed" width="2377" height="2400">
+          <img class="wipe-over" src="images/mosaic/hetch-feather.jpg" loading="lazy" decoding="async" alt="The Hetch Hetchy mosaic, feather blend: the hiker appears twice" width="2377" height="2400">
+          <span class="wipe-tag wipe-tag-l">feather</span>
+          <span class="wipe-tag wipe-tag-r">two-band + one hiker</span>
+          <span class="wipe-line" aria-hidden="true"></span>
+          <span class="wipe-knob" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+          </span>
+          <input type="range" min="0" max="100" value="50" aria-label="Wipe between the feather blend and the two-band blend with one hiker">
+        </div>
+        <img class="print-only" src="images/mosaic/hetch-deghost.jpg" alt="The Hetch Hetchy mosaic, two-band blend with the moving hiker removed" width="2377" height="2400">
+        <figcaption><span class="screen-cap">Drag across the hiker.</span><span class="print-cap">Two-band blend, one hiker.</span> The reservoir from the trail, frames 2–4 onto frame 3.</figcaption>
+      </figure>
+      <div class="split-side">
+      <div class="row keep" style="--n:2">
+        <figure><img src="images/mosaic/hetch-feather-hiker.jpg" loading="lazy" decoding="async" alt="Hiker close-up, feather: two see-through copies" width="500" height="500"><figcaption><b>Feather</b>Two see-through hikers</figcaption></figure>
+        <figure><img src="images/mosaic/hetch-twoband-hiker.jpg" loading="lazy" decoding="async" alt="Hiker close-up, two-band: one solid hiker and one cut in half" width="500" height="500"><figcaption><b>Two-band</b>One whole, one cut at the seam</figcaption></figure>
+        <figure><img src="images/mosaic/hetch-deghost-hiker.jpg" loading="lazy" decoding="async" alt="Hiker close-up, two-band after deghosting: one hiker" width="500" height="500"><figcaption><b>Two-band, deghosted</b>One hiker, as frame 3 saw him</figcaption></figure>
+        <figure><img src="images/mosaic/hetch-mask.jpg" loading="lazy" decoding="async" alt="The canvas in gray with the deghosted regions in amber: the hiker and patches of the near ground" width="1188" height="1200"><figcaption><b>Where frame 3 wins</b>Amber: the two frames disagree</figcaption></figure>
+      </div>
+      <div class="prose">
+        <p><b>One hiker.</b> The hiker walked between frames, so each overlap holds him once over background in the other frame, and no weighting can pick one copy. I compare each frame with the reference after a 2 px blur. Wherever they differ by more than 0.12, I fade the non-reference frame's weight to zero over 12 px. That leaves the hiker as frame 3 saw him. The same test catches the near granite, which is 5–30 px off between frames: it is a few metres away, and a hand-held phone does not turn exactly about its lens. The ridge and shoreline, where I clicked, agree to within 1 px and are left alone.</p>
+      </div>
+      </div>
+      </div>
+
+      <h3 class="sub">Hraunfossar · 3 of 4 frames, flat</h3>
+      <figure class="wide medium">
+        <img src="images/mosaic/hraun-twoband.jpg" loading="lazy" decoding="async" alt="Hraunfossar as a flat mosaic of three frames: the outer frames stretched into wedges" width="2400" height="2018">
+        <figcaption><b>Two-band</b>Frames 2–4 onto frame 3. The outer frames already stretch into wedges.</figcaption>
+      </figure>
+      <div class="prose">
+        <p>On a plane, frame 4, turned 31° from the reference, comes out 2395 px wide, against 1439 px for the reference itself. Frame 5 can't be placed at all: its outer corner is 89° from the reference camera's axis, which on the plane is out at infinity. The next section puts all four frames on a cylinder instead.</p>
+      </div>
+    </section>
+
+    <section class="part" id="cylinder">
+      <header class="part-head">
+        <p class="param" aria-label="six degrees of tilt removed"><span>6.2°</span><i aria-hidden="true">→</i><span>0°</span><small>tilt</small></p>
+        <h2>Part A.5 · Cylindrical projection <small>Bells &amp; whistles · 280A</small></h2>
+      </header>
+      <div class="part-body part-body-wide">
+        <aside class="formula" aria-label="The cylinder map">
+          <p class="formula-line"><var>θ</var> = <var>u</var> / <var>f</var></p>
+          <p class="formula-line"><var>x</var> = <var>f</var> tan <var>θ</var>,  <var>y</var> = <var>v</var> / cos <var>θ</var></p>
+          <p>A canvas pixel (<var>u</var>, <var>v</var>) on the unrolled cylinder is a ray at angle <var>θ</var> from the reference view. It hits the reference image plane at (<var>x</var>, <var>y</var>), and <var>H</var><sub><var>i</var></sub><sup>−1</sup> takes that point into frame <var>i</var>.</p>
+        </aside>
+        <div class="prose">
+          <p><b>Sampled once, from the originals.</b> Each canvas pixel follows the map on the right, through <var>H</var><sub><var>i</var></sub><sup>−1</sup>, into each original frame, and is sampled there with the same bilinear sampler and blended with the same two-band blend. Nothing is resampled twice, so the cylinder is as sharp as the flat mosaic.</p>
+          <p><b>Focal length from the homographies.</b> If the camera only rotates, <var>H</var><sub><var>i</var></sub> = <var>K</var><var>R</var><sub><var>i</var></sub><var>K</var><sup>−1</sup> with <var>K</var> the camera matrix. I search for the <var>f</var> that makes <var>K</var><sup>−1</sup><var>H</var><sub><var>i</var></sub><var>K</var> closest to a rotation for the three other frames at once. That gives <var>f</var> = 1225 px, or 22.1 mm in 35 mm terms; the iPhone 15 Pro's main camera is rated at 24 mm. With it, the frames span 81.6° of panning and 142° of view.</p>
+          <p><b>Levelling.</b> I held the phone at a slight angle while panning, so the axis I turned about leans 6.2° from the reference camera's vertical. A cylinder around that vertical bends the horizon into an arc, so I recover each frame's rotation from <var>H</var><sub><var>i</var></sub> = <var>K</var><var>R</var><sub><var>i</var></sub><var>K</var><sup>−1</sup>, take the pan axis from the first frame to the last, and rotate the reference view so the axis points straight up. That is <var>H</var><sub><var>i</var></sub> ← <var>K</var><var>Q</var><var>K</var><sup>−1</sup><var>H</var><sub><var>i</var></sub>, where <var>Q</var> is the smallest rotation that does it. A synthetic check with 8° of tilt recovers 8.00°.</p>
+        </div>
+      </div>
+      <figure class="wide">
+        <img src="images/curved/hraun-cyl.jpg" loading="lazy" decoding="async" alt="Hraunfossar on a cylinder before levelling: the horizon sags into an arc" width="2400" height="1612">
+        <figcaption><b>Cylinder</b>Around the reference camera's vertical: the horizon bows</figcaption>
+      </figure>
+      <figure class="wide">
+        <img src="images/curved/hraun-level.jpg" loading="lazy" decoding="async" alt="Hraunfossar on a levelled cylinder: a straight horizon over 142 degrees" width="2400" height="1512">
+        <figcaption><b>Levelled cylinder</b>Around the pan axis: a straight horizon across 142°, all four frames</figcaption>
+      </figure>
+      <p class="note">On land the seams agree to within about 1 px, and to within 5 px near the horizon at the 3 → 4 seam. The clouds drifted during the 1.5 s between frames, and the 6 px soft seam in the high band hides that.</p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Yusuf Afifi · CS 280A Project 4 · Fall 2026</p>
+    <p class="colophon-url">afifi-yusuf.github.io/280a/proj4</p>
+  </footer>
+
+  <script src="../shared/site.js?v=177a1a56"></script>
+</body>
+</html>
