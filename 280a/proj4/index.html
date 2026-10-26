@@ -26,7 +26,7 @@
       <a href="#homography"><b>A.2</b> Homography</a>
       <a href="#rectify"><b>A.3</b> Warp</a>
       <a href="#mosaics"><b>A.4</b> Mosaics</a>
-      <a href="#cylinder"><b>B&amp;W</b> Cylinder</a>
+      <a href="#cylinder"><b>A.5</b> Cylinder</a>
     </nav>
   </header>
 
@@ -34,7 +34,7 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
-          <p class="spec">Project 4A · my own photos · NumPy</p>
+          <p class="spec">Project 4A · my own videos and photos · NumPy</p>
           <h1>Stitching photo mosaics</h1>
           <p class="lede">
             Overlapping frames from my videos of a World Cup match, a lake in Yosemite and a waterfall in Iceland. I click matching points, solve for the homography between each pair, warp the frames and blend them into one picture. The widest one, 142°, goes on a cylinder.
@@ -59,7 +59,7 @@
 
     <section class="part" id="shoot">
       <header class="part-head">
-        <p class="param" aria-label="three to four frames per mosaic"><span>3</span><i aria-hidden="true">→</i><span>4</span><small>frames</small></p>
+        <p class="param" aria-label="three to four frames per mosaic"><span>3</span><i aria-hidden="true">→</i><span>4</span><small>frames per set</small></p>
         <h2>Part A.1 · Shoot the pictures</h2>
       </header>
       <div class="prose">
@@ -91,7 +91,7 @@
 
     <section class="part" id="homography">
       <header class="part-head">
-        <p class="param" aria-label="from 6 to 10 points per pair"><span>6</span><i aria-hidden="true">→</i><span>10</span><small>points</small></p>
+        <p class="param" aria-label="from 6 to 10 points per pair"><span>6</span><i aria-hidden="true">→</i><span>10</span><small>points per pair</small></p>
         <h2>Part A.2 · Recover the homographies</h2>
       </header>
       <div class="part-body part-body-wide">
@@ -174,7 +174,7 @@ H =  [  0.831796   -0.006530   442.042084 ]
 
     <section class="part" id="rectify">
       <header class="part-head">
-        <p class="param" aria-label="from 4 to 6 points"><span>4</span><i aria-hidden="true">→</i><span>6</span><small>points</small></p>
+        <p class="param" aria-label="2 rectified objects"><span>2</span><small>rectified</small></p>
         <h2>Part A.3 · Warp the images and rectify</h2>
       </header>
       <div class="prose">
@@ -228,7 +228,7 @@ def sample_bilinear(im, xs, ys):
 
     <section class="part" id="mosaics">
       <header class="part-head">
-        <p class="param" aria-label="three blends"><span>1</span><i aria-hidden="true">→</i><span>3</span><small>blends</small></p>
+        <p class="param" aria-label="3 mosaics"><span>3</span><small>mosaics</small></p>
         <h2>Part A.4 · Blend the images into a mosaic</h2>
       </header>
       <div class="prose">
@@ -267,7 +267,7 @@ def sample_bilinear(im, xs, ys):
       </div>
       </div>
 
-      <h3 class="sub">Hetch Hetchy</h3>
+      <h3 class="sub">Hetch Hetchy Reservoir</h3>
       <div class="row keep sources" style="--n:3" aria-label="Source images"><figure><img src="images/points/hetch-2.jpg" loading="lazy" decoding="async" alt="Source frame 2" width="506" height="900"><figcaption><b>2</b></figcaption></figure><figure><img src="images/points/hetch-3.jpg" loading="lazy" decoding="async" alt="Source frame 3" width="506" height="900"><figcaption><b>3</b></figcaption></figure><figure><img src="images/points/hetch-4.jpg" loading="lazy" decoding="async" alt="Source frame 4" width="506" height="900"><figcaption><b>4</b></figcaption></figure></div>
       <div class="split">
       <figure class="wipe full" data-wipe>
@@ -298,7 +298,7 @@ def sample_bilinear(im, xs, ys):
       </div>
       </div>
 
-      <h3 class="sub">Hraunfossar, flat</h3>
+      <h3 class="sub">Hraunfossar on a flat plane</h3>
       <div class="row keep sources" style="--n:3" aria-label="Source images"><figure><img src="images/points/hraun-2.jpg" loading="lazy" decoding="async" alt="Source frame 2" width="675" height="900"><figcaption><b>2</b></figcaption></figure><figure><img src="images/points/hraun-3.jpg" loading="lazy" decoding="async" alt="Source frame 3" width="675" height="900"><figcaption><b>3</b></figcaption></figure><figure><img src="images/points/hraun-4.jpg" loading="lazy" decoding="async" alt="Source frame 4" width="675" height="900"><figcaption><b>4</b></figcaption></figure></div>
       <figure class="wide medium">
         <img src="images/mosaic/hraun-twoband.jpg" loading="lazy" decoding="async" alt="Hraunfossar as a flat mosaic of three frames: the outer frames stretched into wedges" width="2400" height="2018">
@@ -311,7 +311,7 @@ def sample_bilinear(im, xs, ys):
 
     <section class="part" id="cylinder">
       <header class="part-head">
-        <p class="param" aria-label="six degrees of tilt removed"><span>6°</span><i aria-hidden="true">→</i><span>0°</span><small>tilt</small></p>
+        <p class="param" aria-label="six degrees of tilt removed"><span>6°</span><i aria-hidden="true">→</i><span>0°</span><small>horizon tilt</small></p>
         <h2>Part A.5 · Cylindrical projection <small>Bells &amp; whistles · 280A</small></h2>
       </header>
       <div class="part-body part-body-wide">
