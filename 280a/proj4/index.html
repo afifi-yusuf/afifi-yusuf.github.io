@@ -193,19 +193,21 @@ def sample_bilinear(im, xs, ys):
         <p><b>Rectification.</b> I click the corners of something flat and send them to a rectangle with its real proportions, which I measured.</p>
       </div>
       <h3 class="sub">The painting on my wall · 15.5 × 13 in</h3>
-      <div class="row" style="--n:3">
+      <div class="row" style="--n:4">
         <figure><img src="images/rect/painting-photo.jpg" loading="lazy" decoding="async" alt="The photo: a framed painting of a Ferrari driver seen from far to the left, with its four outer corners marked" width="1050" height="1400"><figcaption><b>Photo</b>4 corners</figcaption></figure>
-        <figure><img src="images/rect/painting-bilinear.jpg" loading="lazy" decoding="async" alt="The painting rectified: a face-on view of the driver raising his fist" width="1200" height="1006"><figcaption><b>Rectified</b>1200 × 1006 px, bilinear</figcaption></figure>
+        <figure><img src="images/rect/painting-nearest.jpg" loading="lazy" decoding="async" alt="The painting rectified with nearest neighbour" width="1200" height="1006"><figcaption><b>Nearest neighbour</b>1200 × 1006 px</figcaption></figure>
+        <figure><img src="images/rect/painting-bilinear.jpg" loading="lazy" decoding="async" alt="The painting rectified with bilinear: a face-on view of the driver raising his fist" width="1200" height="1006"><figcaption><b>Bilinear</b>1200 × 1006 px</figcaption></figure>
         <figure><img src="images/rect/painting-context.jpg" loading="lazy" decoding="async" alt="The painting rectified with the surrounding wall kept, which shears away to the right" width="1600" height="1342"><figcaption><b>With the wall</b></figcaption></figure>
       </div>
       <h3 class="sub">The rug by my door · 29.5 × 43 in</h3>
-      <div class="row" style="--n:3">
+      <div class="row" style="--n:4">
         <figure><img src="images/rect/rug-photo.jpg" loading="lazy" decoding="async" alt="The photo: a Persian rug on a wood floor seen at a low angle, with six points marked" width="1050" height="1400"><figcaption><b>Photo</b>4 corners and 2 side midpoints</figcaption></figure>
-        <figure><img src="images/rect/rug-bilinear.jpg" loading="lazy" decoding="async" alt="The rug rectified: the medallion pattern seen from directly above" width="1000" height="1458"><figcaption><b>Rectified</b>1000 × 1458 px, bilinear</figcaption></figure>
+        <figure><img src="images/rect/rug-nearest.jpg" loading="lazy" decoding="async" alt="The rug rectified with nearest neighbour" width="1000" height="1458"><figcaption><b>Nearest neighbour</b>1000 × 1458 px</figcaption></figure>
+        <figure><img src="images/rect/rug-bilinear.jpg" loading="lazy" decoding="async" alt="The rug rectified with bilinear: the medallion pattern seen from directly above" width="1000" height="1458"><figcaption><b>Bilinear</b>1000 × 1458 px</figcaption></figure>
         <figure><img src="images/rect/rug-context.jpg" loading="lazy" decoding="async" alt="The rug rectified with the floor kept: the floorboards come out parallel" width="1098" height="1600"><figcaption><b>With the floor</b>The floorboards come out parallel</figcaption></figure>
       </div>
       <p class="note">With 6 points this one is least squares; every point lands within 0.73 in of its spot.</p>
-      <h3 class="sub">Nearest neighbour against bilinear</h3>
+      <h3 class="sub">Nearest neighbour against bilinear, up close</h3>
       <div class="row" style="--n:2">
         <figure><img src="images/rect/painting-zoom-nearest.jpg" loading="lazy" decoding="async" alt="The signature warped with nearest neighbour: blocky, stair-stepped strokes" width="1020" height="450"><figcaption><b>Nearest</b></figcaption></figure>
         <figure><img src="images/rect/painting-zoom-bilinear.jpg" loading="lazy" decoding="async" alt="The signature warped with bilinear: smooth strokes" width="1020" height="450"><figcaption><b>Bilinear</b></figcaption></figure>
@@ -222,7 +224,7 @@ def sample_bilinear(im, xs, ys):
         </table>
       </div>
       <div class="prose">
-        <p>The close-ups are the signature and the rug border rectified 6× larger. Nearest neighbour gives blocky, jagged edges; bilinear is smooth. Bilinear is about 3× slower since it reads four pixels instead of one, but it's still a fraction of a second, so I use it everywhere else.</p>
+        <p>At full size the two look almost the same, because the warp mostly shrinks the photo. The close-ups are the signature and the rug border rectified 6× larger, where the difference shows: nearest neighbour gives blocky, jagged edges; bilinear is smooth. Bilinear is about 3× slower since it reads four pixels instead of one, but it's still a fraction of a second, so I use it everywhere else.</p>
       </div>
     </section>
 

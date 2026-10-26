@@ -534,3 +534,9 @@
 .part-head + .prose + .sub {
   margin-top: 1.5rem;
 }
+
+@media print {
+  .table-wrap {
+    break-inside: avoid;
+  }
+}
