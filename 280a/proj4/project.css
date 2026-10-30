@@ -540,3 +540,128 @@
     break-inside: avoid;
   }
 }
+
+/* B.2: the frame with its windows, beside a grid of window / patch / matched patch. */
+.desc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-items: start;
+  margin: 1.5rem 0 0;
+}
+
+.desc-where {
+  margin: 0;
+}
+
+.desc-where img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.desc-where figcaption {
+  margin-top: 0.4rem;
+  font-family: var(--display);
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+
+.desc-where figcaption b {
+  display: block;
+  font-stretch: 70%;
+  font-weight: 750;
+  font-size: 0.98rem;
+  color: var(--indigo);
+}
+
+.desc-grid {
+  display: grid;
+  grid-template-columns: 1.4rem repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.desc-grid [role="columnheader"] {
+  font-family: var(--display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  line-height: 1.2;
+}
+
+.desc-grid b {
+  font-family: var(--display);
+  font-stretch: 70%;
+  font-weight: 800;
+  color: var(--amber-ink);
+  text-align: center;
+}
+
+.desc-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+@media (max-width: 640px) {
+  .desc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media print {
+  .desc {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+    break-inside: avoid;
+  }
+  .desc-grid [role="columnheader"] {
+    font-size: 6.5pt;
+  }
+}
+
+/* B.5: the pair chart beside its explanation. */
+.split > .wide {
+  margin: 0;
+}
+
+.note + .prose {
+  margin-top: 1.5rem;
+}
+
+/* Portrait figures (the match drawings): narrower, so they don't fill the screen. */
+.wide.narrow {
+  max-width: 28rem;
+}
+
+@media print {
+  .wide.narrow {
+    max-width: 17rem;
+  }
+}
+
+/* B.3: the match drawing beside the ratio chart. */
+.split-match {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+}
+
+.split-match > .wide {
+  margin: 0;
+}
+
+@media print {
+  .split-match {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+}
+
+@media print {
+  /* the two stadium panoramas are tall: two to a page */
+  #recognition .wide.tall {
+    max-width: 30rem;
+  }
+}

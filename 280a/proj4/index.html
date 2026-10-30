@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project 4 · Stitching photo mosaics · Yusuf Afifi</title>
-  <meta name="description" content="CS 280A Project 4A: homographies from clicked correspondences by least squares, inverse warping with nearest-neighbour and bilinear sampling, rectification, three blended mosaics, and a levelled cylindrical panorama.">
+  <meta name="description" content="CS 280A Project 4: homographies from clicked points, inverse warping, rectification, blended mosaics and a levelled cylinder; then automatic stitching with Harris corners, ANMS, MOPS descriptors, ratio-test matching and RANSAC, and panorama recognition from a shuffled pile of frames.">
   <meta name="theme-color" content="#1d1a4f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,11 @@
       <a href="#rectify"><b>A.3</b> Warp</a>
       <a href="#mosaics"><b>A.4</b> Mosaics</a>
       <a href="#cylinder"><b>A.5</b> Cylinder</a>
+      <a href="#corners"><b>B.1</b> Corners</a>
+      <a href="#descriptors"><b>B.2</b> Descriptors</a>
+      <a href="#matching"><b>B.3</b> Matching</a>
+      <a href="#ransac"><b>B.4</b> RANSAC</a>
+      <a href="#recognition"><b>B.5</b> Recognition</a>
     </nav>
   </header>
 
@@ -34,10 +39,10 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
-          <p class="spec">Project 4A · my own videos and photos · NumPy</p>
+          <p class="spec">Project 4 · my own videos and photos · NumPy</p>
           <h1>Stitching photo mosaics</h1>
           <p class="lede">
-            Overlapping frames from my videos of a World Cup match, a lake in Yosemite and a waterfall in Iceland. I click matching points, solve for the homography between each pair, warp the frames and blend them into one picture. The widest one, 142°, goes on a cylinder.
+            Overlapping frames from my videos of a World Cup match, a lake in Yosemite and a waterfall in Iceland. I click matching points, solve for the homography between each pair, warp the frames and blend them into one picture. The widest one, 142°, goes on a cylinder. In Part B the computer finds the points itself.
           </p>
         </div>
         <p class="print-only print-note">Printed from afifi-yusuf.github.io/280a/proj4, where the two comparators in A.4 can be dragged.</p>
@@ -336,6 +341,200 @@ def sample_bilinear(im, xs, ys):
       <figure class="wide">
         <img src="images/curved/hraun-level.jpg" loading="lazy" decoding="async" alt="Hraunfossar on a levelled cylinder: a straight horizon over 142 degrees" width="2400" height="1512">
         <figcaption><b>Straightened</b>All four frames, 142° across</figcaption>
+      </figure>
+    </section>
+
+    <section class="part" id="corners">
+      <header class="part-head">
+        <p class="param" aria-label="from 18,363 corners to 500"><span>18,363</span><i aria-hidden="true">→</i><span>500</span><small>corners</small></p>
+        <h2>Part B.1 · Find corners</h2>
+      </header>
+      <div class="prose">
+        <p>Part B finds the points automatically. I follow the MOPS paper at a single scale, without rotation.</p>
+        <p>I run the course's <code>harris.py</code> on a 1024 px copy of each frame. On Hraunfossar frame 3 it finds 18,363 corners.</p>
+        <p>The 500 strongest bunch up on the waterfalls and the lava edge, so I use ANMS instead. Each corner gets the distance to the nearest corner that is clearly stronger (<var>f</var><sub><var>i</var></sub> &lt; 0.9 <var>f</var><sub><var>j</var></sub>), and I keep the 500 with the largest distance. They spread over the whole frame.</p>
+<pre class="code">def anms(xy, f, n=500, c=0.9):
+    order = np.argsort(-f)                       # strongest first
+    xy, f = xy[order], f[order]
+    r = np.full(len(f), np.inf)
+    for s in range(0, len(f), 1024):             # only stronger corners suppress
+        e = min(s + 1024, len(f))
+        d = ((xy[s:e, None] - xy[None, :e]) ** 2).sum(-1)
+        d[f[s:e, None] >= c * f[None, :e]] = np.inf
+        r[s:e] = np.sqrt(d.min(1))
+    return order[np.argsort(-r)[:n]]</pre>
+      </div>
+      <div class="row" style="--n:3">
+        <figure><img src="images/auto/corners-all.jpg" loading="lazy" decoding="async" alt="Every Harris corner on the Hraunfossar frame: dots cover the whole picture" width="750" height="1000"><figcaption><b>All Harris corners</b>18,363</figcaption></figure>
+        <figure><img src="images/auto/corners-strong.jpg" loading="lazy" decoding="async" alt="The 500 strongest corners: bunched along the waterfalls and the lava edge, none in the sky" width="750" height="1000"><figcaption><b>500 strongest</b>None in the top third</figcaption></figure>
+        <figure><img src="images/auto/corners-anms.jpg" loading="lazy" decoding="async" alt="The 500 corners kept by ANMS: spread evenly over sky, lava, falls and river" width="750" height="1000"><figcaption><b>500 after ANMS</b>30% in the top third</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="part" id="descriptors">
+      <header class="part-head">
+        <p class="param" aria-label="40 pixel windows sampled down to 8 by 8"><span>40</span><i aria-hidden="true">→</i><span>8</span><small>pixels across</small></p>
+        <h2>Part B.2 · Describe each corner</h2>
+      </header>
+      <div class="prose">
+        <p>For each corner I blur the 40×40 window around it and sample it every 5 px into an 8×8 patch. Then I subtract the mean and divide by the standard deviation, so brightness and contrast don't matter.</p>
+<pre class="code">blur = gaussian_filter(gray, 2.5)
+off = (np.arange(8) - 3.5) * 5                 # 8 samples, 5 px apart, across 40 px
+ox, oy = np.meshgrid(off, off)
+d = sample_bilinear(blur, x + ox, y + oy)[0].reshape(-1)
+d = (d - d.mean()) / d.std()</pre>
+        <p>Six of the 500 corners in frame 3, next to the patch each one matched in frame 4:</p>
+      </div>
+      <div class="desc">
+        <figure class="desc-where"><img src="images/auto/desc-where.jpg" loading="lazy" decoding="async" alt="The Hraunfossar frame with six numbered 40 by 40 pixel boxes: three on clouds, two on the lava and rocks above the falls, one on white water" width="750" height="1000"><figcaption><b>Frame 3</b>Each box is one 40 × 40 window</figcaption></figure>
+        <div class="desc-grid" role="table" aria-label="Six windows, their descriptors, and the descriptors of their matches">
+          <span role="columnheader"></span><span role="columnheader">Window</span><span role="columnheader">Patch, frame 3</span><span role="columnheader">Its match, frame 4</span>
+          <b>1</b><img src="images/auto/desc-1-window.png" loading="lazy" decoding="async" alt="Window 1: lava and moss" width="240" height="240"><img src="images/auto/desc-1-patch.png" loading="lazy" decoding="async" alt="Patch 1" width="240" height="240"><img src="images/auto/desc-1-match.png" loading="lazy" decoding="async" alt="Patch 1 in frame 4" width="240" height="240">
+          <b>2</b><img src="images/auto/desc-2-window.png" loading="lazy" decoding="async" alt="Window 2: cloud" width="240" height="240"><img src="images/auto/desc-2-patch.png" loading="lazy" decoding="async" alt="Patch 2" width="240" height="240"><img src="images/auto/desc-2-match.png" loading="lazy" decoding="async" alt="Patch 2 in frame 4" width="240" height="240">
+          <b>3</b><img src="images/auto/desc-3-window.png" loading="lazy" decoding="async" alt="Window 3: a rock at the edge of the falls" width="240" height="240"><img src="images/auto/desc-3-patch.png" loading="lazy" decoding="async" alt="Patch 3" width="240" height="240"><img src="images/auto/desc-3-match.png" loading="lazy" decoding="async" alt="Patch 3 in frame 4" width="240" height="240">
+          <b>4</b><img src="images/auto/desc-4-window.png" loading="lazy" decoding="async" alt="Window 4: the edge of a cloud bank over the horizon" width="240" height="240"><img src="images/auto/desc-4-patch.png" loading="lazy" decoding="async" alt="Patch 4" width="240" height="240"><img src="images/auto/desc-4-match.png" loading="lazy" decoding="async" alt="Patch 4 in frame 4" width="240" height="240">
+          <b>5</b><img src="images/auto/desc-5-window.png" loading="lazy" decoding="async" alt="Window 5: white water in the river" width="240" height="240"><img src="images/auto/desc-5-patch.png" loading="lazy" decoding="async" alt="Patch 5" width="240" height="240"><img src="images/auto/desc-5-match.png" loading="lazy" decoding="async" alt="Patch 5 in frame 4" width="240" height="240">
+          <b>6</b><img src="images/auto/desc-6-window.png" loading="lazy" decoding="async" alt="Window 6: small clouds" width="240" height="240"><img src="images/auto/desc-6-patch.png" loading="lazy" decoding="async" alt="Patch 6" width="240" height="240"><img src="images/auto/desc-6-match.png" loading="lazy" decoding="async" alt="Patch 6 in frame 4" width="240" height="240">
+        </div>
+      </div>
+      <p class="note">Patches go from −3 (black) to +3 (white) standard deviations.</p>
+    </section>
+
+    <section class="part" id="matching">
+      <header class="part-head">
+        <p class="param" aria-label="ratio threshold 0.5"><span>0.5</span><small>ratio threshold</small></p>
+        <h2>Part B.3 · Match the patches</h2>
+      </header>
+      <div class="prose">
+        <p>For each patch I find the closest and second-closest patch in the other frame. A real match is much closer than the runner-up, so I keep it only if the ratio of their squared distances is under 0.5. That's the cutoff the paper's figure 6b suggests.</p>
+        <p>I made the same plot for my frames, using the final <var>H</var> to tell right matches from wrong ones. At 0.5 it keeps 85% of the right ones and 2% of the wrong ones.</p>
+      </div>
+      <div class="row" style="grid-template-columns: 673fr 846fr">
+        <figure><img src="images/auto/matches.jpg" loading="lazy" decoding="async" alt="The overlap of Dallas frames 3 and 2 side by side, with 40 matches drawn as coloured lines across the roof, the scoreboard, the stands, the pitch and the fans" width="673" height="1000"><figcaption><b>Dallas 2 → 3</b>113 matches; 40 shown</figcaption></figure>
+        <figure><img src="images/auto/matches-hraun.jpg" loading="lazy" decoding="async" alt="The overlap of Hraunfossar frames 3 and 4 side by side, with 40 matches drawn as coloured lines across the clouds, the lava, the falls and the river; one line in the sky crosses the others" width="846" height="1000"><figcaption><b>Hraunfossar 3 → 4</b>110 matches; 40 shown. The line crossing the sky is a wrong match.</figcaption></figure>
+      </div>
+      <figure class="wide medium">
+        <img src="images/auto/ratio.png" loading="lazy" decoding="async" alt="Chart: the ratio for correct matches peaks near 0.1 and falls off; for incorrect matches it stays near zero until 0.5 and climbs steeply towards 1" width="1280" height="640">
+        <figcaption><b>Figure 6b on my frames</b>3,500 corners from the seven Part A pairs</figcaption>
+      </figure>
+    </section>
+
+    <section class="part" id="ransac">
+      <header class="part-head">
+        <p class="param" aria-label="4 matches per RANSAC sample"><span>4</span><small>matches per guess</small></p>
+        <h2>Part B.4 · RANSAC and automatic mosaics</h2>
+      </header>
+      <div class="prose">
+        <p>Some wrong matches still get through, like fans who moved. RANSAC picks 4 matches at random, fits <var>H</var> to them, and counts how many matches land within 10 px of their partner. I keep the largest set and refit <var>H</var> to it with <code>computeH</code>.</p>
+<pre class="code">def ransac(p, q, eps=10.0, iters=2000):
+    best = np.zeros(len(p), bool)
+    for _ in range(iters):
+        k = rng.choice(len(p), 4, replace=False)
+        H = computeH(p[k], q[k])
+        inl = reprojection_error(H, p, q) &lt; eps
+        if inl.sum() &gt; best.sum():
+            best = inl
+    return computeH(p[best], q[best]), best</pre>
+      </div>
+      <div class="split split-match">
+      <figure class="wide">
+        <img src="images/auto/ransac.jpg" loading="lazy" decoding="async" alt="The same overlap with all 113 matches: 108 faint amber inlier lines, all parallel, and 5 red rejected lines, one crossing diagonally and four on the fans" width="680" height="1000">
+        <figcaption><b>Dallas 2 → 3</b>108 inliers in amber, 5 rejected in red</figcaption>
+      </figure>
+      <div class="prose">
+        <p>My clicks were bunched in the middle of each overlap, so my <var>H</var> is less accurate away from them: up to 20 px off on the RANSAC inliers. The automatic <var>H</var> is only 2–6 px off on my clicks.</p>
+      </div>
+      </div>
+      <div class="table-wrap">
+        <table class="results">
+          <thead><tr><th>Pair</th><th>Matches</th><th>Inliers</th><th>My H, my clicks</th><th>Auto H, my clicks</th><th>My H, inliers</th><th>Auto H, inliers</th></tr></thead>
+          <tbody>
+          <tr><td>Dallas 2 → 3</td><td class="num">113</td><td class="num">108</td><td class="num">3.1 px</td><td class="num">4.0 px</td><td class="num">4.8 px</td><td class="num">3.6 px</td></tr>
+          <tr><td>Dallas 3 → 4</td><td class="num">98</td><td class="num">87</td><td class="num">2.0 px</td><td class="num">3.7 px</td><td class="num">4.3 px</td><td class="num">3.5 px</td></tr>
+          <tr><td>Hetch Hetchy 2 → 3</td><td class="num">155</td><td class="num">149</td><td class="num">1.1 px</td><td class="num">5.1 px</td><td class="num">16.7 px</td><td class="num">3.3 px</td></tr>
+          <tr><td>Hetch Hetchy 3 → 4</td><td class="num">106</td><td class="num">93</td><td class="num">1.3 px</td><td class="num">5.6 px</td><td class="num">17.8 px</td><td class="num">3.8 px</td></tr>
+          <tr><td>Hraunfossar 2 → 3</td><td class="num">110</td><td class="num">100</td><td class="num">0.5 px</td><td class="num">1.8 px</td><td class="num">6.5 px</td><td class="num">3.4 px</td></tr>
+          <tr><td>Hraunfossar 3 → 4</td><td class="num">110</td><td class="num">104</td><td class="num">1.3 px</td><td class="num">3.9 px</td><td class="num">19.5 px</td><td class="num">3.5 px</td></tr>
+          <tr><td>Hraunfossar 4 → 5</td><td class="num">108</td><td class="num">102</td><td class="num">1.3 px</td><td class="num">3.5 px</td><td class="num">11.5 px</td><td class="num">3.3 px</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">RMS error in pixels.</p>
+
+      <div class="prose">
+        <p>The Part A mosaics again, from the automatic <var>H</var>. The close-ups use a plain feather blend, so any misalignment shows up as doubling.</p>
+      </div>
+      <h3 class="sub">Egypt at the World Cup</h3>
+      <div class="row" style="--n:2">
+        <figure><img src="images/auto/dallas-manual.jpg" loading="lazy" decoding="async" alt="The Dallas mosaic from clicked points" width="1886" height="2000"><figcaption><b>Clicked</b>9 and 10 points</figcaption></figure>
+        <figure><img src="images/auto/dallas-auto.jpg" loading="lazy" decoding="async" alt="The Dallas mosaic from RANSAC: the same picture" width="1880" height="2000"><figcaption><b>Automatic</b>108 and 87 inliers</figcaption></figure>
+      </div>
+      <p class="note">Almost identical.</p>
+
+      <h3 class="sub">Hetch Hetchy Reservoir</h3>
+      <div class="row" style="--n:2">
+        <figure><img src="images/auto/hetch-manual.jpg" loading="lazy" decoding="async" alt="The Hetch Hetchy mosaic from clicked points" width="1981" height="2000"><figcaption><b>Clicked</b>7 and 7 points</figcaption></figure>
+        <figure><img src="images/auto/hetch-auto.jpg" loading="lazy" decoding="async" alt="The Hetch Hetchy mosaic from RANSAC" width="2000" height="1964"><figcaption><b>Automatic</b>149 and 93 inliers</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/auto/hetch-manual-rock.jpg" loading="lazy" decoding="async" alt="Close-up of rocks in dry grass from the clicked mosaic: every rock is doubled and blurred" width="420" height="420"><figcaption><b>Clicked</b>Doubled</figcaption></figure>
+        <figure><img src="images/auto/hetch-auto-rock.jpg" loading="lazy" decoding="async" alt="The same rocks from the automatic mosaic: sharp" width="420" height="420"><figcaption><b>Automatic</b>Sharp</figcaption></figure>
+        <figure><img src="images/auto/hetch-manual-path.jpg" loading="lazy" decoding="async" alt="Close-up of the stone steps on the trail from the clicked mosaic: the step edges are doubled" width="420" height="420"><figcaption><b>Clicked</b></figcaption></figure>
+        <figure><img src="images/auto/hetch-auto-path.jpg" loading="lazy" decoding="async" alt="The same steps from the automatic mosaic: single, sharp edges" width="420" height="420"><figcaption><b>Automatic</b></figcaption></figure>
+      </div>
+      <p class="note">My clicks stopped at the shoreline, so the ground in front came out about 20 px off.</p>
+
+      <h3 class="sub">Hraunfossar on a flat plane</h3>
+      <div class="row" style="--n:2">
+        <figure><img src="images/auto/hraun-manual.jpg" loading="lazy" decoding="async" alt="The flat Hraunfossar mosaic from clicked points: the left frame is stretched into a tall wedge and the horizon slopes" width="2000" height="1681"><figcaption><b>Clicked</b>6 and 8 points</figcaption></figure>
+        <figure><img src="images/auto/hraun-auto.jpg" loading="lazy" decoding="async" alt="The flat Hraunfossar mosaic from RANSAC: less stretched, horizon nearly level" width="2000" height="1579"><figcaption><b>Automatic</b>100 and 104 inliers</figcaption></figure>
+      </div>
+      <div class="row keep" style="--n:4">
+        <figure><img src="images/auto/hraun-manual-falls.jpg" loading="lazy" decoding="async" alt="Close-up of the falls from the clicked mosaic: the waterfalls and rocks are blurred and doubled" width="420" height="420"><figcaption><b>Clicked</b>Doubled falls</figcaption></figure>
+        <figure><img src="images/auto/hraun-auto-falls.jpg" loading="lazy" decoding="async" alt="The same falls from the automatic mosaic: sharp" width="420" height="420"><figcaption><b>Automatic</b>Sharp</figcaption></figure>
+        <figure><img src="images/auto/hraun-manual-lava.jpg" loading="lazy" decoding="async" alt="Close-up of the lava and brush above the falls from the clicked mosaic: blurred" width="420" height="420"><figcaption><b>Clicked</b></figcaption></figure>
+        <figure><img src="images/auto/hraun-auto-lava.jpg" loading="lazy" decoding="async" alt="The same lava and brush from the automatic mosaic: sharp" width="420" height="420"><figcaption><b>Automatic</b></figcaption></figure>
+      </div>
+      <p class="note">My clicks were all between the horizon and the falls, so the clicked version stretches the left frame much more.</p>
+    </section>
+
+    <section class="part" id="recognition">
+      <header class="part-head">
+        <p class="param" aria-label="25 shuffled frames sorted into 4 panoramas"><span>25</span><i aria-hidden="true">→</i><span>4</span><small>panoramas</small></p>
+        <h2>Part B.5 · Panorama recognition <small>Bells &amp; whistles · 280A</small></h2>
+      </header>
+      <div class="prose">
+        <p>I shuffled every frame I had into one pile: the three Part A videos, a fourth from Egypt vs Argentina in Atlanta, and the painting and rug from A.3. Atlanta looks a lot like Dallas, so it's a good test.</p>
+        <p>The program matches all 300 pairs. A pair counts if RANSAC keeps more than 8 + 0.3<var>n</var> of its <var>n</var> matches (from Brown and Lowe). Frames linked by passing pairs form a panorama, and each one goes on a cylinder like in A.5.</p>
+      </div>
+      <figure class="wide">
+        <img src="images/auto/pile.jpg" loading="lazy" decoding="async" alt="25 numbered thumbnails in shuffled order: frames of two stadiums, a lake, a waterfall, plus a painting and a rug" width="1422" height="624">
+        <figcaption><b>The pile</b>25 frames, shuffled</figcaption>
+      </figure>
+      <div class="split">
+        <figure class="wide" style="margin:0">
+          <img src="images/auto/graph.png" loading="lazy" decoding="async" alt="A 25 by 25 grid of frame pairs. Only 25 cells are filled, in four blocks along the diagonal, one per panorama; the painting and the rug rows are empty" width="1120" height="1000">
+          <figcaption><b>Pairs that pass</b>Frames grouped by panorama, numbered as in the pile</figcaption>
+        </figure>
+        <div class="prose">
+          <p>25 pairs pass, all within the same video. Atlanta and Dallas never match, and the painting and rug match nothing. The closest pair from two different places had 6 inliers; it needed 23.</p>
+        </div>
+      </div>
+      <figure class="wide">
+        <img src="images/auto/pano-1.jpg" loading="lazy" decoding="async" alt="Hetch Hetchy from seven frames on a cylinder: the reservoir between two ridges, a hiker on the granite, a pine on the right" width="2400" height="1360">
+        <figcaption><b>Hetch Hetchy</b>Pile frames 7, 25, 6, 16, 15, 5, 18</figcaption>
+      </figure>
+      <figure class="wide">
+        <img src="images/auto/pano-2.jpg" loading="lazy" decoding="async" alt="Hraunfossar from six frames on a cylinder: the falls along the whole bend of the river" width="2400" height="1228">
+        <figcaption><b>Hraunfossar</b>Pile frames 21, 23, 9, 3, 10, 1</figcaption>
+      </figure>
+      <figure class="wide tall">
+        <img src="images/auto/pano-3.jpg" loading="lazy" decoding="async" alt="The Atlanta stadium from five frames: the round roof, the ring-shaped screen, the pitch and the crowd" width="2400" height="1678">
+        <figcaption><b>Atlanta</b>Pile frames 2, 4, 22, 13, 8. Never clicked by hand.</figcaption>
+      </figure>
+      <figure class="wide tall">
+        <img src="images/auto/pano-4.jpg" loading="lazy" decoding="async" alt="The Dallas stadium from five frames: the roof, the scoreboard cube, the pitch and the Egypt fans" width="2400" height="1706">
+        <figcaption><b>Dallas</b>Pile frames 24, 11, 12, 17, 19</figcaption>
       </figure>
     </section>
   </main>
